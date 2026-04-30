@@ -1,0 +1,32 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: booknest
+      POSTGRES_PASSWORD: booknest123
+      POSTGRES_DB: booknest
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    ports:
+      - "4000:4000"
+    environment:
+      DATABASE_URL: postgresql://booknest:booknest123@postgres:5432/booknest
+      JWT_SECRET: booknest-dev-secret-change-in-production
+      PORT: 4000
+    depends_on:
+      - postgres
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "4001:4001"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:

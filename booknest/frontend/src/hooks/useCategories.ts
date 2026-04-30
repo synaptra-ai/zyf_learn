@@ -26,6 +26,19 @@ export function useCreateCategory() {
   })
 }
 
+export function useUpdateCategory() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, ...data }: { id: string; name?: string; color?: string }) => {
+      const { data: updated } = await apiClient.put(`/categories/${id}`, data)
+      return updated
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: categoryKeys.list() })
+    },
+  })
+}
+
 export function useDeleteCategory() {
   const queryClient = useQueryClient()
   return useMutation({
