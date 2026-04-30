@@ -4,8 +4,12 @@ import { ArrowLeft, Pencil, Trash2, BookOpen, Hash, FileText, Calendar } from 'l
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Modal } from '@/components/ui/Modal'
-import { useBookStore } from '@/stores/useBookStore'
-import { useCategoryStore } from '@/stores/useCategoryStore'
+import { useBook, useDeleteBook } from '@/hooks/useBooks'
+import { useReviews } from '@/hooks/useReviews'
+import { ReviewForm } from '@/components/book/ReviewForm'
+import { BookListSkeleton } from '@/components/ui/Skeleton'
+import { ErrorState } from '@/components/ui/ErrorState'
+import { Star } from 'lucide-react'
 
 const statusVariant = { OWNED: 'owned', READING: 'reading', FINISHED: 'finished', WISHLIST: 'wishlist' } as const
 const statusText = { OWNED: '已拥有', READING: '在读', FINISHED: '已读完', WISHLIST: '想读' } as const
@@ -13,27 +17,19 @@ const statusText = { OWNED: '已拥有', READING: '在读', FINISHED: '已读完
 export default function BookDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const book = useBookStore((s) => s.books.find((b) => b.id === id))
-  const deleteBook = useBookStore((s) => s.deleteBook)
-  const category = useCategoryStore((s) =>
-    book ? s.categories.find((c) => c.id === book.categoryId) : undefined
-  )
+  const { data: book, isLoading, isError, error, refetch } = useBook(id!)
+  const { data: reviews = [] } = useReviews(id!)
+  const deleteBook = useDeleteBook()
   const [showDelete, setShowDelete] = useState(false)
 
-  if (!book) {
-    return (
-      <div className="py-16 text-center text-gray-500 dark:text-gray-400">
-        <p>书籍不存在</p>
-        <Button className="mt-4" onClick={() => navigate('/')}>
-          返回列表
-        </Button>
-      </div>
-    )
+  if (isLoading) return <BookListSkeleton count={1} />
+
+  if (isError || !book) {
+    return <ErrorState message={error?.message || '书籍不存在'} onRetry={() => refetch()} />
   }
 
   const handleDelete = () => {
-    deleteBook(book.id)
-    navigate('/')
+    deleteBook.mutate(book.id, { onSuccess: () => navigate('/') })
   }
 
   return (
@@ -61,7 +57,6 @@ export default function BookDetail() {
       {/* 书籍信息卡片 */}
       <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
         <div className="flex gap-6">
-          {/* 封面 */}
           <div className="flex h-40 w-28 shrink-0 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700">
             {book.coverUrl ? (
               <img src={book.coverUrl} alt={book.title} className="h-full w-full rounded-lg object-cover" />
@@ -69,51 +64,42 @@ export default function BookDetail() {
               <BookOpen className="h-12 w-12 text-gray-400 dark:text-gray-500" />
             )}
           </div>
-
-          {/* 信息 */}
           <div className="flex-1 space-y-4">
             <div>
               <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">{book.title}</h2>
               <p className="text-gray-500 dark:text-gray-400">{book.author}</p>
             </div>
-
             <div className="flex flex-wrap items-center gap-3">
               <Badge variant={statusVariant[book.status]}>
                 {statusText[book.status]}
               </Badge>
-              {category && (
+              {book.category && (
                 <span
                   className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
-                  style={{ backgroundColor: category.color + '20', color: category.color }}
+                  style={{ backgroundColor: book.category.color + '20', color: book.category.color }}
                 >
-                  {category.name}
+                  {book.category.name}
                 </span>
               )}
             </div>
-
             {book.isbn && (
               <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                <Hash className="h-4 w-4" />
-                ISBN: {book.isbn}
+                <Hash className="h-4 w-4" /> ISBN: {book.isbn}
               </div>
             )}
-
             {book.pageCount && (
               <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                <FileText className="h-4 w-4" />
-                {book.pageCount} 页
+                <FileText className="h-4 w-4" /> {book.pageCount} 页
               </div>
             )}
           </div>
         </div>
-
         {book.description && (
           <div className="mt-6 border-t border-gray-100 pt-4 dark:border-gray-700">
             <h3 className="mb-2 font-medium text-gray-700 dark:text-gray-300">简介</h3>
             <p className="whitespace-pre-wrap text-sm text-gray-600 dark:text-gray-300">{book.description}</p>
           </div>
         )}
-
         <div className="mt-4 flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500">
           <Calendar className="h-3.5 w-3.5" />
           添加于 {new Date(book.createdAt).toLocaleString()}
@@ -121,6 +107,35 @@ export default function BookDetail() {
             <> · 更新于 {new Date(book.updatedAt).toLocaleString()}</>
           )}
         </div>
+      </div>
+
+      {/* 评论区域 */}
+      <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
+        <h3 className="mb-4 text-lg font-bold">评论 ({reviews.length})</h3>
+        <ReviewForm bookId={book.id} />
+        {reviews.length > 0 ? (
+          <div className="mt-4 space-y-4">
+            {reviews.map((review) => (
+              <div key={review.id} className="border-b border-gray-100 pb-4 last:border-0 dark:border-gray-700">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{review.user.name}</span>
+                  <span className="flex">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`h-3.5 w-3.5 ${i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300 dark:text-gray-600'}`}
+                      />
+                    ))}
+                  </span>
+                  <span className="text-xs text-gray-400">{new Date(review.createdAt).toLocaleDateString()}</span>
+                </div>
+                {review.text && <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">{review.text}</p>}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="mt-2 text-sm text-gray-400">暂无评论，来写第一条吧</p>
+        )}
       </div>
 
       {/* 删除确认弹窗 */}
