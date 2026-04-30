@@ -22,13 +22,15 @@ npm run lint      # ESLint
 
 Testing uses Vitest — run with `npx vitest` or `npx vitest run path/to/test.tsx`.
 
-### Backend (`booknest/backend/`, planned for Day 2)
+### Backend (`booknest/backend/`)
 
 ```bash
 npm run dev           # Start dev server on port 4000
-npx prisma migrate dev   # Run DB migrations
-npm run prisma:seed      # Seed test data
-npm test             # Jest + Supertest
+npm run build         # TypeScript compile
+npm test              # Jest + Supertest
+npm run prisma:seed   # Seed test data
+npx prisma migrate dev  # Run DB migrations
+npx prisma studio       # Open DB visual editor
 ```
 
 ### Docker
@@ -69,14 +71,42 @@ User 1→N Book, User 1→N Category, User 1→N Review
 Book 1→N Review, Category 1→N Book
 ```
 
+## 后端 (backend/)
+
+### 技术栈
+- Express 5 + TypeScript 6
+- Prisma 7 ORM + PostgreSQL 16
+- JWT 认证
+- Jest 30 + Supertest 测试
+
+### API 基础路径
+- `/api/v1` — 业务接口
+- `/health` — 健康检查
+
+### 代码架构
+- Controller → Service → Prisma
+- 所有响应使用 ResponseUtil 统一格式 `{code, message, data}`
+- 错误使用 ApiError 类 + errorHandler 中间件
+- 路由使用 express-validator + validate 中间件
+
+### 数据库
+- PostgreSQL 16, Docker 运行, 宿主机端口 5433
+- Prisma 迁移: `cd backend && npx prisma migrate dev`
+- 种子数据: `cd backend && npm run prisma:seed`
+
+### 端口说明
+- 前端: http://localhost:4001
+- 后端: http://localhost:4000
+- PostgreSQL: localhost:5433
+
 ## Tech Stack by Day
 
 | Day | Stack |
 |-----|-------|
 | 1 | React 19 / TypeScript 6 / Vite 8 / Tailwind CSS 3 / Zustand / React Hook Form / Zod / React Router v7 / Lucide React / Vitest |
-| 2 | Express 4 / TypeScript / Prisma 5 / PostgreSQL 16 / JWT / bcrypt / express-validator / Jest / Supertest |
+| 2 | Express 5 / TypeScript 6 / Prisma 7 / PostgreSQL 16 / JWT / bcrypt / express-validator / Jest 30 / Supertest |
 | 3 | Axios / TanStack React Query 5 / MSW 2 / Docker Compose |
 
 ## Current State
 
-Frontend scaffolded with Vite defaults. Task guides in `tasks/` are ready — work through them in order (Day 1 → Day 2 → Day 3).
+Frontend scaffolded with Vite defaults. Backend Day 2 completed (Express 5 + Prisma 7 + PostgreSQL). Task guides in `tasks/` — next: Day 3 full-stack integration.
