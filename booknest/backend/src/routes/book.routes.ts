@@ -26,6 +26,7 @@ const listRules = [
 ]
 
 router.get('/', authenticate, listRules, validate, bookController.list)
+router.post('/batch', authenticate, bookController.batchCreate)
 router.get('/:id', authenticate, bookController.getById)
 router.post('/', authenticate, createRules, validate, bookController.create)
 router.put('/:id', authenticate, updateRules, validate, bookController.update)
