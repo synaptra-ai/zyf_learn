@@ -107,6 +107,38 @@ Book 1→N Review, Category 1→N Book
 | 2 | Express 5 / TypeScript 6 / Prisma 7 / PostgreSQL 16 / JWT / bcrypt / express-validator / Jest 30 / Supertest |
 | 3 | Axios / TanStack React Query 5 / MSW 2 / Docker Compose |
 
+## Day 3: API 集成
+
+### 数据流
+UI → React Query Hooks → Axios Client → Express API → PostgreSQL
+
+### 关键文件 (frontend/src/)
+- lib/api-client.ts — Axios 实例 + 拦截器 (token 注入、响应解包)
+- lib/query-client.ts — QueryClient 配置 (staleTime 5min, gcTime 30min)
+- hooks/query-keys.ts — 缓存键工厂 (bookKeys, categoryKeys, reviewKeys, statsKeys)
+- hooks/useBooks.ts — 书籍 React Query hooks (含乐观删除)
+- hooks/useCategories.ts — 分类 hooks (CRUD + invalidate)
+- hooks/useReviews.ts — 评论 hooks
+- hooks/useStats.ts — 统计数据 hook
+- stores/useAuthStore.ts — 认证状态 (Zustand, token 持久化 localStorage)
+- mocks/ — MSW 2 mock handlers + server
+
+### 认证
+- JWT token 存在 localStorage (auth_token)
+- Axios 请求拦截器自动注入 Bearer token
+- 401 响应自动清除 token 并跳转 /login
+- ProtectedRoute 包裹所有需要认证的页面
+
+### 测试
+- 6 个测试文件、27 个测试用例，全部通过
+- MSW mock API，不需要启动真实后端
+- 测试文件放在 src/test/ 目录
+
+### Docker Compose
+- docker-compose.yml — PostgreSQL + Backend + Frontend 一键启动
+- frontend/Dockerfile — 多阶段构建 (node → nginx 反向代理)
+- backend/Dockerfile — Prisma migrate deploy + Node 启动
+
 ## Current State
 
-Frontend scaffolded with Vite defaults. Backend Day 2 completed (Express 5 + Prisma 7 + PostgreSQL). Task guides in `tasks/` — next: Day 3 full-stack integration.
+Day 3 全栈集成已完成。前后端通过 Axios + React Query 连接，Docker Compose 一键部署。所有验收项通过。
