@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum BookStatus {
+  OWNED
+  READING
+  FINISHED
+  WISHLIST
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  name         String
+  role         UserRole @default(USER)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  books      Book[]
+  categories Category[]
+  reviews    Review[]
+
+  @@map("users")
+}
+
+model Book {
+  id            String     @id @default(uuid())
+  title         String     @db.VarChar(200)
+  author        String     @db.VarChar(100)
+  isbn          String?    @db.VarChar(13)
+  publishedDate DateTime?  @map("published_date")
+  pageCount     Int?       @map("page_count")
+  description   String?    @db.Text
+  coverUrl      String?    @map("cover_url")
+  status        BookStatus @default(WISHLIST)
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+
+  userId     String    @map("user_id")
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId String?   @map("category_id")
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  reviews    Review[]
+
+  @@map("books")
+}
+
+model Category {
+  id        String   @id @default(uuid())
+  name      String   @db.VarChar(50)
+  color     String   @db.VarChar(7)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  books  Book[]
+
+  @@unique([userId, name])
+  @@map("categories")
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  rating    Int
+  text      String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  bookId String @map("book_id")
+  book   Book   @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("reviews")
+}
