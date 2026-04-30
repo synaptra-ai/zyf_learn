@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Pencil, Trash2, Plus, X, Check } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { useCategoryStore } from '@/stores/useCategoryStore'
+import { useCategories, useCreateCategory, useUpdateCategory, useDeleteCategory } from '@/hooks/useCategories'
 
 const COLORS = [
   '#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6',
@@ -10,10 +10,10 @@ const COLORS = [
 ]
 
 export default function CategoryManager() {
-  const categories = useCategoryStore((s) => s.categories)
-  const addCategory = useCategoryStore((s) => s.addCategory)
-  const updateCategory = useCategoryStore((s) => s.updateCategory)
-  const deleteCategory = useCategoryStore((s) => s.deleteCategory)
+  const { data: categories = [], isLoading } = useCategories()
+  const createMutation = useCreateCategory()
+  const updateMutation = useUpdateCategory()
+  const deleteMutation = useDeleteCategory()
 
   const [name, setName] = useState('')
   const [color, setColor] = useState(COLORS[0])
@@ -23,9 +23,10 @@ export default function CategoryManager() {
 
   const handleAdd = () => {
     if (!name.trim()) return
-    addCategory({ name: name.trim(), color })
-    setName('')
-    setColor(COLORS[0])
+    createMutation.mutate(
+      { name: name.trim(), color },
+      { onSuccess: () => { setName(''); setColor(COLORS[0]) } },
+    )
   }
 
   const startEdit = (id: string, currentName: string, currentColor: string) => {
@@ -36,12 +37,27 @@ export default function CategoryManager() {
 
   const saveEdit = () => {
     if (!editingId || !editName.trim()) return
-    updateCategory(editingId, { name: editName.trim(), color: editColor })
-    setEditingId(null)
+    updateMutation.mutate(
+      { id: editingId, name: editName.trim(), color: editColor },
+      { onSuccess: () => setEditingId(null) },
+    )
   }
 
   const cancelEdit = () => {
     setEditingId(null)
+  }
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <h1 className="text-2xl font-bold">分类管理</h1>
+        <div className="animate-pulse space-y-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-14 rounded-lg bg-gray-200 dark:bg-gray-700" />
+          ))}
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -76,7 +92,7 @@ export default function CategoryManager() {
               ))}
             </div>
           </div>
-          <Button onClick={handleAdd} disabled={!name.trim()}>
+          <Button onClick={handleAdd} disabled={!name.trim() || createMutation.isPending}>
             <Plus className="mr-1 h-4 w-4" />
             添加
           </Button>
@@ -119,6 +135,7 @@ export default function CategoryManager() {
                   <div className="flex gap-1">
                     <button
                       onClick={saveEdit}
+                      disabled={updateMutation.isPending}
                       className="rounded p-1 text-green-600 hover:bg-green-50"
                     >
                       <Check className="h-4 w-4" />
@@ -139,6 +156,9 @@ export default function CategoryManager() {
                       style={{ backgroundColor: cat.color }}
                     />
                     <span className="font-medium text-gray-900 dark:text-gray-100">{cat.name}</span>
+                    {cat._count && (
+                      <span className="text-sm text-gray-400">{cat._count.books} 本</span>
+                    )}
                   </div>
                   <div className="flex gap-1">
                     <Button
@@ -151,7 +171,8 @@ export default function CategoryManager() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => deleteCategory(cat.id)}
+                      onClick={() => deleteMutation.mutate(cat.id)}
+                      disabled={deleteMutation.isPending}
                     >
                       <Trash2 className="h-4 w-4 text-red-500" />
                     </Button>

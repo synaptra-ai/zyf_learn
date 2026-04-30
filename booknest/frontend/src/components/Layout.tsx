@@ -1,17 +1,9 @@
-import { useRef } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
-import { BookOpen, Moon, Sun, BarChart3, FolderOpen, Plus, Download, Upload } from 'lucide-react'
+import { BookOpen, Moon, Sun, BarChart3, FolderOpen, Plus } from 'lucide-react'
 import { useThemeStore } from '@/stores/useThemeStore'
-import { useBookStore } from '@/stores/useBookStore'
-import { useCategoryStore } from '@/stores/useCategoryStore'
 
 export default function Layout() {
   const { isDark, toggleTheme } = useThemeStore()
-  const books = useBookStore((s) => s.books)
-  const categories = useCategoryStore((s) => s.categories)
-  const setBooks = useBookStore((s) => s.setBooks)
-  const setCategories = useCategoryStore((s) => s.setCategories)
-  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     `flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
@@ -19,35 +11,6 @@ export default function Layout() {
         ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400'
         : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'
     }`
-
-  const handleExport = () => {
-    const data = JSON.stringify({ books, categories }, null, 2)
-    const blob = new Blob([data], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `booknest-export-${new Date().toISOString().slice(0, 10)}.json`
-    a.click()
-    URL.revokeObjectURL(url)
-  }
-
-  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = (event) => {
-      try {
-        const data = JSON.parse(event.target?.result as string)
-        if (data.books) setBooks(data.books)
-        if (data.categories) setCategories(data.categories)
-        alert('导入成功！')
-      } catch {
-        alert('导入失败：文件格式不正确')
-      }
-    }
-    reader.readAsText(file)
-    e.target.value = ''
-  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -78,27 +41,6 @@ export default function Layout() {
             </nav>
           </div>
           <div className="flex items-center gap-1">
-            <button
-              onClick={handleExport}
-              title="导出数据"
-              className="rounded-md p-2 text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
-            >
-              <Download className="h-5 w-5" />
-            </button>
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              title="导入数据"
-              className="rounded-md p-2 text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
-            >
-              <Upload className="h-5 w-5" />
-            </button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".json"
-              className="hidden"
-              onChange={handleImport}
-            />
             <button
               onClick={toggleTheme}
               className="rounded-md p-2 text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"

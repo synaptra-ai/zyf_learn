@@ -1,13 +1,14 @@
 import { useQuery } from '@tanstack/react-query'
 import apiClient from '@/lib/api-client'
 import { statsKeys } from './query-keys'
+import type { Book, Category } from '@/types'
 
-interface StatsData {
+export interface StatsData {
   totalBooks: number
   totalCategories: number
   statusBreakdown: Record<string, number>
   averageRating: number | null
-  recentBooks: any[]
+  recentBooks: (Book & { category?: Category })[]
 }
 
 export function useStats() {
