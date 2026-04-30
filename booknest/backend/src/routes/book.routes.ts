@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { body, query } from 'express-validator'
 import { bookController } from '../controllers/book.controller'
+import { reviewController } from '../controllers/review.controller'
 import { authenticate } from '../middleware/auth'
 import { validate } from '../middleware/validate'
 
@@ -29,5 +30,14 @@ router.get('/:id', authenticate, bookController.getById)
 router.post('/', authenticate, createRules, validate, bookController.create)
 router.put('/:id', authenticate, updateRules, validate, bookController.update)
 router.delete('/:id', authenticate, bookController.delete)
+
+// Review routes
+const createReviewRules = [
+  body('rating').isInt({ min: 1, max: 5 }).withMessage('评分必须为 1-5 的整数'),
+  body('text').optional().isString().withMessage('评论内容必须为文本'),
+]
+
+router.post('/:bookId/reviews', authenticate, createReviewRules, validate, reviewController.create)
+router.get('/:bookId/reviews', authenticate, reviewController.listByBook)
 
 export default router
