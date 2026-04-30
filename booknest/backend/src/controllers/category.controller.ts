@@ -23,7 +23,7 @@ export const categoryController = {
 
   async update(req: Request, res: Response, next: NextFunction) {
     try {
-      const category = await categoryService.update(req.user!.id, req.params.id, req.body)
+      const category = await categoryService.update(req.user!.id, req.params.id as string, req.body)
       ResponseUtil.success(res, category, '更新成功')
     } catch (err) {
       next(err)
@@ -32,7 +32,7 @@ export const categoryController = {
 
   async delete(req: Request, res: Response, next: NextFunction) {
     try {
-      await categoryService.delete(req.user!.id, req.params.id)
+      await categoryService.delete(req.user!.id, req.params.id as string)
       ResponseUtil.success(res, null, '删除成功')
     } catch (err) {
       next(err)
