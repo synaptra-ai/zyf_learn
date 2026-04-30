@@ -73,7 +73,7 @@ Book 1→N Review, Category 1→N Book
 
 | Day | Stack |
 |-----|-------|
-| 1 | React 19 / TypeScript 6 / Vite 8 / Tailwind CSS 3 / Zustand / React Hook Form / Zod / React Router v6 / Lucide React / Vitest |
+| 1 | React 19 / TypeScript 6 / Vite 8 / Tailwind CSS 3 / Zustand / React Hook Form / Zod / React Router v7 / Lucide React / Vitest |
 | 2 | Express 4 / TypeScript / Prisma 5 / PostgreSQL 16 / JWT / bcrypt / express-validator / Jest / Supertest |
 | 3 | Axios / TanStack React Query 5 / MSW 2 / Docker Compose |
 
