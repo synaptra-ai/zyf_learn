@@ -94,4 +94,25 @@ export const bookService = {
 
     await prisma.book.delete({ where: { id: bookId } })
   },
+
+  async batchCreate(userId: string, books: any[]) {
+    if (!books.length) throw new ApiError(400, '书籍列表不能为空')
+    if (books.length > 50) throw new ApiError(400, '单次最多导入 50 本书')
+
+    const data = books.map((b) => ({
+      title: b.title,
+      author: b.author,
+      isbn: b.isbn || null,
+      publishedDate: b.publishedDate ? new Date(b.publishedDate) : null,
+      pageCount: b.pageCount || null,
+      description: b.description || null,
+      coverUrl: b.coverUrl || null,
+      status: b.status || 'WISHLIST',
+      categoryId: b.categoryId || null,
+      userId,
+    }))
+
+    const result = await prisma.book.createMany({ data })
+    return { count: result.count }
+  },
 }

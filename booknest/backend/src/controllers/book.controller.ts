@@ -54,4 +54,13 @@ export const bookController = {
       next(err)
     }
   },
+
+  async batchCreate(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await bookService.batchCreate(req.user!.id, req.body.books)
+      ResponseUtil.success(res, result, '批量导入成功', 201)
+    } catch (err) {
+      next(err)
+    }
+  },
 }
