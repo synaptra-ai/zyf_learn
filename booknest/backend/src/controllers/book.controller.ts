@@ -21,7 +21,7 @@ export const bookController = {
 
   async getById(req: Request, res: Response, next: NextFunction) {
     try {
-      const book = await bookService.getById(req.user!.id, req.params.id)
+      const book = await bookService.getById(req.user!.id, req.params.id as string)
       ResponseUtil.success(res, book)
     } catch (err) {
       next(err)
@@ -39,7 +39,7 @@ export const bookController = {
 
   async update(req: Request, res: Response, next: NextFunction) {
     try {
-      const book = await bookService.update(req.user!.id, req.params.id, req.body)
+      const book = await bookService.update(req.user!.id, req.params.id as string, req.body)
       ResponseUtil.success(res, book, '更新成功')
     } catch (err) {
       next(err)
@@ -48,7 +48,7 @@ export const bookController = {
 
   async delete(req: Request, res: Response, next: NextFunction) {
     try {
-      await bookService.delete(req.user!.id, req.params.id)
+      await bookService.delete(req.user!.id, req.params.id as string)
       ResponseUtil.success(res, null, '删除成功')
     } catch (err) {
       next(err)
