@@ -4,11 +4,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-BookNest is a full-stack book collection management app, structured as a 3-day progressive learning project. The detailed task guides in `tasks/` are the source of truth for what to build each day.
+BookNest is a full-stack book collection management app, structured as a 7-day progressive learning project. The detailed task guides in `tasks/` are the source of truth for what to build each day.
 
 - **Day 1** (`tasks/day1-frontend.md`): Frontend UI with React + TypeScript + Tailwind CSS + Zustand, data in localStorage
 - **Day 2** (`tasks/day2-backend.md`): RESTful API with Express + Prisma + PostgreSQL, JWT auth, Controller-Service layered architecture
 - **Day 3** (`tasks/day3-integration.md`): Full-stack integration — replace localStorage with real API via Axios + TanStack React Query, Docker Compose deployment
+- **Day 4** (`tasks/day4-deploy.md`): CI/CD + 阿里云 ECS 部署 + Nginx 反向代理 + HTTPS + 域名 DNS
+- **Day 5** (`tasks/day5-security.md`): 云服务器网络安全 — 安全组 + SSH 加固 + fail2ban + 系统加固 + 备份恢复
+- **Day 6** (`tasks/day6-advanced-backend.md`): Redis 缓存 + 文件上传 (阿里云 OSS) + WebSocket 实时通知 + 接口限流
+- **Day 7** (`tasks/day7-observability.md`): Winston 结构化日志 + 错误追踪 + 健康检查 + React 性能优化 + Lighthouse
 
 ## Development Commands
 
@@ -106,6 +110,10 @@ Book 1→N Review, Category 1→N Book
 | 1 | React 19 / TypeScript 6 / Vite 8 / Tailwind CSS 3 / Zustand / React Hook Form / Zod / React Router v7 / Lucide React / Vitest |
 | 2 | Express 5 / TypeScript 6 / Prisma 7 / PostgreSQL 16 / JWT / bcrypt / express-validator / Jest 30 / Supertest |
 | 3 | Axios / TanStack React Query 5 / MSW 2 / Docker Compose |
+| 4 | GitHub Actions / 阿里云 ECS / Nginx / Let's Encrypt / Certbot |
+| 5 | 阿里云安全组 / VPC / fail2ban / WAF / 自动备份 / Lynis |
+| 6 | Redis 7 (ioredis) / 阿里云 OSS / Socket.IO / Multer / express-rate-limit |
+| 7 | Winston / Morgan / rollup-plugin-visualizer / Lighthouse / React.lazy |
 
 ## Day 3: API 集成
 
@@ -142,3 +150,5 @@ UI → React Query Hooks → Axios Client → Express API → PostgreSQL
 ## Current State
 
 Day 3 全栈集成已完成。前后端通过 Axios + React Query 连接，Docker Compose 一键部署。所有验收项通过。
+
+Day 4-7 进阶阶段任务文档已创建 (tasks/day4-deploy.md, day5-security.md, day6-advanced-backend.md, day7-observability.md)，待实施。
