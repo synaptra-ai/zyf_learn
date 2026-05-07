@@ -8,7 +8,11 @@ import routes from './routes'
 const app = express()
 
 app.use(helmet())
-app.use(cors())
+const corsOrigins = process.env.CORS_ORIGINS
+  ? process.env.CORS_ORIGINS.split(',')
+  : '*'
+
+app.use(cors({ origin: corsOrigins }))
 app.use(express.json())
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100, message: { code: 429, message: '请求过于频繁，请稍后再试' } }))
 
