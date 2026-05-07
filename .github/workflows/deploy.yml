@@ -1,0 +1,107 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  # Job 1: 测试
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: booknest_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          # 👇 必须加上这一段，用 | 符号支持多行路径
+          cache-dependency-path: |
+            booknest/frontend/package-lock.json
+            booknest/backend/package-lock.json
+
+      - name: Test Backend
+        run: |
+          cd booknest/backend
+          npm ci
+          npx prisma generate
+          npm test
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/booknest_test
+          JWT_SECRET: test-secret
+
+      - name: Test Frontend
+        run: |
+          cd booknest/frontend
+          npm ci
+          npm run build
+          npx vitest run
+
+  # Job 2: 部署 (仅 main 分支)
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to ECS
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.ECS_HOST }}
+          username: ${{ secrets.ECS_USER }}
+          key: ${{ secrets.ECS_SSH_KEY }}
+          script: |
+            cd /home/deploy/booknest
+
+            # 拉取最新代码
+            git pull origin main
+
+            # 写入生产环境变量
+            cat > booknest/.env <<EOF
+            DB_USER=booknest
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            DB_NAME=booknest
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            DOMAIN=139.224.246.39
+            EOF
+
+            # 重新构建并启动
+            cd booknest
+            docker compose -f docker-compose.prod.yml down
+            docker compose -f docker-compose.prod.yml up -d --build
+
+            # 等待服务启动
+            sleep 10
+
+            # 健康检查
+            curl -f http://localhost:4000/health || exit 1
+
+            # 清理旧镜像
+            docker image prune -f
+
+      - name: Verify Deployment
+        run: |
+          curl -f http://139.224.246.39/health || exit 1
+          echo "Deployment successful!"
