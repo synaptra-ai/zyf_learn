@@ -36,8 +36,9 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-            frontend/package-lock.json
-            backend/package-lock.json
+           # 👇 删除下面这两行，它们既没有键名，缩进也是错的
+          # frontend/package-lock.json
+          # backend/package-lock.json
 
       - name: Test Backend
         run: |
