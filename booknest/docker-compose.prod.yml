@@ -21,6 +21,8 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     restart: always
+    ports:
+      - "4000:4000"
     environment:
       DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
       JWT_SECRET: ${JWT_SECRET}
@@ -41,6 +43,8 @@ services:
       args:
         VITE_API_URL: /api/v1
     restart: always
+    ports:
+      - "3000:80"
     networks:
       - booknest-proxy
 
