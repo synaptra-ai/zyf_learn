@@ -2,8 +2,11 @@ import { Router } from 'express'
 import { body, query } from 'express-validator'
 import { bookController } from '../controllers/book.controller'
 import { reviewController } from '../controllers/review.controller'
+import { uploadController } from '../controllers/upload.controller'
 import { authenticate } from '../middleware/auth'
 import { validate } from '../middleware/validate'
+import { upload } from '../lib/upload'
+import { uploadLimiter } from '../middleware/rateLimit'
 
 const router = Router()
 
@@ -31,6 +34,7 @@ router.get('/:id', authenticate, bookController.getById)
 router.post('/', authenticate, createRules, validate, bookController.create)
 router.put('/:id', authenticate, updateRules, validate, bookController.update)
 router.delete('/:id', authenticate, bookController.delete)
+router.post('/:id/cover', authenticate, uploadLimiter, upload.single('cover'), uploadController.uploadCover)
 
 // Review routes
 const createReviewRules = [

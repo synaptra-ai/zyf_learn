@@ -9,6 +9,19 @@ services:
       - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U booknest"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    command: redis-server --appendonly yes
 
   backend:
     build: ./backend
@@ -18,15 +31,21 @@ services:
       DATABASE_URL: postgresql://booknest:booknest123@postgres:5432/booknest
       JWT_SECRET: booknest-dev-secret-change-in-production
       PORT: 4000
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
 
   frontend:
     build: ./frontend
     ports:
-      - "4001:4001"
+      - "4001:80"
     depends_on:
       - backend
 
 volumes:
   pgdata:
+  redisdata:

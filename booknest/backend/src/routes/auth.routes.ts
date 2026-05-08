@@ -3,6 +3,7 @@ import { body } from 'express-validator'
 import { authController } from '../controllers/auth.controller'
 import { authenticate } from '../middleware/auth'
 import { validate } from '../middleware/validate'
+import { authLimiter } from '../middleware/rateLimit'
 
 const router = Router()
 
@@ -17,8 +18,8 @@ const loginRules = [
   body('password').notEmpty().withMessage('密码不能为空'),
 ]
 
-router.post('/register', registerRules, validate, authController.register)
-router.post('/login', loginRules, validate, authController.login)
+router.post('/register', authLimiter, registerRules, validate, authController.register)
+router.post('/login', authLimiter, loginRules, validate, authController.login)
 router.get('/me', authenticate, authController.me)
 
 export default router

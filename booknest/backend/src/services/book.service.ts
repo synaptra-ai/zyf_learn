@@ -1,4 +1,6 @@
 import prisma from '../lib/prisma'
+import { cache } from '../lib/cache'
+import { notifyUser } from '../lib/socket'
 import { ApiError } from '../utils/errors'
 
 interface ListParams {
@@ -18,23 +20,33 @@ export const bookService = {
     const pageSize = Math.min(50, Math.max(1, params.pageSize || 10))
     const sortBy = ALLOWED_SORT_FIELDS.includes(params.sortBy || '') ? params.sortBy! : 'createdAt'
     const sortOrder = params.sortOrder === 'asc' ? 'asc' : 'desc'
+    const status = params.status || ''
+    const categoryId = params.categoryId || ''
 
-    const where: any = { userId }
-    if (params.status) where.status = params.status
-    if (params.categoryId) where.categoryId = params.categoryId
+    const cacheKey = `books:${userId}:${page}:${pageSize}:${sortBy}:${sortOrder}:${status}:${categoryId}`
 
-    const [items, total] = await Promise.all([
-      prisma.book.findMany({
-        where,
-        include: { category: true },
-        orderBy: { [sortBy]: sortOrder },
-        skip: (page - 1) * pageSize,
-        take: pageSize,
-      }),
-      prisma.book.count({ where }),
-    ])
+    return cache.getOrSet(
+      cacheKey,
+      async () => {
+        const where: any = { userId }
+        if (params.status) where.status = params.status
+        if (params.categoryId) where.categoryId = params.categoryId
 
-    return { items, total, page, pageSize, totalPages: Math.ceil(total / pageSize) }
+        const [items, total] = await Promise.all([
+          prisma.book.findMany({
+            where,
+            include: { category: true },
+            orderBy: { [sortBy]: sortOrder },
+            skip: (page - 1) * pageSize,
+            take: pageSize,
+          }),
+          prisma.book.count({ where }),
+        ])
+
+        return { items, total, page, pageSize, totalPages: Math.ceil(total / pageSize) }
+      },
+      300,
+    )
   },
 
   async getById(userId: string, bookId: string) {
@@ -48,7 +60,7 @@ export const bookService = {
   },
 
   async create(userId: string, data: any) {
-    return prisma.book.create({
+    const book = await prisma.book.create({
       data: {
         title: data.title,
         author: data.author,
@@ -63,6 +75,9 @@ export const bookService = {
       },
       include: { category: true },
     })
+    await Promise.all([cache.del(`books:${userId}*`), cache.del(`stats:${userId}`)])
+    notifyUser(userId, 'book:created', { message: `《${book.title}》已添加到书架`, book })
+    return book
   },
 
   async update(userId: string, bookId: string, data: any) {
@@ -70,7 +85,7 @@ export const bookService = {
     if (!book) throw new ApiError(404, '书籍不存在')
     if (book.userId !== userId) throw new ApiError(403, '无权修改此书籍')
 
-    return prisma.book.update({
+    const updated = await prisma.book.update({
       where: { id: bookId },
       data: {
         ...(data.title !== undefined && { title: data.title }),
@@ -85,6 +100,9 @@ export const bookService = {
       },
       include: { category: true },
     })
+    await Promise.all([cache.del(`books:${userId}*`), cache.del(`stats:${userId}`)])
+    notifyUser(userId, 'book:updated', { message: `《${updated.title}》已更新`, book: updated })
+    return updated
   },
 
   async delete(userId: string, bookId: string) {
@@ -93,6 +111,8 @@ export const bookService = {
     if (book.userId !== userId) throw new ApiError(403, '无权删除此书籍')
 
     await prisma.book.delete({ where: { id: bookId } })
+    await Promise.all([cache.del(`books:${userId}*`), cache.del(`stats:${userId}`)])
+    notifyUser(userId, 'book:deleted', { message: `《${book.title}》已从书架移除` })
   },
 
   async batchCreate(userId: string, books: any[]) {
@@ -113,6 +133,7 @@ export const bookService = {
     }))
 
     const result = await prisma.book.createMany({ data })
+    await Promise.all([cache.del(`books:${userId}*`), cache.del(`stats:${userId}`)])
     return { count: result.count }
   },
 }

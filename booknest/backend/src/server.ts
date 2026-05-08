@@ -1,4 +1,5 @@
 import express from 'express'
+import path from 'path'
 import cors from 'cors'
 import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
@@ -19,6 +20,8 @@ app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100, message: { code: 429, me
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() })
 })
+
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')))
 
 app.use('/api/v1', routes)
 

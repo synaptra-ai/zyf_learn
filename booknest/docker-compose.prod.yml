@@ -16,6 +16,15 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:7-alpine
+    restart: always
+    command: redis-server --appendonly yes
+    volumes:
+      - redisdata:/data
+    networks:
+      - booknest-internal
+
   backend:
     build:
       context: ./backend
@@ -29,6 +38,8 @@ services:
       PORT: 4000
       NODE_ENV: production
       CORS_ORIGINS: ${CORS_ORIGINS}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     depends_on:
       postgres:
         condition: service_healthy
@@ -44,12 +55,13 @@ services:
         VITE_API_URL: /api/v1
     restart: always
     ports:
-      - "3000:80"
+      - "80:80"
     networks:
       - booknest-proxy
 
 volumes:
   pgdata:
+  redisdata:
 
 networks:
   booknest-internal:

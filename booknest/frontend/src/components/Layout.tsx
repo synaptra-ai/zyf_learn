@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { BookOpen, Moon, Sun, BarChart3, FolderOpen, Plus } from 'lucide-react'
 import { useThemeStore } from '@/stores/useThemeStore'
+import NotificationToast from './ui/NotificationToast'
 
 export default function Layout() {
   const { isDark, toggleTheme } = useThemeStore()
@@ -54,6 +55,8 @@ export default function Layout() {
       <main className="mx-auto max-w-6xl px-4 py-6">
         <Outlet />
       </main>
+
+      <NotificationToast />
     </div>
   )
 }
