@@ -1,4 +1,4 @@
-name: Deploy to ECS
+name: Deploy to Production
 
 on:
   push:
@@ -6,6 +6,7 @@ on:
       - main
 
 jobs:
+  # 我们直接定义 deploy 任务，不再定义 test 任务
   deploy:
     runs-on: ubuntu-latest
     
@@ -22,20 +23,12 @@ jobs:
           port: 22
           script: |
             echo "🚀 开始部署..."
-            
-            # 进入项目目录
             cd /home/deploy/booknest/booknest
-            
-            # 拉取最新代码
             git pull origin main
             
-            # 停止旧容器
-            docker compose -f docker-compose.prod.yml down
-            
-            # 重新构建并启动
-            docker compose -f docker-compose.prod.yml up -d --build
-            
-            # 清理旧镜像
-            docker image prune -f
+            echo "🐳 重启 Docker 容器..."
+            # 这里假设你用的是 docker-compose，如果是纯 docker 命令请自行调整
+            docker compose down
+            docker compose up -d --build
             
             echo "✅ 部署完成！"
