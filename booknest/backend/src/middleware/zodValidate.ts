@@ -19,7 +19,7 @@ export function validateQuery<T>(schema: ZodSchema<T>) {
     if (!result.success) {
       return next(new ApiError(400, 'Validation failed', result.error.flatten()))
     }
-    req.query = result.data as any
+    ;(req as any).validatedQuery = result.data
     next()
   }
 }

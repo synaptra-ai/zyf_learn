@@ -5,13 +5,14 @@ import { ResponseUtil } from '../utils/response'
 export const bookController = {
   async list(req: Request, res: Response, next: NextFunction) {
     try {
+      const query = (req as any).validatedQuery ?? req.query
       const data = await bookService.list(req.user!.id, {
-        page: req.query.page ? Number(req.query.page) : undefined,
-        pageSize: req.query.pageSize ? Number(req.query.pageSize) : undefined,
-        status: req.query.status as string | undefined,
-        categoryId: req.query.categoryId as string | undefined,
-        sortBy: req.query.sortBy as string | undefined,
-        sortOrder: req.query.sortOrder as 'asc' | 'desc' | undefined,
+        page: query.page ? Number(query.page) : undefined,
+        pageSize: query.pageSize ? Number(query.pageSize) : undefined,
+        status: query.status as string | undefined,
+        categoryId: query.categoryId as string | undefined,
+        sortBy: query.sortBy as string | undefined,
+        sortOrder: query.sortOrder as 'asc' | 'desc' | undefined,
       })
       ResponseUtil.paginated(res, data.items, data.total, data.page, data.pageSize)
     } catch (err) {
