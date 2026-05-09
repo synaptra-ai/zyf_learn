@@ -50,10 +50,17 @@ jobs:
           DATABASE_URL: postgresql://test:test@localhost:5432/booknest_test
           JWT_SECRET: test-secret
 
-      - name: Test Frontend
+      - name: Backend Lint and OpenAPI
+        run: |
+          cd booknest/backend
+          npm run lint
+          npm run openapi:generate
+
+      - name: Frontend Lint and API Types
         run: |
           cd booknest/frontend
           npm ci
+          npm run api:types:local
           npm run build
           npx vitest run
 
