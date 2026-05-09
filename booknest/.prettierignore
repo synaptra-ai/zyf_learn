@@ -1,0 +1,6 @@
+node_modules
+dist
+coverage
+logs
+backend/generated
+frontend/src/types/api.generated.ts
