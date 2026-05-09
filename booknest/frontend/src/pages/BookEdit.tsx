@@ -1,11 +1,11 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Upload, BookOpen } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { useBook, useUpdateBook } from '@/hooks/useBooks'
+import { useBook, useUpdateBook, useUploadCover } from '@/hooks/useBooks'
 import { useCategories } from '@/hooks/useCategories'
 import { bookSchema, type BookFormData } from '@/lib/schemas'
 import { Toast } from '@/components/ui/Toast'
@@ -23,8 +23,21 @@ export default function BookEdit() {
   const navigate = useNavigate()
   const { data: book, isLoading } = useBook(id!)
   const updateBook = useUpdateBook()
+  const uploadCover = useUploadCover()
   const { data: categories = [] } = useCategories()
   const [toast, setToast] = useState<{ message: string; variant: 'success' | 'error' } | null>(null)
+  const [coverFile, setCoverFile] = useState<File | null>(null)
+  const [coverPreview, setCoverPreview] = useState<string | null>(null)
+  const fileRef = useRef<HTMLInputElement>(null)
+
+  const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setCoverFile(file)
+    const reader = new FileReader()
+    reader.onload = (ev) => setCoverPreview(ev.target?.result as string)
+    reader.readAsDataURL(file)
+  }
 
   const {
     register,
@@ -56,20 +69,18 @@ export default function BookEdit() {
     )
   }
 
-  const onSubmit = (data: BookFormData) => {
+  const onSubmit = async (data: BookFormData) => {
     const clean = { ...data, isbn: data.isbn || undefined, categoryId: data.categoryId || undefined }
-    updateBook.mutate(
-      { id: book.id, ...clean },
-      {
-        onSuccess: () => {
-          setToast({ message: '保存成功', variant: 'success' })
-          setTimeout(() => navigate(`/books/${book.id}`), 800)
-        },
-        onError: () => {
-          setToast({ message: '保存失败', variant: 'error' })
-        },
+    try {
+      await updateBook.mutateAsync({ id: book.id, ...clean })
+      if (coverFile) {
+        await uploadCover.mutateAsync({ bookId: book.id, file: coverFile })
       }
-    )
+      setToast({ message: '保存成功', variant: 'success' })
+      setTimeout(() => navigate(`/books/${book.id}`), 800)
+    } catch {
+      setToast({ message: '保存失败', variant: 'error' })
+    }
   }
 
   return (
@@ -134,6 +145,29 @@ export default function BookEdit() {
             className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
             {...register('description')}
           />
+        </div>
+
+        <div className="space-y-1">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">封面</label>
+          <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleCoverChange} />
+          <div
+            onClick={() => fileRef.current?.click()}
+            className="group relative flex h-36 cursor-pointer items-center justify-center rounded-md border-2 border-dashed border-gray-300 bg-gray-50 transition-colors hover:border-primary-400 hover:bg-primary-50 dark:border-gray-600 dark:bg-gray-800 dark:hover:border-primary-500 dark:hover:bg-gray-700"
+          >
+            {coverPreview || book.coverUrl ? (
+              <>
+                <img src={coverPreview || book.coverUrl} alt="封面" className="h-full w-full rounded-md object-cover" />
+                <div className="absolute inset-0 flex items-center justify-center rounded-md bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+                  <Upload className="h-6 w-6 text-white" />
+                </div>
+              </>
+            ) : (
+              <div className="flex flex-col items-center gap-2 text-gray-400">
+                <BookOpen className="h-8 w-8" />
+                <span className="text-sm">点击上传封面</span>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="flex gap-3 pt-2">
