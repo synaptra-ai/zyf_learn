@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from '../lib/zod-extended'
 
 export const reviewSchema = z.object({
   id: z.string().uuid(),

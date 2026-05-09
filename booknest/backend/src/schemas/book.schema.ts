@@ -1,7 +1,4 @@
-import { z } from 'zod'
-import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi'
-
-extendZodWithOpenApi(z)
+import { z } from '../lib/zod-extended'
 
 export const bookStatusSchema = z.enum(['OWNED', 'READING', 'FINISHED', 'WISHLIST'])
 

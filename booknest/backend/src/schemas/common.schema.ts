@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from '../lib/zod-extended'
 
 export const uuidSchema = z.string().uuid()
 

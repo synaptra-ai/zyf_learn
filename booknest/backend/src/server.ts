@@ -4,9 +4,11 @@ import cors from 'cors'
 import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
 import morgan from 'morgan'
+import swaggerUi from 'swagger-ui-express'
 import { errorHandler } from './middleware/errorHandler'
 import routes from './routes'
 import { morganStream } from './utils/morgan-stream'
+import { generateOpenApiDocument } from './lib/openapi'
 
 const app = express()
 
@@ -63,6 +65,10 @@ app.get('/health/detailed', async (_req, res) => {
 })
 
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')))
+
+const openApiDocument = generateOpenApiDocument()
+app.get('/openapi.json', (_req, res) => res.json(openApiDocument))
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openApiDocument))
 
 app.use('/api/v1', routes)
 
