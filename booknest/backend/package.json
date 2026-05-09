@@ -11,7 +11,8 @@
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\" \"prisma/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\" \"prisma/**/*.ts\"",
     "prisma:seed": "ts-node --transpile-only prisma/seed.ts",
-    "prisma:studio": "npx prisma studio"
+    "prisma:studio": "npx prisma studio",
+    "openapi:generate": "tsx scripts/generate-openapi.ts"
   },
   "keywords": [],
   "author": "",

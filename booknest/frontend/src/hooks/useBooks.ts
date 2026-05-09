@@ -1,7 +1,18 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import apiClient from '@/lib/api-client'
 import { bookKeys } from './query-keys'
-import type { Book, PaginatedData } from '@/types'
+import type { paths } from '@/types/api.generated'
+
+type ListBooksResponse =
+  paths['/api/v1/books']['get']['responses']['200']['content']['application/json']['data']
+
+type CreateBookBody =
+  paths['/api/v1/books']['post']['requestBody']['content']['application/json']
+
+type UpdateBookBody =
+  paths['/api/v1/books/{id}']['put']['requestBody']['content']['application/json']
+
+type BookItem = ListBooksResponse['items'][number]
 
 interface BookFilters {
   page?: number
@@ -16,7 +27,7 @@ export function useBooks(filters: BookFilters) {
   return useQuery({
     queryKey: bookKeys.list(filters),
     queryFn: async () => {
-      const { data } = await apiClient.get<PaginatedData<Book>>('/books', { params: filters })
+      const { data } = await apiClient.get<ListBooksResponse>('/books', { params: filters })
       return data
     },
   })
@@ -26,7 +37,7 @@ export function useBook(id: string) {
   return useQuery({
     queryKey: bookKeys.detail(id),
     queryFn: async () => {
-      const { data } = await apiClient.get<Book>(`/books/${id}`)
+      const { data } = await apiClient.get<BookItem>(`/books/${id}`)
       return data
     },
     enabled: !!id,
@@ -36,7 +47,7 @@ export function useBook(id: string) {
 export function useCreateBook() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (bookData: any) => {
+    mutationFn: async (bookData: CreateBookBody) => {
       const { data } = await apiClient.post('/books', bookData)
       return data
     },
@@ -49,7 +60,7 @@ export function useCreateBook() {
 export function useUpdateBook() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async ({ id, ...data }: any) => {
+    mutationFn: async ({ id, ...data }: UpdateBookBody & { id: string }) => {
       const { data: updated } = await apiClient.put(`/books/${id}`, data)
       return updated
     },
@@ -69,7 +80,7 @@ export function useDeleteBook() {
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: bookKeys.lists() })
       const previousLists = queryClient.getQueriesData({ queryKey: bookKeys.lists() })
-      queryClient.setQueriesData<PaginatedData<Book>>({ queryKey: bookKeys.lists() }, (old) => {
+      queryClient.setQueriesData<ListBooksResponse>({ queryKey: bookKeys.lists() }, (old) => {
         if (!old) return old
         return { ...old, items: old.items.filter((b) => b.id !== id), total: old.total - 1 }
       })
