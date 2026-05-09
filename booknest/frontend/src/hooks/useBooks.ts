@@ -87,3 +87,21 @@ export function useDeleteBook() {
     },
   })
 }
+
+export function useUploadCover() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ bookId, file }: { bookId: string; file: File }) => {
+      const formData = new FormData()
+      formData.append('cover', file)
+      const { data } = await apiClient.post(`/books/${bookId}/cover`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      return data
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: bookKeys.detail(variables.bookId) })
+      queryClient.invalidateQueries({ queryKey: bookKeys.lists() })
+    },
+  })
+}

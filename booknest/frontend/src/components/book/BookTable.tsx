@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { List } from 'react-window'
 import { Badge } from '@/components/ui/Badge'
 import type { Book, Category } from '@/types'
 
@@ -21,60 +22,71 @@ interface BookTableProps {
   getCategory: (id?: string) => Category | undefined
 }
 
+const ROW_HEIGHT = 52
+
+interface RowData {
+  books: Book[]
+  getCategory: (id?: string) => Category | undefined
+  navigate: (path: string) => void
+}
+
+function Row({ index, style, books, getCategory, navigate }: RowData & {
+  index: number
+  style: React.CSSProperties
+}) {
+  const book = books[index]
+  const category = getCategory(book.categoryId)
+  return (
+    <div
+      style={style}
+      onClick={() => navigate(`/books/${book.id}`)}
+      className="flex cursor-pointer items-center border-b border-gray-100 dark:border-gray-700 px-4 transition-colors hover:bg-gray-50 dark:hover:bg-gray-700"
+    >
+      <span className="w-[30%] truncate font-medium text-gray-900 dark:text-gray-100">{book.title}</span>
+      <span className="w-[20%] truncate text-gray-500 dark:text-gray-400">{book.author}</span>
+      <span className="w-[15%]">
+        <Badge variant={statusLabel[book.status]}>{statusText[book.status]}</Badge>
+      </span>
+      <span className="w-[20%]">
+        {category ? (
+          <span
+            className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
+            style={{ backgroundColor: category.color + '20', color: category.color }}
+          >
+            {category.name}
+          </span>
+        ) : (
+          <span className="text-gray-400 dark:text-gray-500">-</span>
+        )}
+      </span>
+      <span className="w-[15%] text-gray-500 dark:text-gray-400">
+        {new Date(book.createdAt).toLocaleDateString()}
+      </span>
+    </div>
+  )
+}
+
 export function BookTable({ books, getCategory }: BookTableProps) {
   const navigate = useNavigate()
 
   return (
     <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-            <th className="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400">书名</th>
-            <th className="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400">作者</th>
-            <th className="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400">状态</th>
-            <th className="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400">分类</th>
-            <th className="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400">添加时间</th>
-          </tr>
-        </thead>
-        <tbody>
-          {books.map((book) => {
-            const category = getCategory(book.categoryId)
-            return (
-              <tr
-                key={book.id}
-                onClick={() => navigate(`/books/${book.id}`)}
-                className="cursor-pointer border-b border-gray-100 dark:border-gray-700 transition-colors hover:bg-gray-50 dark:hover:bg-gray-700"
-              >
-                <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">{book.title}</td>
-                <td className="px-4 py-3 text-gray-500 dark:text-gray-400">{book.author}</td>
-                <td className="px-4 py-3">
-                  <Badge variant={statusLabel[book.status]}>
-                    {statusText[book.status]}
-                  </Badge>
-                </td>
-                <td className="px-4 py-3">
-                  {category ? (
-                    <span
-                      className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
-                      style={{
-                        backgroundColor: category.color + '20',
-                        color: category.color,
-                      }}
-                    >
-                      {category.name}
-                    </span>
-                  ) : (
-                    <span className="text-gray-400 dark:text-gray-500">-</span>
-                  )}
-                </td>
-                <td className="px-4 py-3 text-gray-500 dark:text-gray-400">
-                  {new Date(book.createdAt).toLocaleDateString()}
-                </td>
-              </tr>
-            )
-          })}
-        </tbody>
-      </table>
+      <div className="flex items-center border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-3">
+        <span className="w-[30%] text-sm font-medium text-gray-500 dark:text-gray-400">书名</span>
+        <span className="w-[20%] text-sm font-medium text-gray-500 dark:text-gray-400">作者</span>
+        <span className="w-[15%] text-sm font-medium text-gray-500 dark:text-gray-400">状态</span>
+        <span className="w-[20%] text-sm font-medium text-gray-500 dark:text-gray-400">分类</span>
+        <span className="w-[15%] text-sm font-medium text-gray-500 dark:text-gray-400">添加时间</span>
+      </div>
+      {books.length > 0 && (
+        <List
+          rowComponent={Row as any}
+          rowCount={books.length}
+          rowHeight={ROW_HEIGHT}
+          rowProps={{ books, getCategory, navigate } as any}
+          style={{ height: Math.min(books.length * ROW_HEIGHT, 520), overflow: 'auto' }}
+        />
+      )}
     </div>
   )
 }

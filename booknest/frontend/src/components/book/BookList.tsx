@@ -27,10 +27,11 @@ export function BookListView() {
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid')
   const [page, setPage] = useState(1)
   const pageSize = 12
+  const tablePageSize = 50
 
   const { data, isLoading, isError, error, refetch } = useBooks({
     page,
-    pageSize,
+    pageSize: viewMode === 'table' ? tablePageSize : pageSize,
     ...(statusFilter !== 'ALL' && { status: statusFilter }),
     ...(categoryFilter !== 'ALL' && { categoryId: categoryFilter }),
   })
