@@ -26,6 +26,42 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() })
 })
 
+app.get('/health/detailed', async (_req, res) => {
+  const checks: Record<string, { status: string; responseTime?: string; error?: string }> = {}
+
+  try {
+    const start = Date.now()
+    const { PrismaClient } = await import('./generated/prisma/client')
+    const { PrismaPg } = await import('@prisma/adapter-pg')
+    const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL })
+    const prisma = new PrismaClient({ adapter })
+    await prisma.$queryRaw`SELECT 1`
+    await prisma.$disconnect()
+    checks.database = { status: 'ok', responseTime: `${Date.now() - start}ms` }
+  } catch (err: any) {
+    checks.database = { status: 'error', error: err.message }
+  }
+
+  try {
+    const start = Date.now()
+    const { default: redis } = await import('./lib/redis')
+    await redis.ping()
+    checks.redis = { status: 'ok', responseTime: `${Date.now() - start}ms` }
+  } catch (err: any) {
+    checks.redis = { status: 'error', error: err.message }
+  }
+
+  const allOk = Object.values(checks).every((c) => c.status === 'ok')
+
+  res.status(allOk ? 200 : 503).json({
+    status: allOk ? 'ok' : 'degraded',
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+    version: process.env.npm_package_version || '1.0.0',
+    checks,
+  })
+})
+
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')))
 
 app.use('/api/v1', routes)
