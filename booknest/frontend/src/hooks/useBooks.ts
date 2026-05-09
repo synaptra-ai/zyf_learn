@@ -6,13 +6,28 @@ import type { paths } from '@/types/api.generated'
 type ListBooksResponse =
   paths['/api/v1/books']['get']['responses']['200']['content']['application/json']['data']
 
-type CreateBookBody =
-  paths['/api/v1/books']['post']['requestBody']['content']['application/json']
+type CreateBookRequestBody =
+  paths['/api/v1/books']['post']['requestBody']
+type CreateBookBody = NonNullable<CreateBookRequestBody>['content']['application/json']
 
-type UpdateBookBody =
-  paths['/api/v1/books/{id}']['put']['requestBody']['content']['application/json']
+type UpdateBookRequestBody =
+  paths['/api/v1/books/{id}']['put']['requestBody']
+type UpdateBookBody = NonNullable<UpdateBookRequestBody>['content']['application/json']
 
-type BookItem = ListBooksResponse['items'][number]
+type BookItem = ListBooksResponse['items'][number] & {
+  category?: { id: string; name: string; color: string }
+  reviews?: { id: string; rating: number; text?: string; user: { id: string; name: string }; createdAt: string }[]
+}
+
+export type { BookItem }
+
+interface BookListData {
+  items: BookItem[]
+  total: number
+  page: number
+  pageSize: number
+  totalPages: number
+}
 
 interface BookFilters {
   page?: number
@@ -27,7 +42,7 @@ export function useBooks(filters: BookFilters) {
   return useQuery({
     queryKey: bookKeys.list(filters),
     queryFn: async () => {
-      const { data } = await apiClient.get<ListBooksResponse>('/books', { params: filters })
+      const { data } = await apiClient.get<BookListData>('/books', { params: filters })
       return data
     },
   })
@@ -80,7 +95,7 @@ export function useDeleteBook() {
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: bookKeys.lists() })
       const previousLists = queryClient.getQueriesData({ queryKey: bookKeys.lists() })
-      queryClient.setQueriesData<ListBooksResponse>({ queryKey: bookKeys.lists() }, (old) => {
+      queryClient.setQueriesData<BookListData>({ queryKey: bookKeys.lists() }, (old) => {
         if (!old) return old
         return { ...old, items: old.items.filter((b) => b.id !== id), total: old.total - 1 }
       })

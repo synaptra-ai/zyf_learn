@@ -50,7 +50,7 @@ export default function BookEdit() {
           title: book.title,
           author: book.author,
           isbn: book.isbn ?? '',
-          pageCount: book.pageCount,
+          pageCount: book.pageCount ?? undefined,
           description: book.description ?? '',
           status: book.status,
           categoryId: book.categoryId ?? '',
@@ -156,7 +156,7 @@ export default function BookEdit() {
           >
             {coverPreview || book.coverUrl ? (
               <>
-                <img src={coverPreview || book.coverUrl} alt="封面" className="h-full w-full rounded-md object-cover" />
+                <img src={coverPreview || book.coverUrl || undefined} alt="封面" className="h-full w-full rounded-md object-cover" />
                 <div className="absolute inset-0 flex items-center justify-center rounded-md bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
                   <Upload className="h-6 w-6 text-white" />
                 </div>

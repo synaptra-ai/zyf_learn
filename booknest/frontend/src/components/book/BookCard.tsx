@@ -2,16 +2,16 @@ import { useNavigate } from 'react-router-dom'
 import { BookOpen } from 'lucide-react'
 import { Badge } from '@/components/ui/Badge'
 import { Card } from '@/components/ui/Card'
-import type { Book, Category } from '@/types'
+import type { BookItem } from '@/hooks/useBooks'
 
-const statusLabel: Record<Book['status'], 'owned' | 'reading' | 'finished' | 'wishlist'> = {
+const statusLabel: Record<BookItem['status'], 'owned' | 'reading' | 'finished' | 'wishlist'> = {
   OWNED: 'owned',
   READING: 'reading',
   FINISHED: 'finished',
   WISHLIST: 'wishlist',
 }
 
-const statusText: Record<Book['status'], string> = {
+const statusText: Record<BookItem['status'], string> = {
   OWNED: '已拥有',
   READING: '在读',
   FINISHED: '已读完',
@@ -19,8 +19,8 @@ const statusText: Record<Book['status'], string> = {
 }
 
 interface BookCardProps {
-  book: Book
-  category?: Category
+  book: BookItem
+  category?: { id: string; name: string; color: string }
 }
 
 export function BookCard({ book, category }: BookCardProps) {

@@ -1,16 +1,16 @@
 import { useNavigate } from 'react-router-dom'
 import { List } from 'react-window'
 import { Badge } from '@/components/ui/Badge'
-import type { Book, Category } from '@/types'
+import type { BookItem } from '@/hooks/useBooks'
 
-const statusLabel: Record<Book['status'], 'owned' | 'reading' | 'finished' | 'wishlist'> = {
+const statusLabel: Record<BookItem['status'], 'owned' | 'reading' | 'finished' | 'wishlist'> = {
   OWNED: 'owned',
   READING: 'reading',
   FINISHED: 'finished',
   WISHLIST: 'wishlist',
 }
 
-const statusText: Record<Book['status'], string> = {
+const statusText: Record<BookItem['status'], string> = {
   OWNED: '已拥有',
   READING: '在读',
   FINISHED: '已读完',
@@ -18,15 +18,15 @@ const statusText: Record<Book['status'], string> = {
 }
 
 interface BookTableProps {
-  books: Book[]
-  getCategory: (id?: string) => Category | undefined
+  books: BookItem[]
+  getCategory: (id?: string) => { id: string; name: string; color: string } | undefined
 }
 
 const ROW_HEIGHT = 52
 
 interface RowData {
-  books: Book[]
-  getCategory: (id?: string) => Category | undefined
+  books: BookItem[]
+  getCategory: (id?: string) => { id: string; name: string; color: string } | undefined
   navigate: (path: string) => void
 }
 
@@ -35,7 +35,7 @@ function Row({ index, style, books, getCategory, navigate }: RowData & {
   style: React.CSSProperties
 }) {
   const book = books[index]
-  const category = getCategory(book.categoryId)
+  const category = getCategory(book.categoryId ?? undefined)
   return (
     <div
       style={style}
