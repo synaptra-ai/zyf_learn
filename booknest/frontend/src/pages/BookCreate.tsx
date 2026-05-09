@@ -50,7 +50,12 @@ export default function BookCreate() {
     createBook.mutate(clean, {
       onSuccess: async (newBook) => {
         if (coverFile) {
-          await uploadCover.mutateAsync({ bookId: newBook.id, file: coverFile })
+          try {
+            await uploadCover.mutateAsync({ bookId: newBook.id, file: coverFile })
+          } catch {
+            setToast({ message: '书籍已添加，但封面上传失败', variant: 'error' })
+            return
+          }
         }
         setToast({ message: '添加成功', variant: 'success' })
         setTimeout(() => navigate(`/books/${newBook.id}`), 800)
