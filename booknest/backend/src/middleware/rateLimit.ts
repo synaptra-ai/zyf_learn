@@ -11,6 +11,6 @@ export const authLimiter = rateLimit({
 export const uploadLimiter = rateLimit({
   windowMs: 60 * 1000,
   max: 10,
-  keyGenerator: (req) => req.user?.id || req.ip?.replace(/:\d+[^:]*$/, '') || 'unknown',
+  keyGenerator: (req) => req.user?.id || req.ip || 'unknown',
   message: { code: 429, message: '上传请求过于频繁，请稍后再试' },
 })
