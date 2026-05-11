@@ -1,7 +1,9 @@
+import { WorkspaceRole } from '@/generated/prisma/enums'
 import prisma from '../lib/prisma'
 import { cache } from '../lib/cache'
 import { notifyUser } from '../lib/socket'
 import { ApiError } from '../utils/errors'
+import { writeAuditLog } from './audit.service'
 
 interface ListParams {
   page?: number
@@ -15,7 +17,7 @@ interface ListParams {
 const ALLOWED_SORT_FIELDS = ['createdAt', 'title', 'author', 'pageCount']
 
 export const bookService = {
-  async list(userId: string, params: ListParams) {
+  async list(workspaceId: string, params: ListParams) {
     const page = Math.max(1, params.page || 1)
     const pageSize = Math.min(50, Math.max(1, params.pageSize || 10))
     const sortBy = ALLOWED_SORT_FIELDS.includes(params.sortBy || '') ? params.sortBy! : 'createdAt'
@@ -23,12 +25,12 @@ export const bookService = {
     const status = params.status || ''
     const categoryId = params.categoryId || ''
 
-    const cacheKey = `books:${userId}:${page}:${pageSize}:${sortBy}:${sortOrder}:${status}:${categoryId}`
+    const cacheKey = `books:${workspaceId}:${page}:${pageSize}:${sortBy}:${sortOrder}:${status}:${categoryId}`
 
     return cache.getOrSet(
       cacheKey,
       async () => {
-        const where: any = { userId }
+        const where: any = { workspaceId }
         if (params.status) where.status = params.status
         if (params.categoryId) where.categoryId = params.categoryId
 
@@ -49,17 +51,23 @@ export const bookService = {
     )
   },
 
-  async getById(userId: string, bookId: string) {
+  async getById(workspaceId: string, bookId: string) {
     const book = await prisma.book.findUnique({
       where: { id: bookId },
-      include: { category: true, reviews: { include: { user: { select: { id: true, name: true } } }, orderBy: { createdAt: 'desc' } } },
+      include: {
+        category: true,
+        reviews: {
+          include: { user: { select: { id: true, name: true } } },
+          orderBy: { createdAt: 'desc' },
+        },
+      },
     })
     if (!book) throw new ApiError(404, '书籍不存在')
-    if (book.userId !== userId) throw new ApiError(403, '无权访问此书籍')
+    if (book.workspaceId !== workspaceId) throw new ApiError(403, '无权访问此书籍')
     return book
   },
 
-  async create(userId: string, data: any) {
+  async create(userId: string, workspaceId: string, data: any) {
     const book = await prisma.book.create({
       data: {
         title: data.title,
@@ -72,18 +80,31 @@ export const bookService = {
         status: data.status || 'WISHLIST',
         categoryId: data.categoryId || null,
         userId,
+        workspaceId,
       },
       include: { category: true },
     })
-    await Promise.all([cache.del(`books:${userId}*`), cache.del(`stats:${userId}`)])
+
+    await writeAuditLog({
+      workspaceId,
+      actorId: userId,
+      action: 'book.created',
+      entityType: 'Book',
+      entityId: book.id,
+      metadata: { title: book.title },
+    })
+
+    await cache.del(`books:${workspaceId}*`)
     notifyUser(userId, 'book:created', { message: `《${book.title}》已添加到书架`, book })
     return book
   },
 
-  async update(userId: string, bookId: string, data: any) {
-    const book = await prisma.book.findUnique({ where: { id: bookId } })
+  async update(userId: string, workspaceId: string, role: WorkspaceRole, bookId: string, data: any) {
+    const book = await prisma.book.findFirst({ where: { id: bookId, workspaceId } })
     if (!book) throw new ApiError(404, '书籍不存在')
-    if (book.userId !== userId) throw new ApiError(403, '无权修改此书籍')
+
+    const canEdit = ['OWNER', 'ADMIN'].includes(role) || (role === 'MEMBER' && book.userId === userId)
+    if (!canEdit) throw new ApiError(403, '无权编辑该书籍')
 
     const updated = await prisma.book.update({
       where: { id: bookId },
@@ -100,22 +121,44 @@ export const bookService = {
       },
       include: { category: true },
     })
-    await Promise.all([cache.del(`books:${userId}*`), cache.del(`stats:${userId}`)])
+
+    await writeAuditLog({
+      workspaceId,
+      actorId: userId,
+      action: 'book.updated',
+      entityType: 'Book',
+      entityId: bookId,
+      metadata: { changes: Object.keys(data) },
+    })
+
+    await cache.del(`books:${workspaceId}*`)
     notifyUser(userId, 'book:updated', { message: `《${updated.title}》已更新`, book: updated })
     return updated
   },
 
-  async delete(userId: string, bookId: string) {
-    const book = await prisma.book.findUnique({ where: { id: bookId } })
+  async delete(userId: string, workspaceId: string, role: WorkspaceRole, bookId: string) {
+    const book = await prisma.book.findFirst({ where: { id: bookId, workspaceId } })
     if (!book) throw new ApiError(404, '书籍不存在')
-    if (book.userId !== userId) throw new ApiError(403, '无权删除此书籍')
+
+    const canDelete = ['OWNER', 'ADMIN'].includes(role) || (role === 'MEMBER' && book.userId === userId)
+    if (!canDelete) throw new ApiError(403, '无权删除此书籍')
 
     await prisma.book.delete({ where: { id: bookId } })
-    await Promise.all([cache.del(`books:${userId}*`), cache.del(`stats:${userId}`)])
+
+    await writeAuditLog({
+      workspaceId,
+      actorId: userId,
+      action: 'book.deleted',
+      entityType: 'Book',
+      entityId: bookId,
+      metadata: { title: book.title },
+    })
+
+    await cache.del(`books:${workspaceId}*`)
     notifyUser(userId, 'book:deleted', { message: `《${book.title}》已从书架移除` })
   },
 
-  async batchCreate(userId: string, books: any[]) {
+  async batchCreate(userId: string, workspaceId: string, books: any[]) {
     if (!books.length) throw new ApiError(400, '书籍列表不能为空')
     if (books.length > 50) throw new ApiError(400, '单次最多导入 50 本书')
 
@@ -130,10 +173,11 @@ export const bookService = {
       status: b.status || 'WISHLIST',
       categoryId: b.categoryId || null,
       userId,
+      workspaceId,
     }))
 
     const result = await prisma.book.createMany({ data })
-    await Promise.all([cache.del(`books:${userId}*`), cache.del(`stats:${userId}`)])
+    await cache.del(`books:${workspaceId}*`)
     return { count: result.count }
   },
 }

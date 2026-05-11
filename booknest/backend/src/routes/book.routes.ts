@@ -3,6 +3,7 @@ import { bookController } from '../controllers/book.controller'
 import { reviewController } from '../controllers/review.controller'
 import { uploadController } from '../controllers/upload.controller'
 import { authenticate } from '../middleware/auth'
+import { resolveWorkspace, requireWorkspaceRole } from '../middleware/workspace'
 import { validateBody, validateQuery } from '../middleware/zodValidate'
 import {
   createBookBodySchema,
@@ -15,16 +16,18 @@ import { uploadLimiter } from '../middleware/rateLimit'
 
 const router = Router()
 
-router.get('/', authenticate, validateQuery(listBooksQuerySchema), bookController.list)
-router.post('/batch', authenticate, bookController.batchCreate)
-router.get('/:id', authenticate, bookController.getById)
-router.post('/', authenticate, validateBody(createBookBodySchema), bookController.create)
-router.put('/:id', authenticate, validateBody(updateBookBodySchema), bookController.update)
-router.delete('/:id', authenticate, bookController.delete)
-router.post('/:id/cover', authenticate, uploadLimiter, upload.single('cover'), uploadController.uploadCover)
+router.use(authenticate, resolveWorkspace)
+
+router.get('/', validateQuery(listBooksQuerySchema), bookController.list)
+router.post('/batch', requireWorkspaceRole('MEMBER'), bookController.batchCreate)
+router.get('/:id', bookController.getById)
+router.post('/', requireWorkspaceRole('MEMBER'), validateBody(createBookBodySchema), bookController.create)
+router.put('/:id', requireWorkspaceRole('MEMBER'), validateBody(updateBookBodySchema), bookController.update)
+router.delete('/:id', requireWorkspaceRole('ADMIN'), bookController.delete)
+router.post('/:id/cover', requireWorkspaceRole('MEMBER'), uploadLimiter, upload.single('cover'), uploadController.uploadCover)
 
 // Review routes
-router.post('/:bookId/reviews', authenticate, validateBody(createReviewBodySchema), reviewController.create)
-router.get('/:bookId/reviews', authenticate, reviewController.listByBook)
+router.post('/:bookId/reviews', requireWorkspaceRole('MEMBER'), validateBody(createReviewBodySchema), reviewController.create)
+router.get('/:bookId/reviews', reviewController.listByBook)
 
 export default router
