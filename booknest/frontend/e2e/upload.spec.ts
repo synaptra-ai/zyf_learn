@@ -1,5 +1,8 @@
 import { test, expect } from '@playwright/test'
 import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 import { login } from './helpers/auth'
 
 test('用户可以通过编辑页面上传书籍封面', async ({ page }) => {
