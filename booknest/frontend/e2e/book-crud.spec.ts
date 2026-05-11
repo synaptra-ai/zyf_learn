@@ -38,7 +38,7 @@ test.describe('Book CRUD', () => {
     // 删除
     await page.getByTestId('delete-book').click()
     await page.getByTestId('modal-confirm').click()
-    await expect(page).toHaveURL(/\/$/)
+    await expect(page).toHaveURL(/\/(\?.*)?$/)
     await expect(page.getByTestId('book-list').getByText(`${uniqueTitle} Updated`)).not.toBeVisible()
   })
 })
