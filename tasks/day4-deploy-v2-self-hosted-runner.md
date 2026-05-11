@@ -1,15 +1,19 @@
-# Day 4 v2：BookNest 上线部署方案
+# Day 4 v2：BookNest 上线部署方案（备选）
 ## 基于 ECS Self-hosted Runner 的 CI/CD + Docker Compose + Nginx
 
-> 适用项目：`synaptra-ai/zyf_learn` / `booknest`  
-> 适用阶段：Vibe Coding 学习项目 Day 4 部署阶段  
-> 版本：v2 — 从 GitHub-hosted runner + SSH 部署，调整为 ECS self-hosted runner 本机部署
+> **说明**：本项目仓库已设为 public，GitHub Actions 对公开仓库免费且不限时长。
+> 推荐使用主文档 [`day4-deploy.md`](./day4-deploy.md)（GitHub-hosted runner + SSH 部署方案）。
+> 本文档作为备选方案，适用于**私有仓库**遇到 GitHub Actions 计费问题时的替代方案。
+
+> 适用项目：`synaptra-ai/zyf_learn` / `booknest`
+> 适用阶段：Vibe Coding 学习项目 Day 4 部署阶段
+> 版本：v2 — ECS self-hosted runner 本机部署（备选方案）
 
 ---
 
-## 0. 本版方案为什么要切换到 ECS Self-hosted Runner？
+## 0. 什么情况下使用本方案？
 
-原 Day 4 方案采用的是：
+主文档 [`day4-deploy.md`](./day4-deploy.md) 采用的是：
 
 ```text
 GitHub-hosted runner
@@ -21,13 +25,13 @@ appleboy/ssh-action 远程 SSH 到 ECS
 ECS 拉代码、写 .env、docker compose up
 ```
 
-这个方案在教学上没有问题，也很接近常见中小项目部署方式。但本项目在实际执行中遇到两个现实问题：
+这是推荐方案，因为 GitHub Actions 对公开仓库完全免费。但如果遇到以下情况，可以使用本备选方案：
 
-1. **GitHub Actions 计费 / 额度问题**  
-   私有仓库使用 GitHub-hosted runner 会消耗 Actions minutes。如果账户付款失败、额度不足或 spending limit 过低，job 可能根本无法启动，表现为 workflow 在几秒内失败，而不是代码执行报错。
+1. **仓库为私有**且不想处理 GitHub Actions 计费问题  
+   私有仓库使用 GitHub-hosted runner 会消耗 Actions minutes。如果账户付款失败、额度不足或 spending limit 过低，job 可能根本无法启动。
 
-2. **部署链路有额外 SSH 环节**  
-   GitHub-hosted runner 部署 ECS 时，需要配置 `ECS_HOST`、`ECS_USER`、`ECS_SSH_KEY`，还要排查安全组、SSH key、known_hosts、sshd、fail2ban 等问题。学习阶段会把 CI/CD 主线复杂化。
+2. **部署链路有额外 SSH 环节需要简化**  
+   GitHub-hosted runner 部署 ECS 时，需要配置 `ECS_HOST`、`ECS_USER`、`ECS_SSH_KEY`等 Secrets。本方案在 ECS 本机运行 runner，省去 SSH 配置。
 
 因此 v2 改为：
 

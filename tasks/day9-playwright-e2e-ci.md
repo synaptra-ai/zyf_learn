@@ -129,7 +129,7 @@ export default defineConfig({
     ['list'],
   ],
   use: {
-    baseURL: process.env.E2E_BASE_URL || 'http://localhost:4011',
+    baseURL: process.env.E2E_BASE_URL || 'http://localhost:4001',
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
@@ -142,15 +142,15 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: 'cd ../backend && PORT=4010 npm run dev',
-      url: 'http://localhost:4010/health',
-      reuseExistingServer: true,
+      command: 'cd ../backend && npm run dev',
+      url: 'http://localhost:4000/health',
+      reuseExistingServer: !process.env.CI,
       timeout: 120_000,
     },
     {
-      command: 'npx vite --port 4011 --host 0.0.0.0',
-      url: 'http://localhost:4011',
-      reuseExistingServer: true,
+      command: 'npx vite --port 4001 --host 0.0.0.0',
+      url: 'http://localhost:4001',
+      reuseExistingServer: !process.env.CI,
       timeout: 120_000,
     },
   ],
@@ -177,16 +177,16 @@ export default defineConfig({
 前端 `.env.e2e`：
 
 ```bash
-VITE_API_URL=http://localhost:4010/api/v1
-VITE_SOCKET_URL=http://localhost:4010
+VITE_API_URL=http://localhost:4000/api/v1
+VITE_SOCKET_URL=http://localhost:4000
 ```
 
 后端 `.env.e2e`：
 
 ```bash
-DATABASE_URL="postgresql://booknest:booknest123@localhost:55433/booknest_e2e"
+DATABASE_URL="postgresql://booknest:booknest123@localhost:5433/booknest_e2e"
 JWT_SECRET="booknest-e2e-secret"
-PORT=4010
+PORT=4000
 NODE_ENV=test
 REDIS_HOST=localhost
 REDIS_PORT=6379
@@ -286,8 +286,8 @@ main()
 
 ```bash
 cd backend
-DATABASE_URL="postgresql://booknest:booknest123@localhost:55433/booknest_e2e" npx prisma migrate deploy
-DATABASE_URL="postgresql://booknest:booknest123@localhost:55433/booknest_e2e" npm run prisma:seed:e2e
+DATABASE_URL="postgresql://booknest:booknest123@localhost:5433/booknest_e2e" npx prisma migrate deploy
+DATABASE_URL="postgresql://booknest:booknest123@localhost:5433/booknest_e2e" npm run prisma:seed:e2e
 ```
 
 ---
@@ -361,7 +361,7 @@ export async function login(page: Page, email = 'e2e-a@booknest.com', password =
 ```ts
 import { APIRequestContext } from '@playwright/test'
 
-const API_BASE = process.env.E2E_API_URL || 'http://localhost:4010/api/v1'
+const API_BASE = process.env.E2E_API_URL || 'http://localhost:4000/api/v1'
 
 export async function apiLogin(request: APIRequestContext, email: string, password: string) {
   const res = await request.post(`${API_BASE}/auth/login`, {
@@ -532,11 +532,11 @@ test('用户可以上传书籍封面', async ({ page }) => {
 
 ```ts
 if (process.env.NODE_ENV === 'test') {
-  return `http://localhost:${process.env.PORT || 4000}/mock-uploads/${filename}`
+  return `http://localhost:4000/mock-uploads/${filename}`
 }
 ```
 
-这样 E2E 不依赖阿里云 OSS，更稳定。注意 mock URL 使用 `process.env.PORT` 以适配 E2E 环境的端口 (4010)。
+这样 E2E 不依赖阿里云 OSS，更稳定。
 
 ---
 
@@ -550,7 +550,7 @@ if (process.env.NODE_ENV === 'test') {
 import { test, expect } from '@playwright/test'
 import { apiLogin } from './helpers/api'
 
-const API_BASE = process.env.E2E_API_URL || 'http://localhost:4010/api/v1'
+const API_BASE = process.env.E2E_API_URL || 'http://localhost:4000/api/v1'
 
 test('用户不能访问其他用户的书籍', async ({ request }) => {
   const tokenA = await apiLogin(request, 'e2e-a@booknest.com', 'password123')
@@ -589,11 +589,10 @@ cd booknest
 docker compose up -d postgres redis
 ```
 
-迁移和 seed（本地开发环境用 5433，CI 环境用 55433）：
+迁移和 seed：
 
 ```bash
 cd backend
-# 本地开发时 PostgreSQL 映射在 5433
 DATABASE_URL="postgresql://booknest:booknest123@localhost:5433/booknest_e2e" npx prisma migrate deploy
 DATABASE_URL="postgresql://booknest:booknest123@localhost:5433/booknest_e2e" npm run prisma:seed:e2e
 ```
@@ -615,40 +614,25 @@ npm run e2e:report
 
 ---
 
-## Step 13：接入 GitHub Actions（ECS Self-hosted Runner 版）
+## Step 13：接入 GitHub Actions
 
-> **前提**：本项目已切换为 ECS Self-hosted Runner 方案（参见 `tasks/day4-deploy-v2-self-hosted-runner.md`）。
-> E2E workflow 运行在 ECS 本机，需要注意端口冲突问题。
+> **前提**：本项目使用 GitHub-hosted runner + SSH 部署方案（参见 `tasks/day4-deploy.md`）。
+> 公开仓库 GitHub Actions 完全免费，不限时长。
 
 创建 `.github/workflows/e2e.yml`
-
-### 13.1 端口规划
-
-Self-hosted runner 运行在 ECS 上，生产服务可能已经占用端口。E2E 必须使用不同端口：
-
-| 服务 | 生产端口 | E2E 端口 | 说明 |
-|---|---|---|---|
-| PostgreSQL | Docker 内网 5432 | 宿主机 55433 | 避免与 CI 测试库 (55432) 和生产冲突 |
-| Redis | Docker 内网 6379 | 宿主机 6380 | 避免与生产 Redis 冲突 |
-| Backend | 4000 | 4010 | 避免与生产后端冲突 |
-| Frontend | 8080 | 4011 | 避免与生产前端冲突 |
-
-### 13.2 推荐的 e2e.yml
 
 ```yaml
 name: E2E Tests
 
 on:
-  # Self-hosted runner 上建议使用 workflow_dispatch 手动触发
-  # 避免每次 PR/push 都启动 E2E 与生产服务争抢资源
-  workflow_dispatch:
-  # 如果团队规模小、ECS 资源充裕，也可以改为自动触发：
-  # pull_request:
-  #   branches: [main]
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
 
 jobs:
   e2e:
-    runs-on: [self-hosted, linux, x64]
+    runs-on: ubuntu-latest
 
     services:
       postgres:
@@ -658,7 +642,7 @@ jobs:
           POSTGRES_PASSWORD: booknest123
           POSTGRES_DB: booknest_e2e
         ports:
-          - 55433:5432
+          - 5432:5432
         options: >-
           --health-cmd "pg_isready -U booknest -d booknest_e2e"
           --health-interval 10s
@@ -668,10 +652,19 @@ jobs:
       redis:
         image: redis:7-alpine
         ports:
-          - 6380:6379
+          - 6379:6379
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: |
+            booknest/frontend/package-lock.json
+            booknest/backend/package-lock.json
 
       - name: Install backend dependencies
         run: |
@@ -685,54 +678,45 @@ jobs:
           npx prisma migrate deploy
           npm run prisma:seed:e2e
         env:
-          DATABASE_URL: postgresql://booknest:booknest123@localhost:55433/booknest_e2e
+          DATABASE_URL: postgresql://booknest:booknest123@localhost:5432/booknest_e2e
           JWT_SECRET: booknest-e2e-secret
 
       - name: Install frontend dependencies
         run: |
           cd booknest/frontend
           npm ci
-          # Self-hosted runner 上 chromium 可能已安装，不需要 --with-deps
-          npx playwright install chromium
+          npx playwright install --with-deps chromium
 
       - name: Start backend for e2e
         run: |
           cd booknest/backend
-          PORT=4010 npm run dev > /tmp/e2e-backend.log 2>&1 &
-          echo "BACKEND_PID=$!" >> $GITHUB_ENV
+          npm run dev > /tmp/e2e-backend.log 2>&1 &
           sleep 8
-          curl -f http://localhost:4010/health
+          curl -f http://localhost:4000/health
         env:
-          DATABASE_URL: postgresql://booknest:booknest123@localhost:55433/booknest_e2e
+          DATABASE_URL: postgresql://booknest:booknest123@localhost:5432/booknest_e2e
           JWT_SECRET: booknest-e2e-secret
           REDIS_HOST: localhost
-          REDIS_PORT: 6380
+          REDIS_PORT: 6379
           NODE_ENV: test
 
       - name: Start frontend for e2e
         run: |
           cd booknest/frontend
-          npx vite --port 4011 --host 0.0.0.0 > /tmp/e2e-frontend.log 2>&1 &
-          echo "FRONTEND_PID=$!" >> $GITHUB_ENV
+          npx vite --port 4001 --host 0.0.0.0 > /tmp/e2e-frontend.log 2>&1 &
           sleep 8
-          curl -f http://localhost:4011
+          curl -f http://localhost:4001
         env:
-          VITE_API_URL: http://localhost:4010/api/v1
-          VITE_SOCKET_URL: http://localhost:4010
+          VITE_API_URL: http://localhost:4000/api/v1
+          VITE_SOCKET_URL: http://localhost:4000
 
       - name: Run Playwright tests
         run: |
           cd booknest/frontend
-          E2E_BASE_URL=http://localhost:4011 npm run e2e
+          npm run e2e
         env:
-          VITE_API_URL: http://localhost:4010/api/v1
-          VITE_SOCKET_URL: http://localhost:4010
-
-      - name: Cleanup e2e processes
-        if: always()
-        run: |
-          kill ${{ env.BACKEND_PID }} 2>/dev/null || true
-          kill ${{ env.FRONTEND_PID }} 2>/dev/null || true
+          VITE_API_URL: http://localhost:4000/api/v1
+          VITE_SOCKET_URL: http://localhost:4000
 
       - name: Upload backend logs
         if: always()
@@ -759,43 +743,11 @@ jobs:
           retention-days: 7
 ```
 
-### 13.3 关键变更说明
-
-| 原版 (GitHub-hosted) | Self-hosted Runner 版 | 原因 |
-|---|---|---|
-| `runs-on: ubuntu-latest` | `runs-on: [self-hosted, linux, x64]` | 使用 ECS 上的 runner |
-| PostgreSQL `5433:5432` | `55433:5432` | 避免与 CI 测试库 (55432) 冲突 |
-| Redis `6379:6379` | `6380:6379` | 避免与生产 Redis 冲突 |
-| 后端 `localhost:4000` | `localhost:4010` | 避免与生产后端冲突 |
-| 前端 `localhost:4001` | `localhost:4011` | 避免端口冲突 |
-| `--with-deps chromium` | `chromium` (不加 --with-deps) | 持久机器上系统依赖只需安装一次 |
-| 无清理步骤 | PID 记录 + `kill` 清理 | 持久机器必须可靠清理后台进程 |
-| 无清理步骤 | `Cleanup e2e processes` | 持久机器必须清理后台进程 |
-| `on: pull_request/push` | `on: workflow_dispatch` | 避免与生产服务争抢资源 |
-
-### 13.4 首次在 ECS 上运行 E2E 前
-
-需要手动安装 Playwright 的系统依赖（只需执行一次）：
-
-```bash
-# 在 ECS 上以 deploy 用户执行
-cd /home/deploy/booknest/booknest/frontend
-npx playwright install --with-deps chromium
-```
-
-之后的 CI 运行只需要 `npx playwright install chromium`（不带 `--with-deps`）。
-
-### 13.5 如果想改为自动触发
-
-把 `workflow_dispatch` 改为：
-
-```yaml
-on:
-  pull_request:
-    branches: [main]
-```
-
-但需要注意：E2E 会启动后端和前端进程，与生产服务共用 ECS 资源。如果 ECS 配置较低（2核2G），建议保持手动触发。
+说明：
+- GitHub-hosted runner 每次运行是全新虚拟机，不需要端口隔离，也不需要手动清理后台进程。
+- `--with-deps` 会自动安装 Playwright 所需的系统依赖（Chromium 的共享库等）。
+- PostgreSQL 映射到标准 5432 端口，后端启动在 4000 端口，前端在 4001 端口，与本地开发保持一致。
+- PR 和 push 到 main 分支时自动触发 E2E 测试。
 
 ---
 
@@ -836,8 +788,8 @@ git commit -m "ci: add Playwright e2e workflow"
 帮我在 BookNest 前端项目中配置 Playwright。
 
 要求：
-1. baseURL 是 http://localhost:4011（E2E 使用隔离端口避免与生产冲突）
-2. 自动启动后端 http://localhost:4010/health 和前端 http://localhost:4011
+1. baseURL 是 http://localhost:4001
+2. 自动启动后端 http://localhost:4000/health 和前端 http://localhost:4001
 3. 失败时保留 trace、screenshot、video
 4. 只跑 chromium
 5. 增加 npm scripts：e2e、e2e:ui、e2e:debug、e2e:report
@@ -867,19 +819,18 @@ git commit -m "ci: add Playwright e2e workflow"
 ### CI 接入
 
 ```txt
-帮我写 GitHub Actions e2e.yml（ECS Self-hosted Runner 版）。
+帮我写 GitHub Actions e2e.yml。
 
 要求：
-1. runs-on: [self-hosted, linux, x64]
-2. 触发条件: workflow_dispatch
-3. PostgreSQL 映射到 55433 端口，Redis 映射到 6380 端口（避免与生产服务冲突）
-4. 后端启动在 4010 端口，前端启动在 4011 端口
+1. runs-on: ubuntu-latest
+2. 触发条件: pull_request 和 push 到 main
+3. PostgreSQL 和 Redis 作为 services
+4. 后端启动在 4000 端口，前端启动在 4001 端口
 5. 后端 npm ci、prisma generate、migrate deploy、seed e2e
-6. 前端 npm ci、安装 Playwright chromium
-7. 手动启动 backend (4010) 和 frontend (4011) 作为后台进程
-8. 运行 E2E_BASE_URL=http://localhost:4011 npm run e2e
-9. 清理后台进程（用 PID 记录 + kill）
-10. 失败也上传 playwright-report artifact
+6. 前端 npm ci、安装 Playwright chromium（带 --with-deps）
+7. 手动启动 backend 和 frontend 作为后台进程
+8. 运行 npm run e2e
+9. 失败也上传 playwright-report artifact
 ```
 
 ---

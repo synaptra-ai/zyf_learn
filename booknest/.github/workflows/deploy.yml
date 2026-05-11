@@ -1,12 +1,14 @@
-# 已弃用
-# 本文件是旧版 GitHub-hosted runner + SSH 部署方案的工作流。
-# 实际使用的 workflow 已迁移到仓库根目录 .github/workflows/deploy.yml
-# 使用 ECS Self-hosted Runner 方案。参见 tasks/day4-deploy-v2-self-hosted-runner.md。
+# 此文件位于 booknest/.github/workflows/deploy.yml
+# GitHub Actions 只识别仓库根目录 .github/workflows/ 下的 workflow 文件。
+# 由于本文件在 booknest/ 子目录中，GitHub Actions 不会执行它。
 #
-# 此文件保留仅供参考，GitHub Actions 不会执行此文件
-# （因为 workflows 需要在仓库根目录 .github/workflows/ 下才会被识别）。
+# 实际使用的 workflow 在仓库根目录：
+#   .github/workflows/deploy.yml  — GitHub-hosted runner + SSH 部署
+#   .github/workflows/e2e.yml     — GitHub-hosted runner + Playwright E2E
+#
+# 参见 tasks/day4-deploy.md 了解部署方案详情。
 
-name: Deploy to Production (DEPRECATED)
+name: Deploy (not executed — see root .github/workflows/)
 
 on:
   push:
@@ -17,4 +19,4 @@ jobs:
   deploy:
     runs: false
     steps:
-      - run: echo "This workflow is deprecated. See .github/workflows/deploy.yml at repo root."
+      - run: echo "This file is not executed by GitHub Actions. See .github/workflows/ at repo root."

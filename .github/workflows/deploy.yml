@@ -12,7 +12,7 @@ env:
 jobs:
   # Job 1: 测试
   test:
-    runs-on: [self-hosted, linux, x64]
+    runs-on: ubuntu-latest
 
     services:
       postgres:
@@ -22,12 +22,17 @@ jobs:
           POSTGRES_PASSWORD: test
           POSTGRES_DB: booknest_test
         ports:
-          - 55432:5432
+          - 5432:5432
         options: >-
           --health-cmd "pg_isready -U test -d booknest_test"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
 
     steps:
       - uses: actions/checkout@v4
@@ -53,7 +58,7 @@ jobs:
           npx prisma migrate deploy
           npm run prisma:seed
         env:
-          DATABASE_URL: postgresql://test:test@localhost:55432/booknest_test
+          DATABASE_URL: postgresql://test:test@localhost:5432/booknest_test
           JWT_SECRET: test-secret
           PORT: 4000
           NODE_ENV: test
@@ -63,7 +68,7 @@ jobs:
           cd booknest/backend
           npm test -- --runInBand
         env:
-          DATABASE_URL: postgresql://test:test@localhost:55432/booknest_test
+          DATABASE_URL: postgresql://test:test@localhost:5432/booknest_test
           JWT_SECRET: test-secret
           PORT: 4000
           NODE_ENV: test
@@ -74,7 +79,7 @@ jobs:
           npm run lint
           npm run openapi:generate
         env:
-          DATABASE_URL: postgresql://test:test@localhost:55432/booknest_test
+          DATABASE_URL: postgresql://test:test@localhost:5432/booknest_test
           JWT_SECRET: test-secret
           PORT: 4000
           NODE_ENV: test
@@ -87,69 +92,76 @@ jobs:
       - name: Frontend Build and Tests
         run: |
           cd booknest/frontend
+          npm run lint
+          npm run api:types:local
           npm run build
           npx vitest run --passWithNoTests
         env:
           VITE_API_URL: http://localhost:4000/api/v1
 
-  # Job 2: 部署 (仅 main 分支)
+  # Job 2: 部署 (仅 main 分支 push)
   deploy:
     needs: test
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    runs-on: [self-hosted, linux, x64]
+    runs-on: ubuntu-latest
 
     concurrency:
       group: production-deploy
       cancel-in-progress: false
 
     steps:
-      - name: Deploy on ECS
-        run: |
-          set -e
+      - name: Deploy to ECS via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.ECS_HOST }}
+          username: ${{ secrets.ECS_USER }}
+          key: ${{ secrets.ECS_SSH_KEY }}
+          script: |
+            set -e
 
-          echo "=== Deploy started ==="
-          whoami
-          pwd
-          docker --version
-          docker compose version
+            echo "=== Deploy started ==="
+            whoami
+            pwd
+            docker --version
+            docker compose version
 
-          cd /home/deploy/booknest
-          git fetch origin main
-          git reset --hard origin/main
-          git clean -fd
+            cd /home/deploy/booknest
+            git fetch origin main
+            git reset --hard origin/main
+            git clean -fd
 
-          cd booknest
+            cd booknest
 
-          cat > .env <<'ENVEOF'
-          DB_USER=booknest
-          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-          DB_NAME=booknest
-          JWT_SECRET=${{ secrets.JWT_SECRET }}
-          DOMAIN=139.224.246.39
-          ENVEOF
+            cat > .env <<'ENVEOF'
+            DB_USER=booknest
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            DB_NAME=booknest
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            DOMAIN=${{ secrets.ECS_HOST }}
+            ENVEOF
 
-          docker compose -f docker-compose.prod.yml down
-          docker compose -f docker-compose.prod.yml up -d --build
+            docker compose -f docker-compose.prod.yml down
+            docker compose -f docker-compose.prod.yml up -d --build
 
-          echo "=== Container status ==="
-          docker compose -f docker-compose.prod.yml ps
+            echo "=== Container status ==="
+            docker compose -f docker-compose.prod.yml ps
 
-          echo "=== Backend logs ==="
-          docker compose -f docker-compose.prod.yml logs --tail=100 backend
+            echo "=== Backend logs ==="
+            docker compose -f docker-compose.prod.yml logs --tail=100 backend
 
-          echo "=== Waiting for backend health ==="
-          for i in {1..30}; do
-            if curl -f http://localhost:4000/health; then
-              echo "Backend healthy"
-              break
-            fi
-            echo "Waiting for backend... $i"
-            sleep 2
-          done
+            echo "=== Waiting for backend health ==="
+            for i in {1..30}; do
+              if curl -f http://localhost:4000/health; then
+                echo "Backend healthy"
+                break
+              fi
+              echo "Waiting for backend... $i"
+              sleep 2
+            done
 
-          curl -f http://localhost:4000/health
-          curl -f http://localhost/health
+            curl -f http://localhost:4000/health
+            curl -f http://localhost/health
 
-          docker image prune -f
+            docker image prune -f
 
-          echo "=== Deploy successful ==="
+            echo "=== Deploy successful ==="
