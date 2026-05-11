@@ -22,6 +22,9 @@ export async function uploadToOSS(
   buffer: Buffer,
   contentType: string,
 ): Promise<string> {
+  if (process.env.NODE_ENV === 'test') {
+    return `http://localhost:4000/mock-uploads/${Date.now()}-${filename}`
+  }
   const key = `covers/${Date.now()}-${filename}`
   await getClient().put(key, buffer, {
     headers: { 'Content-Type': contentType },
@@ -30,6 +33,7 @@ export async function uploadToOSS(
 }
 
 export async function deleteFromOSS(url: string): Promise<void> {
+  if (process.env.NODE_ENV === 'test') return
   const key = url.split('.com/')[1]
   if (key) {
     await getClient().delete(key)
