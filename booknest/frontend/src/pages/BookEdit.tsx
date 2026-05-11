@@ -44,7 +44,6 @@ export default function BookEdit() {
     handleSubmit,
     formState: { errors },
   } = useForm({
-    defaultValues: {} as BookFormData,
     resolver: zodResolver(bookSchema),
     values: book
       ? {

@@ -12,6 +12,7 @@ import { generateOpenApiDocument } from './lib/openapi'
 
 const app = express()
 
+app.set('trust proxy', 1)
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }))
 const corsOrigins = process.env.CORS_ORIGINS
   ? process.env.CORS_ORIGINS.split(',')
