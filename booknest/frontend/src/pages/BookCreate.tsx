@@ -85,14 +85,15 @@ export default function BookCreate() {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <Input id="title" label="书名 *" placeholder="输入书名" error={errors.title?.message} {...register('title')} />
-        <Input id="author" label="作者 *" placeholder="输入作者" error={errors.author?.message} {...register('author')} />
+        <Input data-testid="book-title" id="title" label="书名 *" placeholder="输入书名" error={errors.title?.message} {...register('title')} />
+        <Input data-testid="book-author" id="author" label="作者 *" placeholder="输入作者" error={errors.author?.message} {...register('author')} />
         <Input id="isbn" label="ISBN" placeholder="10位或13位数字" error={errors.isbn?.message} {...register('isbn')} />
-        <Input id="pageCount" label="页数" type="number" placeholder="输入页数" error={errors.pageCount?.message} {...register('pageCount', { valueAsNumber: true })} />
+        <Input data-testid="book-page-count" id="pageCount" label="页数" type="number" placeholder="输入页数" error={errors.pageCount?.message} {...register('pageCount', { valueAsNumber: true })} />
 
         <div className="space-y-1">
           <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300">状态 *</label>
           <select
+            data-testid="book-status"
             id="status"
             className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
             {...register('status')}
@@ -107,6 +108,7 @@ export default function BookCreate() {
           <div className="space-y-1">
             <label htmlFor="categoryId" className="block text-sm font-medium text-gray-700 dark:text-gray-300">分类</label>
             <select
+              data-testid="book-category"
               id="categoryId"
               className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
               {...register('categoryId')}
@@ -132,7 +134,7 @@ export default function BookCreate() {
 
         <div className="space-y-1">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">封面</label>
-          <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleCoverChange} />
+          <input ref={fileRef} data-testid="cover-upload-input" type="file" accept="image/*" className="hidden" onChange={handleCoverChange} />
           <div
             onClick={() => fileRef.current?.click()}
             className="group relative flex h-36 cursor-pointer items-center justify-center rounded-md border-2 border-dashed border-gray-300 bg-gray-50 transition-colors hover:border-primary-400 hover:bg-primary-50 dark:border-gray-600 dark:bg-gray-800 dark:hover:border-primary-500 dark:hover:bg-gray-700"
@@ -154,7 +156,7 @@ export default function BookCreate() {
         </div>
 
         <div className="flex gap-3 pt-2">
-          <Button type="submit" isLoading={createBook.isPending}>添加书籍</Button>
+          <Button data-testid="book-submit" type="submit" isLoading={createBook.isPending}>添加书籍</Button>
           <Button type="button" variant="outline" onClick={() => navigate(-1)}>取消</Button>
         </div>
       </form>
