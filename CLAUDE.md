@@ -122,6 +122,11 @@ Prisma enums: `BookStatus` (OWNED, READING, FINISHED, WISHLIST), `UserRole` (USE
 ### API 端点
 - `/api/v1` — 业务接口
 - `/api/v1/workspaces` — Workspace 管理 (RBAC)
+- `/api/v1/activities` — 读书会活动 CRUD
+- `/api/v1/orders` — 订单创建/查询
+- `/api/v1/payments` — 模拟支付回调
+- `/api/v1/imports` — CSV 异步导入
+- `/api/v1/exports/books` — CSV 导出
 - `/health` — 健康检查
 - `/health/detailed` — 详细健康检查 (DB + Redis)
 - `/api-docs` — Swagger UI
@@ -172,6 +177,8 @@ Prisma enums: `BookStatus` (OWNED, READING, FINISHED, WISHLIST), `UserRole` (USE
 - `hooks/useStats.ts` — 统计数据 hook
 - `hooks/useSocket.ts` — WebSocket hook
 - `hooks/useWorkspaces.ts` — Workspace hooks (列表、成员、邀请)
+- `hooks/useActivities.ts` — 活动 + 订单 + 支付 hooks
+- `hooks/useImports.ts` — CSV 导入/导出 hooks
 - `stores/useAuthStore.ts` — 认证状态 (Zustand, token 持久化 localStorage)
 - `stores/useWorkspaceStore.ts` — 当前活跃 Workspace (Zustand persist)
 - `stores/useThemeStore.ts` — 暗色模式切换
@@ -188,6 +195,8 @@ Prisma enums: `BookStatus` (OWNED, READING, FINISHED, WISHLIST), `UserRole` (USE
 - `/categories` — 分类管理
 - `/stats` — 统计
 - `/members` — 成员管理 (邀请、角色)
+- `/activities` — 读书会活动 (报名、模拟支付)
+- `/data-tools` — 数据工具 (CSV 导入/导出)
 
 ### 认证
 - JWT token 存在 localStorage (auth_token)
@@ -253,10 +262,10 @@ Prisma enums: `BookStatus` (OWNED, READING, FINISHED, WISHLIST), `UserRole` (USE
 | Day 8 | ESLint/Prettier + Zod schema + OpenAPI + 前端类型生成 + 架构文档 | 已完成 |
 | Day 9 | Playwright E2E 测试 (auth, book-crud, review, upload, permission) | 已完成 |
 | Day 10 | 多租户 SaaS (Workspace/RBAC/Invitation/AuditLog) | 已完成 |
+| Day 11 | 订单状态机 + 模拟支付 + BullMQ 队列 + CSV 导入导出 | 已完成 |
 
 ### 待实施
 
 | Day | 内容 | 状态 |
 |-----|------|------|
 | Day 5 | 云服务器安全加固 | 待实施 |
-| Day 11 | 订单状态机 + 模拟支付 + BullMQ 队列 + CSV 导入 | 待实施 |
