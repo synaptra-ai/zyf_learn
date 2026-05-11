@@ -49,7 +49,7 @@ function Modal({ open, onClose, title, children, onConfirm, confirmText = 'чбошо
             {cancelText}
           </Button>
           {onConfirm && (
-            <Button onClick={onConfirm}>{confirmText}</Button>
+            <Button data-testid="modal-confirm" onClick={onConfirm}>{confirmText}</Button>
           )}
         </div>
       </div>

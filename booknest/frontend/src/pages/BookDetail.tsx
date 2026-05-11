@@ -43,11 +43,11 @@ export default function BookDetail() {
           <h1 className="text-2xl font-bold">书籍详情</h1>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => navigate(`/books/${book.id}/edit`)}>
+          <Button data-testid="edit-book" variant="outline" onClick={() => navigate(`/books/${book.id}/edit`)}>
             <Pencil className="mr-1 h-4 w-4" />
             编辑
           </Button>
-          <Button variant="destructive" onClick={() => setShowDelete(true)}>
+          <Button data-testid="delete-book" variant="destructive" onClick={() => setShowDelete(true)}>
             <Trash2 className="mr-1 h-4 w-4" />
             删除
           </Button>
@@ -59,7 +59,7 @@ export default function BookDetail() {
         <div className="flex gap-6">
           <div className="flex h-40 w-28 shrink-0 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700">
             {book.coverUrl ? (
-              <img src={book.coverUrl} alt={book.title} className="h-full w-full rounded-lg object-cover" />
+              <img data-testid="book-cover-image" src={book.coverUrl} alt={book.title} className="h-full w-full rounded-lg object-cover" />
             ) : (
               <BookOpen className="h-12 w-12 text-gray-400 dark:text-gray-500" />
             )}
