@@ -9,7 +9,7 @@ export interface MockPaymentPayload {
 }
 
 export function signPaymentPayload(payload: MockPaymentPayload) {
-  const secret = process.env.MOCK_PAYMENT_SECRET!
+  const secret = process.env.MOCK_PAYMENT_SECRET || 'default-mock-payment-secret'
   const content = `${payload.eventId}|${payload.orderNo}|${payload.amountCents}|${payload.paidAt}|${payload.status}`
   return crypto.createHmac('sha256', secret).update(content).digest('hex')
 }

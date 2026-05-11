@@ -72,6 +72,9 @@ jobs:
           JWT_SECRET: test-secret
           PORT: 4000
           NODE_ENV: test
+          MOCK_PAYMENT_SECRET: mock-payment-secret-for-ci
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
 
       - name: Backend Lint and OpenAPI
         run: |
