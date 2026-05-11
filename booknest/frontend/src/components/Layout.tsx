@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom'
-import { BookOpen, Moon, Sun, BarChart3, FolderOpen, Plus, LogOut, Users } from 'lucide-react'
+import { BookOpen, Moon, Sun, BarChart3, FolderOpen, Plus, LogOut, Users, Calendar, Database } from 'lucide-react'
 import { useThemeStore } from '@/stores/useThemeStore'
 import { useAuthStore } from '@/stores/useAuthStore'
 import NotificationToast from './ui/NotificationToast'
@@ -45,6 +45,14 @@ export default function Layout() {
               <NavLink to="/members" className={linkClass}>
                 <Users className="h-4 w-4" />
                 成员
+              </NavLink>
+              <NavLink to="/activities" className={linkClass}>
+                <Calendar className="h-4 w-4" />
+                活动
+              </NavLink>
+              <NavLink to="/data-tools" className={linkClass}>
+                <Database className="h-4 w-4" />
+                工具
               </NavLink>
             </nav>
           </div>
