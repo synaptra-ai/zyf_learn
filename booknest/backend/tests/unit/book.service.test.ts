@@ -19,6 +19,7 @@ describe('BookService', () => {
         author: 'Test Author',
         status: 'READING',
         userId,
+        workspaceId: 'test-workspace-id',
       },
     })
     bookId = book.id
