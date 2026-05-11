@@ -28,7 +28,7 @@ export default function Login() {
     try {
       setError('')
       await login(data.email, data.password)
-      navigate('/')
+      navigate('/?welcome=true')
     } catch (err: any) {
       setError(err.response?.data?.message || '登录失败')
     }
