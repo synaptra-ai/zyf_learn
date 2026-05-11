@@ -22,6 +22,14 @@ async function main() {
     data: { email: 'test@booknest.com', passwordHash, name: '测试用户' },
   })
 
+  // 创建 E2E 测试用户
+  const e2eUserA = await prisma.user.create({
+    data: { email: 'e2e-a@booknest.com', passwordHash, name: 'E2E User A' },
+  })
+  const e2eUserB = await prisma.user.create({
+    data: { email: 'e2e-b@booknest.com', passwordHash, name: 'E2E User B' },
+  })
+
   // 创建分类
   const categories = await Promise.all([
     prisma.category.create({ data: { name: '科幻', color: '#3B82F6', userId: user.id } }),
@@ -30,6 +38,27 @@ async function main() {
     prisma.category.create({ data: { name: '历史', color: '#F59E0B', userId: user.id } }),
     prisma.category.create({ data: { name: '哲学', color: '#8B5CF6', userId: user.id } }),
   ])
+
+  // E2E 用户 A 的分类和书籍
+  const e2eCategory = await prisma.category.create({ data: { name: '技术', color: '#3B82F6', userId: e2eUserA.id } })
+  await prisma.book.create({
+    data: {
+      title: 'E2E Seed Book',
+      author: 'BookNest Tester',
+      status: BookStatus.READING,
+      pageCount: 300,
+      categoryId: e2eCategory.id,
+      userId: e2eUserA.id,
+    },
+  })
+  await prisma.book.create({
+    data: {
+      title: 'Private Book B',
+      author: 'Another User',
+      status: BookStatus.OWNED,
+      userId: e2eUserB.id,
+    },
+  })
 
   // 创建 25 本书
   const statuses = [BookStatus.OWNED, BookStatus.READING, BookStatus.FINISHED, BookStatus.WISHLIST]
