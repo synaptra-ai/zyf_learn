@@ -45,11 +45,12 @@ export default function Login() {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
           {error && (
-            <div className="p-3 text-sm text-red-600 bg-red-50 dark:bg-red-900/20 rounded-md">{error}</div>
+            <div data-testid="login-error" className="p-3 text-sm text-red-600 bg-red-50 dark:bg-red-900/20 rounded-md">{error}</div>
           )}
 
           <Input
             id="email"
+            data-testid="login-email"
             label="邮箱"
             type="email"
             placeholder="your@email.com"
@@ -59,6 +60,7 @@ export default function Login() {
 
           <Input
             id="password"
+            data-testid="login-password"
             label="密码"
             type="password"
             placeholder="••••••"
@@ -66,7 +68,7 @@ export default function Login() {
             {...register('password')}
           />
 
-          <Button type="submit" className="w-full" isLoading={isSubmitting}>
+          <Button type="submit" data-testid="login-submit" className="w-full" isLoading={isSubmitting}>
             登录
           </Button>
 

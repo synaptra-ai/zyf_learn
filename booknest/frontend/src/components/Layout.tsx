@@ -1,10 +1,12 @@
 import { NavLink, Outlet } from 'react-router-dom'
-import { BookOpen, Moon, Sun, BarChart3, FolderOpen, Plus } from 'lucide-react'
+import { BookOpen, Moon, Sun, BarChart3, FolderOpen, Plus, LogOut } from 'lucide-react'
 import { useThemeStore } from '@/stores/useThemeStore'
+import { useAuthStore } from '@/stores/useAuthStore'
 import NotificationToast from './ui/NotificationToast'
 
 export default function Layout() {
   const { isDark, toggleTheme } = useThemeStore()
+  const logout = useAuthStore((s) => s.logout)
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     `flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
@@ -47,6 +49,14 @@ export default function Layout() {
               className="rounded-md p-2 text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
             >
               {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </button>
+            <button
+              data-testid="logout-button"
+              onClick={() => { logout(); window.location.href = '/login' }}
+              className="rounded-md p-2 text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
+              title="退出登录"
+            >
+              <LogOut className="h-5 w-5" />
             </button>
           </div>
         </div>
