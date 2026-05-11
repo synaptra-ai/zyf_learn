@@ -25,6 +25,10 @@ Thumbs.db
 # Test coverage
 coverage/
 
+# Playwright E2E
+playwright-report/
+test-results/
+
 # IDE
 .vscode/
 .idea/
