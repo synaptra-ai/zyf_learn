@@ -3,7 +3,6 @@ import app from '../../src/server'
 import prisma from '../../src/lib/prisma'
 
 describe('Rate Limiting', () => {
-  let token: string
   const originalNodeEnv = process.env.NODE_ENV
 
   beforeAll(async () => {
@@ -13,7 +12,7 @@ describe('Rate Limiting', () => {
     const res = await request(app)
       .post('/api/v1/auth/login')
       .send({ email: 'test@booknest.com', password: 'password123' })
-    token = res.body.data.token
+    void res.body.data.token
   })
 
   afterAll(async () => {

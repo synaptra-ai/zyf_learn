@@ -1,3 +1,4 @@
+import bcrypt from 'bcrypt'
 import prisma from '../../src/lib/prisma'
 import { bookService } from '../../src/services/book.service'
 import { ApiError } from '../../src/utils/errors'
@@ -8,7 +9,7 @@ describe('BookService', () => {
   let bookId: string
 
   beforeAll(async () => {
-    const hash = await require('bcrypt').hash('test123', 10)
+    const hash = await bcrypt.hash('test123', 10)
     const user = await prisma.user.create({
       data: { email: `unit-book-${Date.now()}@test.com`, passwordHash: hash, name: 'Book Tester' },
     })
@@ -64,7 +65,7 @@ describe('BookService', () => {
   })
 
   test('getById: should throw 403 for other user book', async () => {
-    const hash = await require('bcrypt').hash('test123', 10)
+    const hash = await bcrypt.hash('test123', 10)
     const other = await prisma.user.create({
       data: { email: `other-${Date.now()}@test.com`, passwordHash: hash, name: 'Other' },
     })

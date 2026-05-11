@@ -91,7 +91,7 @@ describe('Payment flow', () => {
 
   test('same payment event is idempotent', async () => {
     // Create a new order + pay, then pay again with the same order
-    const orderRes = await request(app)
+    const _orderRes = await request(app)
       .post('/api/v1/orders')
       .set(headers())
       .send({ activityId })
