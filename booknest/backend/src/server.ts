@@ -22,7 +22,7 @@ app.use(cors({ origin: corsOrigins }))
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms', { stream: morganStream }))
 
 app.use(express.json())
-app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100, message: { code: 429, message: '请求过于频繁，请稍后再试' } }))
+app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100, skip: () => process.env.NODE_ENV === 'test', message: { code: 429, message: '请求过于频繁，请稍后再试' } }))
 
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() })
