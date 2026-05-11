@@ -2,18 +2,26 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import apiClient from '@/lib/api-client'
 import { bookKeys } from './query-keys'
 import { useWorkspaceStore } from '@/stores/useWorkspaceStore'
-import type { paths } from '@/types/api.generated'
 
-type ListBooksResponse =
-  paths['/api/v1/books']['get']['responses']['200']['content']['application/json']['data']
+interface CreateBookBody {
+  title: string
+  author: string
+  isbn?: string
+  pageCount?: number
+  description?: string
+  status?: string
+  categoryId?: string
+}
 
-type CreateBookRequestBody =
-  paths['/api/v1/books']['post']['requestBody']
-type CreateBookBody = NonNullable<CreateBookRequestBody>['content']['application/json']
-
-type UpdateBookRequestBody =
-  paths['/api/v1/books']['id']['put']['requestBody']
-type UpdateBookBody = NonNullable<UpdateBookRequestBody>['content']['application/json']
+interface UpdateBookBody {
+  title?: string
+  author?: string
+  isbn?: string
+  pageCount?: number
+  description?: string
+  status?: string
+  categoryId?: string
+}
 
 type BookItem = ListBooksResponse['items'][number] & {
   category?: { id: string; name: string; color: string }

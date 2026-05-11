@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useWorkspaceMembers, useInviteMember } from '@/hooks/useWorkspaces'
-import { Shield, ShieldCheck, User, Eye, Mail, Send } from 'lucide-react'
+import { Shield, ShieldCheck, User, Eye, Send } from 'lucide-react'
 
 const roleIcons: Record<string, typeof Shield> = {
   OWNER: ShieldCheck,
