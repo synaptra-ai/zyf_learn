@@ -43,7 +43,9 @@ export default function BookEdit() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<BookFormData>({
+  } = useForm({
+    defaultValues: {} as BookFormData,
+    resolver: zodResolver(bookSchema),
     resolver: zodResolver(bookSchema),
     values: book
       ? {
@@ -52,7 +54,7 @@ export default function BookEdit() {
           isbn: book.isbn ?? '',
           pageCount: book.pageCount ?? undefined,
           description: book.description ?? '',
-          status: book.status,
+          status: book.status as 'OWNED' | 'READING' | 'FINISHED' | 'WISHLIST',
           categoryId: book.categoryId ?? '',
         }
       : undefined,
