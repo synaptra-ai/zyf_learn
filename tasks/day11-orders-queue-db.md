@@ -16,7 +16,7 @@
 - [ ] Redis 可通过 Docker 启动，端口为 `6379`。
 - [ ] `docker-compose.yml` 能启动 PostgreSQL / Redis。
 - [ ] 后端已有 JWT 认证、Book / Category / Review CRUD、Redis 缓存、OSS 上传、Socket.IO、日志和健康检查。
-- [ ] GitHub Actions 已有基础测试与部署流程。
+- [ ] GitHub Actions 已有基础测试与部署流程（ECS Self-hosted Runner 版）。
 
 建议在进入本阶段时先创建分支：
 

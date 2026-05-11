@@ -16,7 +16,7 @@
 - [ ] Redis 可通过 Docker 启动，端口为 `6379`。
 - [ ] `docker-compose.yml` 能启动 PostgreSQL / Redis。
 - [ ] 后端已有 JWT 认证、Book / Category / Review CRUD、Redis 缓存、OSS 上传、Socket.IO、日志和健康检查。
-- [ ] GitHub Actions 已有基础测试与部署流程。
+- [ ] GitHub Actions 已有基础测试与部署流程（ECS Self-hosted Runner 版）。
 
 建议在进入本阶段时先创建分支：
 
@@ -822,26 +822,32 @@ OpenAPI 文档通过 zod-to-openapi 生成。
 
 路径：`.github/workflows/deploy.yml`
 
-在 test job 中增加：
+> **前提**：本项目已切换为 ECS Self-hosted Runner 方案（参见 `tasks/day4-deploy-v2-self-hosted-runner.md`）。
+> CI 中的 `runs-on` 为 `[self-hosted, linux, x64]`，路径前缀为 `booknest/`。
+
+在 test job 中增加以下步骤（注意路径前缀是 `booknest/`）：
 
 ```yaml
+# 在已有的 "Test Backend" 步骤之后添加
 - name: Backend lint and OpenAPI
   run: |
-    cd backend
-    npm ci
+    cd booknest/backend
     npm run lint
     npm run openapi:generate
 
+# 在已有的 "Test Frontend" 步骤之后添加
 - name: Frontend lint and API types
   run: |
-    cd frontend
-    npm ci
+    cd booknest/frontend
     npm run lint
     npm run api:types:local
     npm run build
 ```
 
-注意：如果 CI 中前端无法访问后端运行中的 `/openapi.json`，就使用本地 `../backend/generated/openapi.json` 方案。
+注意：
+- `npm ci` 已在前面的步骤中执行过，这里不需要重复。
+- 如果 CI 中前端无法访问后端运行中的 `/openapi.json`，就使用本地 `../backend/generated/openapi.json` 方案（`api:types:local` 脚本已处理）。
+- 这些步骤运行在 ECS Self-hosted Runner 上，不需要额外安装依赖。
 
 ---
 

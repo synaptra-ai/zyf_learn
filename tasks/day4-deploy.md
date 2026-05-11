@@ -1,5 +1,9 @@
 # Day 4: BookNest 上线部署 — CI/CD + 阿里云 + Nginx + HTTPS
 
+> **已弃用**：本文档基于 GitHub-hosted runner + SSH 部署方案。由于 GitHub Actions 计费限制，项目已切换为 **ECS Self-hosted Runner** 方案。请使用新版文档：[`day4-deploy-v2-self-hosted-runner.md`](./day4-deploy-v2-self-hosted-runner.md)。
+>
+> 本文档保留供参考学习，其中的阿里云 ECS 购买、域名 DNS、Nginx 配置、HTTPS 证书等基础步骤在 v2 中仍然适用。
+
 ## 项目简介
 
 今天是 BookNest 进阶阶段的第一天。前三天你在本地完成了一个全栈应用，但只有部署到服务器上，别人才能真正访问。今天你将完成代码从本地到线上的最后一公里：购买云服务器、配置域名、搭建 CI/CD 流水线、部署应用并开启 HTTPS。
