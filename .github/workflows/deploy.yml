@@ -90,7 +90,7 @@ jobs:
       - name: Install frontend dependencies
         run: |
           cd booknest/frontend
-          npm ci
+          npm ci --legacy-peer-deps
 
       - name: Frontend Build and Tests
         run: |
