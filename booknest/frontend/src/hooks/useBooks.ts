@@ -23,7 +23,21 @@ interface UpdateBookBody {
   categoryId?: string
 }
 
-type BookItem = ListBooksResponse['items'][number] & {
+interface BookItem {
+  id: string
+  title: string
+  author: string
+  isbn?: string
+  publishedDate?: string
+  pageCount?: number
+  description?: string
+  coverUrl?: string
+  status: string
+  createdAt: string
+  updatedAt: string
+  userId: string
+  workspaceId: string
+  categoryId?: string
   category?: { id: string; name: string; color: string }
   reviews?: { id: string; rating: number; text?: string; user: { id: string; name: string }; createdAt: string }[]
 }
