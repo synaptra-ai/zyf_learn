@@ -141,16 +141,41 @@ jobs:
             DB_NAME=booknest
             JWT_SECRET=${{ secrets.JWT_SECRET }}
             DOMAIN=${{ secrets.ECS_HOST }}
+            CORS_ORIGINS=http://${{ secrets.ECS_HOST }}
             ENVEOF
 
             docker compose -f docker-compose.prod.yml down
-            docker compose -f docker-compose.prod.yml up -d --build
+
+            # 1. Build all images
+            docker compose -f docker-compose.prod.yml build
+
+            # 2. Start postgres + redis first (backend depends on password sync)
+            docker compose -f docker-compose.prod.yml up -d postgres redis
+
+            # 3. Wait for postgres to be healthy
+            for i in {1..30}; do
+              if docker compose -f docker-compose.prod.yml exec -T postgres pg_isready -U booknest; then
+                echo "PostgreSQL ready"
+                break
+              fi
+              echo "Waiting for PostgreSQL... $i"
+              sleep 2
+            done
+
+            # 4. Sync password (handles cases where pgdata volume has a different password)
+            source .env
+            docker compose -f docker-compose.prod.yml exec -T postgres psql -U booknest -d booknest -c "ALTER USER booknest PASSWORD '${DB_PASSWORD}';"
+            echo "Database password synced"
+
+            # 5. Start all remaining services (backend + frontend)
+            docker compose -f docker-compose.prod.yml up -d
 
             echo "=== Container status ==="
             docker compose -f docker-compose.prod.yml ps
 
             echo "=== Backend logs ==="
-            docker compose -f docker-compose.prod.yml logs --tail=100 backend
+            sleep 3
+            docker compose -f docker-compose.prod.yml logs --tail=50 backend
 
             echo "=== Waiting for backend health ==="
             for i in {1..30}; do
