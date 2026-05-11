@@ -8,8 +8,15 @@ test.describe('Auth', () => {
     await page.getByTestId('login-password').fill('password123')
     await page.getByTestId('login-submit').click()
 
-    await expect(page).toHaveURL(/\/$/)
+    await expect(page).toHaveURL(/\/(\?.*)?$/)
     await expect(page.getByText('E2E Seed Book')).toBeVisible()
+
+    // Dismiss welcome modal
+    try {
+      await page.getByText('开始使用').click({ timeout: 5000 })
+    } catch {
+      // Welcome modal not shown
+    }
 
     await page.getByTestId('logout-button').click()
     await expect(page).toHaveURL(/\/login/)

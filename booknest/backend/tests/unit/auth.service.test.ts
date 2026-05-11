@@ -1,4 +1,3 @@
-import bcrypt from 'bcrypt'
 import prisma from '../../src/lib/prisma'
 import { authService } from '../../src/services/auth.service'
 import { ApiError } from '../../src/utils/errors'

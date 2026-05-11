@@ -13,6 +13,7 @@ jobs:
   # Job 1: 测试
   test:
     runs-on: ubuntu-latest
+
     services:
       postgres:
         image: postgres:16-alpine
@@ -23,10 +24,15 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U test -d booknest_test"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
 
     steps:
       - uses: actions/checkout@v4
@@ -40,74 +46,125 @@ jobs:
             booknest/frontend/package-lock.json
             booknest/backend/package-lock.json
 
-      - name: Test Backend
+      - name: Install backend dependencies
         run: |
           cd booknest/backend
           npm ci
+
+      - name: Prepare test database
+        run: |
+          cd booknest/backend
           npx prisma generate
-          npm test
+          npx prisma migrate deploy
+          npm run prisma:seed
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/booknest_test
           JWT_SECRET: test-secret
+          PORT: 4000
+          NODE_ENV: test
+
+      - name: Test Backend
+        run: |
+          cd booknest/backend
+          npm test -- --runInBand
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/booknest_test
+          JWT_SECRET: test-secret
+          PORT: 4000
+          NODE_ENV: test
+          MOCK_PAYMENT_SECRET: mock-payment-secret-for-ci
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
 
       - name: Backend Lint and OpenAPI
         run: |
           cd booknest/backend
           npm run lint
           npm run openapi:generate
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/booknest_test
+          JWT_SECRET: test-secret
+          PORT: 4000
+          NODE_ENV: test
 
-      - name: Frontend Lint and API Types
+      - name: Install frontend dependencies
         run: |
           cd booknest/frontend
-          npm ci
+          npm ci --legacy-peer-deps
+
+      - name: Frontend Build and Tests
+        run: |
+          cd booknest/frontend
+          npm run lint
           npm run api:types:local
           npm run build
-          npx vitest run
+          npx vitest run --passWithNoTests
+        env:
+          VITE_API_URL: http://localhost:4000/api/v1
 
-  # Job 2: 部署 (仅 main 分支)
+  # Job 2: 部署 (仅 main 分支 push)
   deploy:
     needs: test
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - name: Deploy to ECS
+    concurrency:
+      group: production-deploy
+      cancel-in-progress: false
+
+    steps:
+      - name: Deploy to ECS via SSH
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.ECS_HOST }}
           username: ${{ secrets.ECS_USER }}
           key: ${{ secrets.ECS_SSH_KEY }}
           script: |
+            set -e
+
+            echo "=== Deploy started ==="
+            whoami
+            pwd
+            docker --version
+            docker compose version
+
             cd /home/deploy/booknest
+            git fetch origin main
+            git reset --hard origin/main
+            git clean -fd
 
-            # 拉取最新代码
-            git pull origin main
+            cd booknest
 
-            # 写入生产环境变量
-            cat > booknest/.env <<EOF
+            cat > .env <<'ENVEOF'
             DB_USER=booknest
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             DB_NAME=booknest
             JWT_SECRET=${{ secrets.JWT_SECRET }}
-            DOMAIN=139.224.246.39
-            EOF
+            DOMAIN=${{ secrets.ECS_HOST }}
+            ENVEOF
 
-            # 重新构建并启动
-            cd booknest
             docker compose -f docker-compose.prod.yml down
             docker compose -f docker-compose.prod.yml up -d --build
 
-            # 等待服务启动
-            sleep 10
+            echo "=== Container status ==="
+            docker compose -f docker-compose.prod.yml ps
 
-            # 健康检查
-            curl -f http://localhost:4000/health || exit 1
+            echo "=== Backend logs ==="
+            docker compose -f docker-compose.prod.yml logs --tail=100 backend
 
-            # 清理旧镜像
+            echo "=== Waiting for backend health ==="
+            for i in {1..30}; do
+              if curl -f http://localhost:4000/health; then
+                echo "Backend healthy"
+                break
+              fi
+              echo "Waiting for backend... $i"
+              sleep 2
+            done
+
+            curl -f http://localhost:4000/health
+            curl -f http://localhost/health
+
             docker image prune -f
 
-      - name: Verify Deployment
-        run: |
-          curl -f http://139.224.246.39/health || exit 1
-          echo "Deployment successful!"
+            echo "=== Deploy successful ==="

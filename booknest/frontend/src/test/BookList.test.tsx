@@ -2,6 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BrowserRouter } from 'react-router-dom'
 import { BookListView } from '../components/book/BookList'
+import { useWorkspaceStore } from '../stores/useWorkspaceStore'
 
 function renderWithProviders(ui: React.ReactElement) {
   const queryClient = new QueryClient({
@@ -13,6 +14,10 @@ function renderWithProviders(ui: React.ReactElement) {
     </QueryClientProvider>
   )
 }
+
+beforeEach(() => {
+  useWorkspaceStore.getState().setActiveWorkspaceId('test-workspace-id')
+})
 
 describe('BookListView', () => {
   test('renders books from API', async () => {

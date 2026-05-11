@@ -12,6 +12,8 @@ async function main() {
   await prisma.review.deleteMany()
   await prisma.book.deleteMany()
   await prisma.category.deleteMany()
+  await prisma.workspaceMember.deleteMany()
+  await prisma.workspace.deleteMany()
   await prisma.user.deleteMany()
 
   const passwordHash = await bcrypt.hash('password123', 10)
@@ -32,11 +34,37 @@ async function main() {
     },
   })
 
+  // Shared workspace for User A (OWNER) and User B (MEMBER)
+  const wsA = await prisma.workspace.create({
+    data: {
+      name: 'E2E Workspace A',
+      members: {
+        createMany: {
+          data: [
+            { userId: userA.id, role: 'OWNER' },
+            { userId: userB.id, role: 'MEMBER' },
+          ],
+        },
+      },
+    },
+  })
+
+  // Private workspace for User B only (used by permission test)
+  const wsB = await prisma.workspace.create({
+    data: {
+      name: 'E2E Workspace B',
+      members: {
+        create: { userId: userB.id, role: 'OWNER' },
+      },
+    },
+  })
+
   const category = await prisma.category.create({
     data: {
       name: '技术',
       color: '#3B82F6',
       userId: userA.id,
+      workspaceId: wsA.id,
     },
   })
 
@@ -48,6 +76,7 @@ async function main() {
       pageCount: 300,
       categoryId: category.id,
       userId: userA.id,
+      workspaceId: wsA.id,
     },
   })
 
@@ -57,6 +86,7 @@ async function main() {
       author: 'Another User',
       status: 'OWNED',
       userId: userB.id,
+      workspaceId: wsA.id,
     },
   })
 

@@ -18,9 +18,9 @@ jobs:
           POSTGRES_PASSWORD: booknest123
           POSTGRES_DB: booknest_e2e
         ports:
-          - 5433:5432
+          - 5432:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U booknest -d booknest_e2e"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -33,13 +33,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '20'
           cache: 'npm'
           cache-dependency-path: |
-            booknest/backend/package-lock.json
             booknest/frontend/package-lock.json
+            booknest/backend/package-lock.json
 
       - name: Install backend dependencies
         run: |
@@ -53,25 +54,61 @@ jobs:
           npx prisma migrate deploy
           npm run prisma:seed:e2e
         env:
-          DATABASE_URL: postgresql://booknest:booknest123@localhost:5433/booknest_e2e
+          DATABASE_URL: postgresql://booknest:booknest123@localhost:5432/booknest_e2e
           JWT_SECRET: booknest-e2e-secret
 
       - name: Install frontend dependencies
         run: |
           cd booknest/frontend
-          npm ci
+          npm ci --legacy-peer-deps
           npx playwright install --with-deps chromium
+
+      - name: Start backend for e2e
+        run: |
+          cd booknest/backend
+          npm run dev > /tmp/e2e-backend.log 2>&1 &
+          sleep 8
+          curl -f http://localhost:4000/health
+        env:
+          DATABASE_URL: postgresql://booknest:booknest123@localhost:5432/booknest_e2e
+          JWT_SECRET: booknest-e2e-secret
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+          NODE_ENV: test
+
+      - name: Start frontend for e2e
+        run: |
+          cd booknest/frontend
+          npx vite --port 4001 --host 0.0.0.0 > /tmp/e2e-frontend.log 2>&1 &
+          sleep 8
+          curl -f http://localhost:4001
+        env:
+          VITE_API_URL: http://localhost:4000/api/v1
+          VITE_SOCKET_URL: http://localhost:4000
 
       - name: Run Playwright tests
         run: |
           cd booknest/frontend
           npm run e2e
         env:
-          DATABASE_URL: postgresql://booknest:booknest123@localhost:5433/booknest_e2e
-          JWT_SECRET: booknest-e2e-secret
-          NODE_ENV: test
           VITE_API_URL: http://localhost:4000/api/v1
           VITE_SOCKET_URL: http://localhost:4000
+
+      - name: Upload backend logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-backend-log
+          path: /tmp/e2e-backend.log
+          retention-days: 7
+
+      - name: Upload frontend logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-frontend-log
+          path: /tmp/e2e-frontend.log
+          retention-days: 7
 
       - name: Upload Playwright report
         if: always()

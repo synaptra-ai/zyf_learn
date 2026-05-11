@@ -148,7 +148,7 @@ export default defineConfig({
       timeout: 120_000,
     },
     {
-      command: 'npm run dev -- --host 0.0.0.0',
+      command: 'npx vite --port 4001 --host 0.0.0.0',
       url: 'http://localhost:4001',
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,
@@ -361,8 +361,10 @@ export async function login(page: Page, email = 'e2e-a@booknest.com', password =
 ```ts
 import { APIRequestContext } from '@playwright/test'
 
+const API_BASE = process.env.E2E_API_URL || 'http://localhost:4000/api/v1'
+
 export async function apiLogin(request: APIRequestContext, email: string, password: string) {
-  const res = await request.post('http://localhost:4000/api/v1/auth/login', {
+  const res = await request.post(`${API_BASE}/auth/login`, {
     data: { email, password },
   })
   const body = await res.json()
@@ -548,11 +550,13 @@ if (process.env.NODE_ENV === 'test') {
 import { test, expect } from '@playwright/test'
 import { apiLogin } from './helpers/api'
 
+const API_BASE = process.env.E2E_API_URL || 'http://localhost:4000/api/v1'
+
 test('用户不能访问其他用户的书籍', async ({ request }) => {
   const tokenA = await apiLogin(request, 'e2e-a@booknest.com', 'password123')
   const tokenB = await apiLogin(request, 'e2e-b@booknest.com', 'password123')
 
-  const createRes = await request.post('http://localhost:4000/api/v1/books', {
+  const createRes = await request.post(`${API_BASE}/books`, {
     headers: { Authorization: `Bearer ${tokenA}` },
     data: {
       title: `Private ${Date.now()}`,
@@ -564,7 +568,7 @@ test('用户不能访问其他用户的书籍', async ({ request }) => {
   const created = await createRes.json()
   const bookId = created.data.id
 
-  const res = await request.get(`http://localhost:4000/api/v1/books/${bookId}`, {
+  const res = await request.get(`${API_BASE}/books/${bookId}`, {
     headers: { Authorization: `Bearer ${tokenB}` },
   })
 
@@ -612,6 +616,9 @@ npm run e2e:report
 
 ## Step 13：接入 GitHub Actions
 
+> **前提**：本项目使用 GitHub-hosted runner + SSH 部署方案（参见 `tasks/day4-deploy.md`）。
+> 公开仓库 GitHub Actions 完全免费，不限时长。
+
 创建 `.github/workflows/e2e.yml`
 
 ```yaml
@@ -635,9 +642,9 @@ jobs:
           POSTGRES_PASSWORD: booknest123
           POSTGRES_DB: booknest_e2e
         ports:
-          - 5433:5432
+          - 5432:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U booknest -d booknest_e2e"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -650,54 +657,97 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '20'
           cache: 'npm'
           cache-dependency-path: |
-            backend/package-lock.json
-            frontend/package-lock.json
+            booknest/frontend/package-lock.json
+            booknest/backend/package-lock.json
 
       - name: Install backend dependencies
         run: |
-          cd backend
+          cd booknest/backend
           npm ci
           npx prisma generate
 
       - name: Migrate and seed e2e database
         run: |
-          cd backend
+          cd booknest/backend
           npx prisma migrate deploy
           npm run prisma:seed:e2e
         env:
-          DATABASE_URL: postgresql://booknest:booknest123@localhost:5433/booknest_e2e
+          DATABASE_URL: postgresql://booknest:booknest123@localhost:5432/booknest_e2e
           JWT_SECRET: booknest-e2e-secret
 
       - name: Install frontend dependencies
         run: |
-          cd frontend
+          cd booknest/frontend
           npm ci
           npx playwright install --with-deps chromium
 
-      - name: Run Playwright tests
+      - name: Start backend for e2e
         run: |
-          cd frontend
-          npm run e2e
+          cd booknest/backend
+          npm run dev > /tmp/e2e-backend.log 2>&1 &
+          sleep 8
+          curl -f http://localhost:4000/health
         env:
-          DATABASE_URL: postgresql://booknest:booknest123@localhost:5433/booknest_e2e
+          DATABASE_URL: postgresql://booknest:booknest123@localhost:5432/booknest_e2e
           JWT_SECRET: booknest-e2e-secret
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
           NODE_ENV: test
+
+      - name: Start frontend for e2e
+        run: |
+          cd booknest/frontend
+          npx vite --port 4001 --host 0.0.0.0 > /tmp/e2e-frontend.log 2>&1 &
+          sleep 8
+          curl -f http://localhost:4001
+        env:
           VITE_API_URL: http://localhost:4000/api/v1
           VITE_SOCKET_URL: http://localhost:4000
+
+      - name: Run Playwright tests
+        run: |
+          cd booknest/frontend
+          npm run e2e
+        env:
+          VITE_API_URL: http://localhost:4000/api/v1
+          VITE_SOCKET_URL: http://localhost:4000
+
+      - name: Upload backend logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-backend-log
+          path: /tmp/e2e-backend.log
+          retention-days: 7
+
+      - name: Upload frontend logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-frontend-log
+          path: /tmp/e2e-frontend.log
+          retention-days: 7
 
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
-          path: frontend/playwright-report/
+          path: booknest/frontend/playwright-report/
           retention-days: 7
 ```
+
+说明：
+- GitHub-hosted runner 每次运行是全新虚拟机，不需要端口隔离，也不需要手动清理后台进程。
+- `--with-deps` 会自动安装 Playwright 所需的系统依赖（Chromium 的共享库等）。
+- PostgreSQL 映射到标准 5432 端口，后端启动在 4000 端口，前端在 4001 端口，与本地开发保持一致。
+- PR 和 push 到 main 分支时自动触发 E2E 测试。
 
 ---
 
@@ -772,11 +822,15 @@ git commit -m "ci: add Playwright e2e workflow"
 帮我写 GitHub Actions e2e.yml。
 
 要求：
-1. 启动 PostgreSQL 16 和 Redis 7 service container
-2. 后端 npm ci、prisma generate、migrate deploy、seed e2e
-3. 前端 npm ci、安装 Playwright chromium
-4. 运行 npm run e2e
-5. 失败也上传 playwright-report artifact
+1. runs-on: ubuntu-latest
+2. 触发条件: pull_request 和 push 到 main
+3. PostgreSQL 和 Redis 作为 services
+4. 后端启动在 4000 端口，前端启动在 4001 端口
+5. 后端 npm ci、prisma generate、migrate deploy、seed e2e
+6. 前端 npm ci、安装 Playwright chromium（带 --with-deps）
+7. 手动启动 backend 和 frontend 作为后台进程
+8. 运行 npm run e2e
+9. 失败也上传 playwright-report artifact
 ```
 
 ---

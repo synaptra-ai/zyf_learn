@@ -29,13 +29,13 @@ export default defineConfig({
     {
       command: 'cd ../backend && npm run dev',
       url: 'http://localhost:4000/health',
-      reuseExistingServer: !process.env.CI,
+      reuseExistingServer: true,
       timeout: 120_000,
     },
     {
       command: 'npm run dev -- --host 0.0.0.0',
       url: 'http://localhost:4001',
-      reuseExistingServer: !process.env.CI,
+      reuseExistingServer: true,
       timeout: 120_000,
     },
   ],

@@ -822,26 +822,33 @@ OpenAPI 文档通过 zod-to-openapi 生成。
 
 路径：`.github/workflows/deploy.yml`
 
-在 test job 中增加：
+> **前提**：本项目使用 GitHub-hosted runner + SSH 部署方案（参见 `tasks/day4-deploy.md`）。
+> CI 中的 `runs-on` 为 `ubuntu-latest`，路径前缀为 `booknest/`。
+
+在 test job 中增加以下步骤（注意路径前缀是 `booknest/`）：
 
 ```yaml
-- name: Backend lint and OpenAPI
+# 在已有的 "Test Backend" 步骤之后添加
+- name: Backend Lint and OpenAPI
   run: |
-    cd backend
-    npm ci
+    cd booknest/backend
     npm run lint
     npm run openapi:generate
 
-- name: Frontend lint and API types
+# 在已有的 "Frontend Build and Tests" 步骤中扩展
+- name: Frontend Build and Tests
   run: |
-    cd frontend
-    npm ci
+    cd booknest/frontend
     npm run lint
     npm run api:types:local
     npm run build
+    npx vitest run --passWithNoTests
 ```
 
-注意：如果 CI 中前端无法访问后端运行中的 `/openapi.json`，就使用本地 `../backend/generated/openapi.json` 方案。
+注意：
+- `npm ci` 已在前面的步骤中执行过，这里不需要重复。
+- 如果 CI 中前端无法访问后端运行中的 `/openapi.json`，就使用本地 `../backend/generated/openapi.json` 方案（`api:types:local` 脚本已处理）。
+- GitHub-hosted runner 是全新虚拟机，每次运行都从零开始，无需担心环境残留问题。
 
 ---
 

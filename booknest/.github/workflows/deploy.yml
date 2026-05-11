@@ -1,4 +1,14 @@
-name: Deploy to Production
+# 此文件位于 booknest/.github/workflows/deploy.yml
+# GitHub Actions 只识别仓库根目录 .github/workflows/ 下的 workflow 文件。
+# 由于本文件在 booknest/ 子目录中，GitHub Actions 不会执行它。
+#
+# 实际使用的 workflow 在仓库根目录：
+#   .github/workflows/deploy.yml  — GitHub-hosted runner + SSH 部署
+#   .github/workflows/e2e.yml     — GitHub-hosted runner + Playwright E2E
+#
+# 参见 tasks/day4-deploy.md 了解部署方案详情。
+
+name: Deploy (not executed — see root .github/workflows/)
 
 on:
   push:
@@ -6,29 +16,7 @@ on:
       - main
 
 jobs:
-  # 我们直接定义 deploy 任务，不再定义 test 任务
   deploy:
-    runs-on: ubuntu-latest
-    
+    runs: false
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.ECS_HOST }}
-          username: deploy
-          key: ${{ secrets.ECS_SSH_KEY }}
-          port: 22
-          script: |
-            echo "🚀 开始部署..."
-            cd /home/deploy/booknest/booknest
-            git pull origin main
-            
-            echo "🐳 重启 Docker 容器..."
-            # 这里假设你用的是 docker-compose，如果是纯 docker 命令请自行调整
-            docker compose down
-            docker compose up -d --build
-            
-            echo "✅ 部署完成！"
+      - run: echo "This file is not executed by GitHub Actions. See .github/workflows/ at repo root."
