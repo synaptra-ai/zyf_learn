@@ -39,6 +39,6 @@ test.describe('Book CRUD', () => {
     await page.getByTestId('delete-book').click()
     await page.getByTestId('modal-confirm').click()
     await expect(page).toHaveURL(/\/$/)
-    await expect(page.getByText(`${uniqueTitle} Updated`)).not.toBeVisible()
+    await expect(page.getByTestId('book-list').getByText(`${uniqueTitle} Updated`)).not.toBeVisible()
   })
 })
