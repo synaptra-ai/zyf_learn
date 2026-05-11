@@ -19,6 +19,40 @@ enum UserRole {
   ADMIN
 }
 
+enum WorkspaceRole {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  REVOKED
+}
+
+enum ActivityStatus {
+  DRAFT
+  PUBLISHED
+  CANCELLED
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  CANCELLED
+  EXPIRED
+}
+
+enum ImportJobStatus {
+  PENDING
+  RUNNING
+  SUCCESS
+  FAILED
+}
+
 model User {
   id           String   @id @default(uuid())
   email        String   @unique
@@ -28,11 +62,94 @@ model User {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
-  books      Book[]
-  categories Category[]
-  reviews    Review[]
+  books          Book[]
+  categories     Category[]
+  reviews        Review[]
+  memberships    WorkspaceMember[]
+  invitationsSent Invitation[] @relation("InvitedBy")
+  auditLogs      AuditLog[]
+  activitiesCreated Activity[]
+  orders            Order[]
+  tickets           Ticket[]
+  importJobs        ImportJob[]
 
   @@map("users")
+}
+
+model Workspace {
+  id          String   @id @default(uuid())
+  name        String   @db.VarChar(100)
+  description String?  @db.Text
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  members     WorkspaceMember[]
+  invitations Invitation[]
+  auditLogs   AuditLog[]
+  books       Book[]
+  categories  Category[]
+  activities  Activity[]
+  orders      Order[]
+  tickets     Ticket[]
+  importJobs  ImportJob[]
+
+  @@map("workspaces")
+}
+
+model WorkspaceMember {
+  id       String        @id @default(uuid())
+  role     WorkspaceRole @default(MEMBER)
+  joinedAt DateTime      @default(now()) @map("joined_at")
+
+  workspaceId String    @map("workspace_id")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+  @@index([userId])
+  @@map("workspace_members")
+}
+
+model Invitation {
+  id         String           @id @default(uuid())
+  email      String           @db.VarChar(255)
+  role       WorkspaceRole    @default(MEMBER)
+  token      String           @unique
+  status     InvitationStatus @default(PENDING)
+  expiresAt  DateTime         @map("expires_at")
+  createdAt  DateTime         @default(now()) @map("created_at")
+  acceptedAt DateTime?        @map("accepted_at")
+
+  workspaceId String    @map("workspace_id")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  invitedById String @map("invited_by_id")
+  invitedBy   User   @relation("InvitedBy", fields: [invitedById], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId])
+  @@index([email])
+  @@map("invitations")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  action     String   @db.VarChar(100)
+  entityType String   @map("entity_type") @db.VarChar(50)
+  entityId   String?  @map("entity_id")
+  metadata   Json?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  workspaceId String    @map("workspace_id")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  actorId String @map("actor_id")
+  actor   User   @relation(fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, createdAt])
+  @@index([actorId])
+  @@map("audit_logs")
 }
 
 model Book {
@@ -48,12 +165,18 @@ model Book {
   createdAt     DateTime   @default(now()) @map("created_at")
   updatedAt     DateTime   @updatedAt @map("updated_at")
 
-  userId     String    @map("user_id")
-  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  workspaceId String    @map("workspace_id")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
   categoryId String?   @map("category_id")
   category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   reviews    Review[]
 
+  @@index([workspaceId, status])
+  @@index([workspaceId, createdAt])
   @@map("books")
 }
 
@@ -66,9 +189,14 @@ model Category {
 
   userId String @map("user_id")
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  books  Book[]
 
-  @@unique([userId, name])
+  workspaceId String    @map("workspace_id")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  books Book[]
+
+  @@unique([workspaceId, name])
+  @@index([workspaceId])
   @@map("categories")
 }
 
@@ -85,4 +213,114 @@ model Review {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("reviews")
+}
+
+model Activity {
+  id              String         @id @default(uuid())
+  title           String         @db.VarChar(200)
+  description     String?        @db.Text
+  capacity        Int
+  registeredCount Int            @default(0) @map("registered_count")
+  priceCents      Int            @default(0) @map("price_cents")
+  status          ActivityStatus @default(DRAFT)
+  startsAt        DateTime       @map("starts_at")
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+
+  workspaceId String    @map("workspace_id")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  createdById String @map("created_by_id")
+  createdBy   User   @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  orders  Order[]
+  tickets Ticket[]
+
+  @@index([workspaceId, status])
+  @@index([startsAt])
+  @@map("activities")
+}
+
+model Order {
+  id          String      @id @default(uuid())
+  orderNo     String      @unique @map("order_no")
+  amountCents Int         @map("amount_cents")
+  status      OrderStatus @default(PENDING)
+  expiresAt   DateTime    @map("expires_at")
+  paidAt      DateTime?   @map("paid_at")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  workspaceId String    @map("workspace_id")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  activityId String   @map("activity_id")
+  activity   Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+
+  paymentEvents PaymentEvent[]
+  ticket        Ticket?
+
+  @@index([workspaceId, userId])
+  @@index([status, expiresAt])
+  @@map("orders")
+}
+
+model PaymentEvent {
+  id        String   @id @default(uuid())
+  provider  String   @db.VarChar(50)
+  eventId   String   @unique @map("event_id")
+  rawPayload Json    @map("raw_payload")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  orderId String @map("order_id")
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@map("payment_events")
+}
+
+model Ticket {
+  id        String   @id @default(uuid())
+  code      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+
+  workspaceId String    @map("workspace_id")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  activityId String   @map("activity_id")
+  activity   Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+
+  orderId String @unique @map("order_id")
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@unique([activityId, userId])
+  @@index([workspaceId, userId])
+  @@map("tickets")
+}
+
+model ImportJob {
+  id           String          @id @default(uuid())
+  status       ImportJobStatus @default(PENDING)
+  total        Int             @default(0)
+  processed    Int             @default(0)
+  successCount Int             @default(0) @map("success_count")
+  failedCount  Int             @default(0) @map("failed_count")
+  error        String?         @db.Text
+  createdAt    DateTime        @default(now()) @map("created_at")
+  updatedAt    DateTime        @updatedAt @map("updated_at")
+
+  workspaceId String    @map("workspace_id")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, createdAt])
+  @@map("import_jobs")
 }

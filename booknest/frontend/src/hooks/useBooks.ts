@@ -1,20 +1,43 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import apiClient from '@/lib/api-client'
 import { bookKeys } from './query-keys'
-import type { paths } from '@/types/api.generated'
+import { useWorkspaceStore } from '@/stores/useWorkspaceStore'
 
-type ListBooksResponse =
-  paths['/api/v1/books']['get']['responses']['200']['content']['application/json']['data']
+interface CreateBookBody {
+  title: string
+  author: string
+  isbn?: string
+  pageCount?: number
+  description?: string
+  status?: string
+  categoryId?: string
+}
 
-type CreateBookRequestBody =
-  paths['/api/v1/books']['post']['requestBody']
-type CreateBookBody = NonNullable<CreateBookRequestBody>['content']['application/json']
+interface UpdateBookBody {
+  title?: string
+  author?: string
+  isbn?: string
+  pageCount?: number
+  description?: string
+  status?: string
+  categoryId?: string
+}
 
-type UpdateBookRequestBody =
-  paths['/api/v1/books/{id}']['put']['requestBody']
-type UpdateBookBody = NonNullable<UpdateBookRequestBody>['content']['application/json']
-
-type BookItem = ListBooksResponse['items'][number] & {
+interface BookItem {
+  id: string
+  title: string
+  author: string
+  isbn?: string
+  publishedDate?: string
+  pageCount?: number
+  description?: string
+  coverUrl?: string
+  status: string
+  createdAt: string
+  updatedAt: string
+  userId: string
+  workspaceId: string
+  categoryId?: string
   category?: { id: string; name: string; color: string }
   reviews?: { id: string; rating: number; text?: string; user: { id: string; name: string }; createdAt: string }[]
 }
@@ -39,63 +62,69 @@ interface BookFilters {
 }
 
 export function useBooks(filters: BookFilters) {
+  const { activeWorkspaceId } = useWorkspaceStore()
   return useQuery({
-    queryKey: bookKeys.list(filters),
+    queryKey: bookKeys.list(activeWorkspaceId, filters),
     queryFn: async () => {
       const { data } = await apiClient.get<BookListData>('/books', { params: filters })
       return data
     },
+    enabled: !!activeWorkspaceId,
   })
 }
 
 export function useBook(id: string) {
+  const { activeWorkspaceId } = useWorkspaceStore()
   return useQuery({
-    queryKey: bookKeys.detail(id),
+    queryKey: bookKeys.detail(activeWorkspaceId, id),
     queryFn: async () => {
       const { data } = await apiClient.get<BookItem>(`/books/${id}`)
       return data
     },
-    enabled: !!id,
+    enabled: !!id && !!activeWorkspaceId,
   })
 }
 
 export function useCreateBook() {
   const queryClient = useQueryClient()
+  const { activeWorkspaceId } = useWorkspaceStore()
   return useMutation({
     mutationFn: async (bookData: CreateBookBody) => {
       const { data } = await apiClient.post('/books', bookData)
       return data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: bookKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: bookKeys.lists(activeWorkspaceId) })
     },
   })
 }
 
 export function useUpdateBook() {
   const queryClient = useQueryClient()
+  const { activeWorkspaceId } = useWorkspaceStore()
   return useMutation({
     mutationFn: async ({ id, ...data }: UpdateBookBody & { id: string }) => {
       const { data: updated } = await apiClient.put(`/books/${id}`, data)
       return updated
     },
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: bookKeys.detail(variables.id) })
-      queryClient.invalidateQueries({ queryKey: bookKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: bookKeys.detail(activeWorkspaceId, variables.id) })
+      queryClient.invalidateQueries({ queryKey: bookKeys.lists(activeWorkspaceId) })
     },
   })
 }
 
 export function useDeleteBook() {
   const queryClient = useQueryClient()
+  const { activeWorkspaceId } = useWorkspaceStore()
   return useMutation({
     mutationFn: async (id: string) => {
       await apiClient.delete(`/books/${id}`)
     },
     onMutate: async (id) => {
-      await queryClient.cancelQueries({ queryKey: bookKeys.lists() })
-      const previousLists = queryClient.getQueriesData({ queryKey: bookKeys.lists() })
-      queryClient.setQueriesData<BookListData>({ queryKey: bookKeys.lists() }, (old) => {
+      await queryClient.cancelQueries({ queryKey: bookKeys.lists(activeWorkspaceId) })
+      const previousLists = queryClient.getQueriesData({ queryKey: bookKeys.lists(activeWorkspaceId) })
+      queryClient.setQueriesData<BookListData>({ queryKey: bookKeys.lists(activeWorkspaceId) }, (old) => {
         if (!old) return old
         return { ...old, items: old.items.filter((b) => b.id !== id), total: old.total - 1 }
       })
@@ -109,13 +138,14 @@ export function useDeleteBook() {
       }
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: bookKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: bookKeys.lists(activeWorkspaceId) })
     },
   })
 }
 
 export function useUploadCover() {
   const queryClient = useQueryClient()
+  const { activeWorkspaceId } = useWorkspaceStore()
   return useMutation({
     mutationFn: async ({ bookId, file }: { bookId: string; file: File }) => {
       const formData = new FormData()
@@ -126,8 +156,8 @@ export function useUploadCover() {
       return data
     },
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: bookKeys.detail(variables.bookId) })
-      queryClient.invalidateQueries({ queryKey: bookKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: bookKeys.detail(activeWorkspaceId, variables.bookId) })
+      queryClient.invalidateQueries({ queryKey: bookKeys.lists(activeWorkspaceId) })
     },
   })
 }

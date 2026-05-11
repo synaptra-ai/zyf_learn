@@ -70,8 +70,8 @@ export default function BookDetail() {
               <p className="text-gray-500 dark:text-gray-400">{book.author}</p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
-              <Badge variant={statusVariant[book.status]}>
-                {statusText[book.status]}
+              <Badge variant={statusVariant[book.status as keyof typeof statusVariant]}>
+                {statusText[book.status as keyof typeof statusText]}
               </Badge>
               {book.category && (
                 <span

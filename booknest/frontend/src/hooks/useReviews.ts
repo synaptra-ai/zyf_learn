@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import apiClient from '@/lib/api-client'
-import { reviewKeys } from './query-keys'
+import { reviewKeys, bookKeys } from './query-keys'
+import { useWorkspaceStore } from '@/stores/useWorkspaceStore'
 import type { Review } from '@/types'
 
 export function useReviews(bookId: string) {
@@ -16,6 +17,7 @@ export function useReviews(bookId: string) {
 
 export function useCreateReview() {
   const queryClient = useQueryClient()
+  const { activeWorkspaceId } = useWorkspaceStore()
   return useMutation({
     mutationFn: async ({ bookId, ...data }: { bookId: string; rating: number; text?: string }) => {
       const { data: review } = await apiClient.post(`/books/${bookId}/reviews`, data)
@@ -23,7 +25,7 @@ export function useCreateReview() {
     },
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: reviewKeys.byBook(variables.bookId) })
-      queryClient.invalidateQueries({ queryKey: ['books'] })
+      queryClient.invalidateQueries({ queryKey: bookKeys.lists(activeWorkspaceId) })
     },
   })
 }

@@ -14,6 +14,9 @@ const CategoryManager = lazy(() => import('@/pages/CategoryManager'))
 const Stats = lazy(() => import('@/pages/Stats'))
 const Login = lazy(() => import('@/pages/Login'))
 const Register = lazy(() => import('@/pages/Register'))
+const WorkspaceMembers = lazy(() => import('@/pages/WorkspaceMembers'))
+const Activities = lazy(() => import('@/pages/Activities'))
+const DataTools = lazy(() => import('@/pages/DataTools'))
 
 function App() {
   return (
@@ -30,6 +33,9 @@ function App() {
               <Route path="books/:id/edit" element={<BookEdit />} />
               <Route path="categories" element={<CategoryManager />} />
               <Route path="stats" element={<Stats />} />
+              <Route path="members" element={<WorkspaceMembers />} />
+              <Route path="activities" element={<Activities />} />
+              <Route path="data-tools" element={<DataTools />} />
             </Route>
           </Routes>
         </Suspense>

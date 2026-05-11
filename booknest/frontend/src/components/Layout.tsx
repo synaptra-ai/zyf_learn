@@ -1,8 +1,9 @@
 import { NavLink, Outlet } from 'react-router-dom'
-import { BookOpen, Moon, Sun, BarChart3, FolderOpen, Plus, LogOut } from 'lucide-react'
+import { BookOpen, Moon, Sun, BarChart3, FolderOpen, Plus, LogOut, Users, Calendar, Database } from 'lucide-react'
 import { useThemeStore } from '@/stores/useThemeStore'
 import { useAuthStore } from '@/stores/useAuthStore'
 import NotificationToast from './ui/NotificationToast'
+import WorkspaceSwitcher from './ui/WorkspaceSwitcher'
 
 export default function Layout() {
   const { isDark, toggleTheme } = useThemeStore()
@@ -41,9 +42,22 @@ export default function Layout() {
                 <BarChart3 className="h-4 w-4" />
                 统计
               </NavLink>
+              <NavLink to="/members" className={linkClass}>
+                <Users className="h-4 w-4" />
+                成员
+              </NavLink>
+              <NavLink to="/activities" className={linkClass}>
+                <Calendar className="h-4 w-4" />
+                活动
+              </NavLink>
+              <NavLink to="/data-tools" className={linkClass}>
+                <Database className="h-4 w-4" />
+                工具
+              </NavLink>
             </nav>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
+            <WorkspaceSwitcher />
             <button
               onClick={toggleTheme}
               className="rounded-md p-2 text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"

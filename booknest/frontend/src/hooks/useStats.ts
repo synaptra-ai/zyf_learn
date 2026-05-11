@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import apiClient from '@/lib/api-client'
 import { statsKeys } from './query-keys'
+import { useWorkspaceStore } from '@/stores/useWorkspaceStore'
 import type { Book, Category } from '@/types'
 
 export interface StatsData {
@@ -12,11 +13,13 @@ export interface StatsData {
 }
 
 export function useStats() {
+  const { activeWorkspaceId } = useWorkspaceStore()
   return useQuery({
-    queryKey: statsKeys.overview(),
+    queryKey: statsKeys.overview(activeWorkspaceId),
     queryFn: async () => {
       const { data } = await apiClient.get<StatsData>('/stats')
       return data
     },
+    enabled: !!activeWorkspaceId,
   })
 }
