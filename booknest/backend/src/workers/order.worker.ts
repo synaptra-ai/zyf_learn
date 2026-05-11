@@ -1,5 +1,5 @@
-import prisma from '@/lib/prisma'
-import { logger } from '@/utils/logger'
+import prisma from '../lib/prisma'
+import { logger } from '../utils/logger'
 
 export async function handleExpireOrderJob(data: { orderId: string }) {
   const order = await prisma.order.findUnique({ where: { id: data.orderId } })

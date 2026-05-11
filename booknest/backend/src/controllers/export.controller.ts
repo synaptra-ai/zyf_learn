@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import prisma from '@/lib/prisma'
+import prisma from '../lib/prisma'
 
 export async function exportBooks(req: Request, res: Response, next: NextFunction) {
   try {

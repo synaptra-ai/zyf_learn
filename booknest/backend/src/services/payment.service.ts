@@ -1,7 +1,7 @@
 import crypto from 'crypto'
-import prisma from '@/lib/prisma'
-import { ApiError } from '@/utils/errors'
-import { verifyPaymentSignature, signPaymentPayload, MockPaymentPayload } from '@/lib/mockPayment'
+import prisma from '../lib/prisma'
+import { ApiError } from '../utils/errors'
+import { verifyPaymentSignature, signPaymentPayload, MockPaymentPayload } from '../lib/mockPayment'
 import { writeAuditLog } from './audit.service'
 
 export async function createMockPaymentCallback(orderId: string) {

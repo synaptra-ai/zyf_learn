@@ -1,6 +1,6 @@
-import prisma from '@/lib/prisma'
+import prisma from '../lib/prisma'
 import { writeAuditLog } from './audit.service'
-import { ApiError } from '@/utils/errors'
+import { ApiError } from '../utils/errors'
 
 export async function listActivities(workspaceId: string) {
   return prisma.activity.findMany({

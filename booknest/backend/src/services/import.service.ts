@@ -1,5 +1,5 @@
-import prisma from '@/lib/prisma'
-import { importQueue } from '@/lib/queue'
+import prisma from '../lib/prisma'
+import { importQueue } from '../lib/queue'
 
 export async function createBookImportJob(userId: string, workspaceId: string, file: Express.Multer.File) {
   const job = await prisma.importJob.create({

@@ -1,7 +1,7 @@
-import prisma from '@/lib/prisma'
-import { orderQueue } from '@/lib/queue'
-import { ApiError } from '@/utils/errors'
-import { generateOrderNo } from '@/utils/orderNo'
+import prisma from '../lib/prisma'
+import { orderQueue } from '../lib/queue'
+import { ApiError } from '../utils/errors'
+import { generateOrderNo } from '../utils/orderNo'
 import { writeAuditLog } from './audit.service'
 
 const ORDER_EXPIRE_MINUTES = 15

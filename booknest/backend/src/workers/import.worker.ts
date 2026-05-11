@@ -1,6 +1,6 @@
 import { parse } from 'csv-parse/sync'
-import prisma from '@/lib/prisma'
-import { logger } from '@/utils/logger'
+import prisma from '../lib/prisma'
+import { logger } from '../utils/logger'
 
 interface ImportJobData {
   importJobId: string

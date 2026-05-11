@@ -1,8 +1,8 @@
 import dotenv from 'dotenv'
 dotenv.config()
 
-import { logger } from '@/utils/logger'
-import { Worker, queueConnection } from '@/lib/queue'
+import { logger } from '../utils/logger'
+import { Worker, queueConnection } from '../lib/queue'
 import { handleExpireOrderJob } from './order.worker'
 import { handleBookImportJob } from './import.worker'
 
