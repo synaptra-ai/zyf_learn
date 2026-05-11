@@ -20,7 +20,7 @@ jobs:
         ports:
           - 5433:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd pg_isready -U booknest -d booknest_e2e
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -55,6 +55,7 @@ jobs:
         env:
           DATABASE_URL: postgresql://booknest:booknest123@localhost:5433/booknest_e2e
           JWT_SECRET: booknest-e2e-secret
+          NODE_ENV: test
 
       - name: Install frontend dependencies
         run: |
@@ -62,16 +63,51 @@ jobs:
           npm ci
           npx playwright install --with-deps chromium
 
+      - name: Start backend
+        run: |
+          cd booknest/backend
+          npm run dev > backend.log 2>&1 &
+          sleep 8
+          curl -f http://localhost:4000/health
+        env:
+          DATABASE_URL: postgresql://booknest:booknest123@localhost:5433/booknest_e2e
+          JWT_SECRET: booknest-e2e-secret
+          PORT: 4000
+          NODE_ENV: test
+
+      - name: Start frontend
+        run: |
+          cd booknest/frontend
+          npm run dev -- --host 0.0.0.0 > frontend.log 2>&1 &
+          sleep 8
+          curl -f http://localhost:4001
+        env:
+          VITE_API_URL: http://localhost:4000/api/v1
+          VITE_SOCKET_URL: http://localhost:4000
+
       - name: Run Playwright tests
         run: |
           cd booknest/frontend
           npm run e2e
         env:
-          DATABASE_URL: postgresql://booknest:booknest123@localhost:5433/booknest_e2e
-          JWT_SECRET: booknest-e2e-secret
-          NODE_ENV: test
           VITE_API_URL: http://localhost:4000/api/v1
           VITE_SOCKET_URL: http://localhost:4000
+
+      - name: Upload backend logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-log
+          path: booknest/backend/backend.log
+          retention-days: 7
+
+      - name: Upload frontend logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-log
+          path: booknest/frontend/frontend.log
+          retention-days: 7
 
       - name: Upload Playwright report
         if: always()

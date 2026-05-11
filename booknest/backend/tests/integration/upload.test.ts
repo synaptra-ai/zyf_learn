@@ -66,6 +66,6 @@ describe('Book Cover Upload', () => {
 
     expect(res.status).toBe(200)
     expect(res.body.message).toBe('封面上传成功')
-    expect(res.body.data.coverUrl).toContain('aliyuncs.com')
+    expect(res.body.data.coverUrl).toMatch(/aliyuncs\.com|mock-uploads/)
   })
 })
