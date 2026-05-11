@@ -1,13 +1,15 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Plus, Search, LayoutGrid, List } from 'lucide-react'
 import { useBooks } from '@/hooks/useBooks'
 import { useCategories } from '@/hooks/useCategories'
+import { useAuthStore } from '@/stores/useAuthStore'
 import { Button } from '@/components/ui/Button'
 import { BookCard } from './BookCard'
 import { BookTable } from './BookTable'
 import { BookListSkeleton } from '@/components/ui/Skeleton'
 import { ErrorState } from '@/components/ui/ErrorState'
+import { WelcomeModal } from '@/components/ui/WelcomeModal'
 import type { BookStatus } from '@/types'
 
 const statusTabs: { value: BookStatus | 'ALL'; label: string }[] = [
@@ -20,6 +22,15 @@ const statusTabs: { value: BookStatus | 'ALL'; label: string }[] = [
 
 export function BookListView() {
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const userName = useAuthStore((s) => s.user?.name)
+  const [showWelcome, setShowWelcome] = useState(searchParams.get('welcome') === 'true')
+
+  const closeWelcome = () => {
+    setShowWelcome(false)
+    searchParams.delete('welcome')
+    setSearchParams(searchParams, { replace: true })
+  }
 
   const [query, setQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<BookStatus | 'ALL'>('ALL')
@@ -188,6 +199,8 @@ export function BookListView() {
           )}
         </>
       )}
+
+      <WelcomeModal open={showWelcome} onClose={closeWelcome} userName={userName} />
     </div>
   )
 }
