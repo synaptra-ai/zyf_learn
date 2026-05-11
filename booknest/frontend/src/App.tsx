@@ -14,6 +14,7 @@ const CategoryManager = lazy(() => import('@/pages/CategoryManager'))
 const Stats = lazy(() => import('@/pages/Stats'))
 const Login = lazy(() => import('@/pages/Login'))
 const Register = lazy(() => import('@/pages/Register'))
+const WorkspaceMembers = lazy(() => import('@/pages/WorkspaceMembers'))
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
               <Route path="books/:id/edit" element={<BookEdit />} />
               <Route path="categories" element={<CategoryManager />} />
               <Route path="stats" element={<Stats />} />
+              <Route path="members" element={<WorkspaceMembers />} />
             </Route>
           </Routes>
         </Suspense>
