@@ -121,6 +121,7 @@ Prisma enums: `BookStatus` (OWNED, READING, FINISHED, WISHLIST), `UserRole` (USE
 
 ### API 端点
 - `/api/v1` — 业务接口
+- `/api/v1/workspaces` — Workspace 管理 (RBAC)
 - `/health` — 健康检查
 - `/health/detailed` — 详细健康检查 (DB + Redis)
 - `/api-docs` — Swagger UI
@@ -132,6 +133,7 @@ Prisma enums: `BookStatus` (OWNED, READING, FINISHED, WISHLIST), `UserRole` (USE
 - 所有响应使用 ResponseUtil 统一格式 `{code, message, data}`
 - 错误使用 ApiError 类 + errorHandler 中间件
 - 路由使用 zodValidate 中间件 (Zod) 或 express-validator + validate 中间件
+- Workspace RBAC: resolveWorkspace + requireWorkspaceRole 中间件，角色权重 OWNER=4 > ADMIN=3 > MEMBER=2 > VIEWER=1
 
 ### 数据库
 - PostgreSQL 16, Docker 运行, 宿主机端口 5433
@@ -149,7 +151,7 @@ Prisma enums: `BookStatus` (OWNED, READING, FINISHED, WISHLIST), `UserRole` (USE
 ### 技术栈
 - React 19 + TypeScript 6 + Vite 8
 - Tailwind CSS 3 + 暗色模式
-- Zustand 状态管理 (useAuthStore, useThemeStore)
+- Zustand 状态管理 (useAuthStore, useThemeStore, useWorkspaceStore)
 - TanStack React Query 5 数据获取
 - React Hook Form + Zod 表单校验
 - React Router v7 路由
@@ -169,7 +171,9 @@ Prisma enums: `BookStatus` (OWNED, READING, FINISHED, WISHLIST), `UserRole` (USE
 - `hooks/useReviews.ts` — 评论 hooks
 - `hooks/useStats.ts` — 统计数据 hook
 - `hooks/useSocket.ts` — WebSocket hook
+- `hooks/useWorkspaces.ts` — Workspace hooks (列表、成员、邀请)
 - `stores/useAuthStore.ts` — 认证状态 (Zustand, token 持久化 localStorage)
+- `stores/useWorkspaceStore.ts` — 当前活跃 Workspace (Zustand persist)
 - `stores/useThemeStore.ts` — 暗色模式切换
 - `types/api.generated.ts` — 从 OpenAPI 自动生成的 TypeScript 类型
 - `mocks/` — MSW 2 mock handlers + server
@@ -183,10 +187,11 @@ Prisma enums: `BookStatus` (OWNED, READING, FINISHED, WISHLIST), `UserRole` (USE
 - `/books/:id/edit` — 编辑书籍
 - `/categories` — 分类管理
 - `/stats` — 统计
+- `/members` — 成员管理 (邀请、角色)
 
 ### 认证
 - JWT token 存在 localStorage (auth_token)
-- Axios 请求拦截器自动注入 Bearer token
+- Axios 请求拦截器自动注入 Bearer token + X-Workspace-Id header
 - 401 响应自动清除 token 并跳转 /login
 - ProtectedRoute 包裹所有需要认证的页面
 
@@ -247,11 +252,11 @@ Prisma enums: `BookStatus` (OWNED, READING, FINISHED, WISHLIST), `UserRole` (USE
 | Day 7 | Winston 日志 + 健康检查 | 已完成 |
 | Day 8 | ESLint/Prettier + Zod schema + OpenAPI + 前端类型生成 + 架构文档 | 已完成 |
 | Day 9 | Playwright E2E 测试 (auth, book-crud, review, upload, permission) | 已完成 |
+| Day 10 | 多租户 SaaS (Workspace/RBAC/Invitation/AuditLog) | 已完成 |
 
 ### 待实施
 
 | Day | 内容 | 状态 |
 |-----|------|------|
 | Day 5 | 云服务器安全加固 | 待实施 |
-| Day 10 | 多租户 SaaS (Workspace/RBAC/Invitation/AuditLog) | 待实施 |
 | Day 11 | 订单状态机 + 模拟支付 + BullMQ 队列 + CSV 导入 | 待实施 |
