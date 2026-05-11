@@ -28,6 +28,7 @@ export function BookCard({ book, category }: BookCardProps) {
 
   return (
     <Card
+      data-testid={`book-card-${book.id}`}
       className="cursor-pointer border-gray-200 transition-shadow hover:shadow-md dark:border-gray-600"
       onClick={() => navigate(`/books/${book.id}`)}
     >

@@ -57,7 +57,7 @@ export function BookListView() {
       {/* 顶部操作栏 */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">我的书籍</h1>
-        <Button onClick={() => navigate('/books/new')}>
+        <Button data-testid="create-book-link" onClick={() => navigate('/books/new')}>
           <Plus className="mr-1 h-4 w-4" />
           添加书籍
         </Button>
@@ -69,6 +69,7 @@ export function BookListView() {
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
           <input
             type="text"
+            data-testid="book-search"
             placeholder="搜索书名或作者..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -140,7 +141,7 @@ export function BookListView() {
               : '没有找到匹配的书籍'}
           </p>
           {data?.total === 0 && (
-            <Button className="mt-4" onClick={() => navigate('/books/new')}>
+            <Button data-testid="create-book-link" className="mt-4" onClick={() => navigate('/books/new')}>
               <Plus className="mr-1 h-4 w-4" />
               添加书籍
             </Button>
@@ -149,7 +150,7 @@ export function BookListView() {
       ) : (
         <>
           {viewMode === 'grid' ? (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div data-testid="book-list" className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {filtered.map((book) => (
                 <BookCard key={book.id} book={book} category={book.category ?? getCategory(book.categoryId ?? undefined)} />
               ))}
