@@ -12,7 +12,7 @@ export function WelcomeModal({ open, onClose, userName }: WelcomeModalProps) {
     <Modal
       open={open}
       onClose={onClose}
-      title="SB王彭硕欢迎您"
+      title="欢迎回来"
       confirmText="开始使用"
       onConfirm={onClose}
     >
