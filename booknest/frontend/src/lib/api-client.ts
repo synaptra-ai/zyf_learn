@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { useWorkspaceStore } from '@/stores/useWorkspaceStore'
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:4000/api/v1',
@@ -12,6 +13,12 @@ apiClient.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
+
+  const workspaceId = useWorkspaceStore.getState().activeWorkspaceId
+  if (workspaceId) {
+    config.headers['X-Workspace-Id'] = workspaceId
+  }
+
   return config
 })
 
