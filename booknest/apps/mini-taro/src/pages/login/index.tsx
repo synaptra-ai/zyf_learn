@@ -11,12 +11,27 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
 
+  const navigateAfterLogin = () => {
+    const redirect = router.params.redirect
+    if (redirect) {
+      const url = decodeURIComponent(redirect)
+      // TabBar 页面必须用 switchTab
+      const tabbarPages = ['/pages/index/index', '/pages/categories/index', '/pages/me/index']
+      if (tabbarPages.some((p) => url.startsWith(p))) {
+        Taro.switchTab({ url })
+      } else {
+        Taro.redirectTo({ url })
+      }
+    } else {
+      Taro.switchTab({ url: '/pages/index/index' })
+    }
+  }
+
   const handleWechatLogin = async () => {
     try {
       setLoading(true)
       await loginByWechat()
-      const redirect = router.params.redirect
-      Taro.redirectTo({ url: redirect ? decodeURIComponent(redirect) : '/pages/index/index' })
+      navigateAfterLogin()
     } catch {
       // request adapter 已 showToast
     } finally {
@@ -39,8 +54,7 @@ export default function LoginPage() {
       })
       const { useAuthStore } = await import('@/stores/auth-store')
       useAuthStore.getState().setSession(res)
-      const redirect = router.params.redirect
-      Taro.redirectTo({ url: redirect ? decodeURIComponent(redirect) : '/pages/index/index' })
+      navigateAfterLogin()
     } catch {
       // request adapter 已 showToast
     } finally {
