@@ -45,8 +45,8 @@
     "@tarojs/runtime": "4.2.0",
     "@tarojs/shared": "4.2.0",
     "@tarojs/taro": "4.2.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "zustand": "^5.0.0"
   },
   "devDependencies": {
@@ -55,9 +55,9 @@
     "@pmmmwh/react-refresh-webpack-plugin": "^0.6.2",
     "@tarojs/cli": "4.2.0",
     "@tarojs/webpack5-runner": "4.2.0",
-    "@types/react": "^19.0.0",
+    "@types/react": "^18.3.28",
     "babel-preset-taro": "4.2.0",
-    "react-refresh": "^0.18.0",
+    "react-refresh": "^0.14.2",
     "sass": "^1.80.0",
     "typescript": "^5.7.0",
     "webpack": "5.91.0"
