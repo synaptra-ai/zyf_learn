@@ -1,0 +1,15 @@
+.workspace-switcher {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+
+  &__name {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+  }
+
+  &__arrow {
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+  }
+}
