@@ -1,8 +1,11 @@
 import { Input, Text, Textarea, View } from '@tarojs/components'
 import Taro, { useRouter } from '@tarojs/taro'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import type { BookStatus } from '@booknest/domain'
-import { mockBooks, mockCategories } from '@/mocks/books'
+import { createBook, updateBook, getBook, type BookFormInput } from '@/services/books'
+import { listCategories } from '@/services/categories'
+import { useWorkspaceStore } from '@/stores/workspace-store'
 import { SafeAreaButton } from '@/components/SafeAreaButton'
 import './index.scss'
 
@@ -13,23 +16,78 @@ const STATUS_OPTIONS: { value: BookStatus; label: string }[] = [
   { value: 'WISHLIST', label: '想读' },
 ]
 
+function validateBookForm(input: BookFormInput) {
+  if (!input.title.trim()) return '请输入书名'
+  if (!input.author.trim()) return '请输入作者'
+  if (input.pageCount && input.pageCount < 0) return '页数不能为负数'
+  return null
+}
+
 export default function BookFormPage() {
   const router = useRouter()
-  const editBook = mockBooks.find((b) => b.id === router.params.id)
+  const editId = router.params.id
+  const isEdit = Boolean(editId)
+  const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId)
 
-  const [title, setTitle] = useState(editBook?.title || '')
-  const [author, setAuthor] = useState(editBook?.author || '')
-  const [description, setDescription] = useState(editBook?.description || '')
-  const [status, setStatus] = useState<BookStatus>(editBook?.status || 'OWNED')
-  const [categoryId, setCategoryId] = useState(editBook?.categoryId || '')
+  const { data: editBook } = useQuery({
+    queryKey: ['books', 'detail', editId],
+    queryFn: () => getBook(editId!),
+    enabled: isEdit,
+  })
 
-  const handleSubmit = () => {
-    if (!title.trim() || !author.trim()) {
-      Taro.showToast({ title: '请填写书名和作者', icon: 'none' })
-      return
+  const { data: categories = [] } = useQuery({
+    queryKey: ['categories', activeWorkspaceId],
+    queryFn: listCategories,
+  })
+
+  const [form, setForm] = useState<BookFormInput>({
+    title: '',
+    author: '',
+    description: '',
+    status: 'OWNED',
+    categoryId: '',
+    isbn: '',
+    pageCount: undefined,
+    publishedDate: '',
+  })
+  const [submitting, setSubmitting] = useState(false)
+
+  useEffect(() => {
+    if (editBook) {
+      setForm({
+        title: editBook.title,
+        author: editBook.author,
+        description: editBook.description || '',
+        status: editBook.status,
+        categoryId: editBook.categoryId || '',
+        isbn: editBook.isbn || '',
+        pageCount: editBook.pageCount || undefined,
+        publishedDate: editBook.publishedDate || '',
+      })
     }
-    Taro.showToast({ title: editBook ? '保存成功 (mock)' : '添加成功 (mock)', icon: 'success' })
-    setTimeout(() => Taro.navigateBack(), 1500)
+  }, [editBook])
+
+  const update = (field: keyof BookFormInput, value: string | number | undefined) => {
+    setForm((prev) => ({ ...prev, [field]: value }))
+  }
+
+  const handleSubmit = async () => {
+    const error = validateBookForm(form)
+    if (error) return Taro.showToast({ title: error, icon: 'none' })
+    if (submitting) return
+
+    setSubmitting(true)
+    try {
+      const book = isEdit ? await updateBook(editId!, form) : await createBook(form)
+      Taro.showToast({ title: '保存成功', icon: 'success' })
+      setTimeout(() => {
+        Taro.redirectTo({ url: `/pages/books/detail/index?id=${book.id}` })
+      }, 1000)
+    } catch {
+      // request adapter 已 showToast
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -38,9 +96,9 @@ export default function BookFormPage() {
         <Text className="form__label">书名 *</Text>
         <Input
           className="form__input"
-          value={title}
+          value={form.title}
           placeholder="输入书名"
-          onInput={(e) => setTitle(e.detail.value)}
+          onInput={(e) => update('title', e.detail.value)}
         />
       </View>
 
@@ -48,9 +106,9 @@ export default function BookFormPage() {
         <Text className="form__label">作者 *</Text>
         <Input
           className="form__input"
-          value={author}
+          value={form.author}
           placeholder="输入作者"
-          onInput={(e) => setAuthor(e.detail.value)}
+          onInput={(e) => update('author', e.detail.value)}
         />
       </View>
 
@@ -60,8 +118,8 @@ export default function BookFormPage() {
           {STATUS_OPTIONS.map((opt) => (
             <View
               key={opt.value}
-              className={`form__status-chip ${status === opt.value ? 'form__status-chip--active' : ''}`}
-              onClick={() => setStatus(opt.value)}
+              className={`form__status-chip ${form.status === opt.value ? 'form__status-chip--active' : ''}`}
+              onClick={() => update('status', opt.value)}
             >
               <Text className="form__status-chip-text">{opt.label}</Text>
             </View>
@@ -72,16 +130,16 @@ export default function BookFormPage() {
       <View className="form__group">
         <Text className="form__label">分类</Text>
         <View className="form__category-group">
-          {mockCategories.map((cat) => (
+          {categories.map((cat: any) => (
             <View
               key={cat.id}
-              className={`form__category-chip ${categoryId === cat.id ? 'form__category-chip--active' : ''}`}
-              style={{ borderColor: categoryId === cat.id ? cat.color : '#e2e8f0' }}
-              onClick={() => setCategoryId(cat.id)}
+              className={`form__category-chip ${form.categoryId === cat.id ? 'form__category-chip--active' : ''}`}
+              style={{ borderColor: form.categoryId === cat.id ? cat.color : '#e2e8f0' }}
+              onClick={() => update('categoryId', form.categoryId === cat.id ? '' : cat.id)}
             >
               <Text
                 className="form__category-chip-text"
-                style={{ color: categoryId === cat.id ? cat.color : '#64748b' }}
+                style={{ color: form.categoryId === cat.id ? cat.color : '#64748b' }}
               >
                 {cat.name}
               </Text>
@@ -91,17 +149,41 @@ export default function BookFormPage() {
       </View>
 
       <View className="form__group">
-        <Text className="form__label">简介</Text>
-        <Textarea
-          className="form__textarea"
-          value={description}
-          placeholder="输入简介（可选）"
-          onInput={(e) => setDescription(e.detail.value)}
-          maxlength={500}
+        <Text className="form__label">ISBN</Text>
+        <Input
+          className="form__input"
+          value={form.isbn}
+          placeholder="输入 ISBN（可选）"
+          onInput={(e) => update('isbn', e.detail.value)}
         />
       </View>
 
-      <SafeAreaButton text={editBook ? '保存修改' : '添加书籍'} onClick={handleSubmit} />
+      <View className="form__group">
+        <Text className="form__label">页数</Text>
+        <Input
+          className="form__input"
+          type="number"
+          value={form.pageCount ? String(form.pageCount) : ''}
+          placeholder="输入页数（可选）"
+          onInput={(e) => update('pageCount', e.detail.value ? Number(e.detail.value) : undefined)}
+        />
+      </View>
+
+      <View className="form__group">
+        <Text className="form__label">简介</Text>
+        <Textarea
+          className="form__textarea"
+          value={form.description}
+          placeholder="输入简介（可选）"
+          onInput={(e) => update('description', e.detail.value)}
+          maxlength={1000}
+        />
+      </View>
+
+      <SafeAreaButton
+        text={submitting ? '保存中...' : isEdit ? '保存修改' : '添加书籍'}
+        onClick={handleSubmit}
+      />
     </View>
   )
 }
