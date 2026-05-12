@@ -37,6 +37,7 @@
     "@babel/runtime": "^7.24.0",
     "@booknest/api-contract": "workspace:*",
     "@booknest/domain": "workspace:*",
+    "@booknest/permissions": "workspace:*",
     "@tanstack/react-query": "^5.100.10",
     "@tarojs/components": "4.2.0",
     "@tarojs/helper": "4.2.0",
