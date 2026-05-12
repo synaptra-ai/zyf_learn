@@ -237,7 +237,7 @@ Prisma enums: `BookStatus` (OWNED, READING, FINISHED, WISHLIST), `UserRole` (USE
 ## 小程序 (mini-taro/)
 
 ### 技术栈
-- Taro 4 + React 19 + TypeScript
+- Taro 4 + React 18 + TypeScript
 - Zustand 状态管理
 - Sass (rpx + SCSS variables)
 - NutUI React (Taro 组件库，后续引入)
@@ -283,7 +283,7 @@ booknest/
 | 9 | Playwright / @playwright/test / GitHub Actions E2E |
 | 10 | Prisma 多租户 / RBAC / Workspace / Invitation / AuditLog |
 | 11 | BullMQ / 订单状态机 / 模拟支付 / CSV 导入导出 / 并发防超卖 |
-| 12 | Taro 4 / React 19 / TypeScript / Sass / pnpm workspace / Zustand |
+| 12 | Taro 4 / React 18 / TypeScript / Sass / pnpm workspace / Zustand |
 
 ## 部署
 
