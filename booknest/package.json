@@ -7,5 +7,16 @@
     "dev:mini": "pnpm --filter @booknest/mini-taro dev:weapp",
     "dev:mini:h5": "pnpm --filter @booknest/mini-taro dev:h5",
     "build:mini": "pnpm --filter @booknest/mini-taro build:weapp"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "@swc/core",
+      "@tarojs/binding",
+      "@tarojs/cli",
+      "core-js",
+      "core-js-pure",
+      "esbuild"
+    ]
   }
 }

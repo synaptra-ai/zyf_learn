@@ -1,4 +1,5 @@
 import { defineConfig } from '@tarojs/cli'
+import { resolve } from 'path'
 import devConfig from './dev'
 import prodConfig from './prod'
 
@@ -24,10 +25,10 @@ export default defineConfig(async (merge) => {
       prebundle: { enable: false },
     },
     sass: {
-      data: '@import "@/assets/variables.scss";',
+      data: '@use "@/assets/variables.scss" as *;',
     },
     alias: {
-      '@': './src',
+      '@': resolve(__dirname, '..', 'src'),
     },
     mini: {
       postcss: {
