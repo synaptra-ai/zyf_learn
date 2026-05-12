@@ -263,6 +263,7 @@ Prisma enums: `BookStatus` (OWNED, READING, FINISHED, WISHLIST), `UserRole` (USE
 | Day 2 | 后端 RESTful API | 已完成 |
 | Day 3 | 全栈集成 + Docker Compose | 已完成 |
 | Day 4 | CI/CD + ECS 部署 | 部分完成 (已部署到 ECS，CI/CD 流程待完善) |
+| Day 5 | 云服务器安全加固 (安全组/SSH/fail2ban/系统加固/备份) | 已完成 |
 | Day 6 | Redis 缓存 + OSS 上传 + WebSocket + 限流 | 已完成 |
 | Day 7 | Winston 日志 + 健康检查 | 已完成 |
 | Day 8 | ESLint/Prettier + Zod schema + OpenAPI + 前端类型生成 + 架构文档 | 已完成 |
@@ -272,6 +273,4 @@ Prisma enums: `BookStatus` (OWNED, READING, FINISHED, WISHLIST), `UserRole` (USE
 
 ### 待实施
 
-| Day | 内容 | 状态 |
-|-----|------|------|
-| Day 5 | 云服务器安全加固 | 待实施 |
+所有 Day 1-11 任务已完成。

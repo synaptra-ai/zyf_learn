@@ -1,0 +1,91 @@
+.form {
+  min-height: 100vh;
+  background: $color-bg-secondary;
+  padding: $spacing-lg;
+  padding-bottom: 200rpx;
+
+  &__group {
+    margin-bottom: $spacing-lg;
+  }
+
+  &__label {
+    display: block;
+    font-size: $font-size-md;
+    font-weight: 600;
+    color: $color-text-primary;
+    margin-bottom: $spacing-sm;
+  }
+
+  &__input {
+    width: 100%;
+    height: 88rpx;
+    padding: 0 $spacing-md;
+    background: $color-bg-primary;
+    border: 2rpx solid #e2e8f0;
+    border-radius: $border-radius-md;
+    font-size: $font-size-md;
+    color: $color-text-primary;
+    box-sizing: border-box;
+  }
+
+  &__textarea {
+    width: 100%;
+    height: 240rpx;
+    padding: $spacing-md;
+    background: $color-bg-primary;
+    border: 2rpx solid #e2e8f0;
+    border-radius: $border-radius-md;
+    font-size: $font-size-md;
+    color: $color-text-primary;
+    box-sizing: border-box;
+  }
+
+  &__status-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-sm;
+  }
+
+  &__status-chip {
+    padding: $spacing-sm $spacing-md;
+    border-radius: 999rpx;
+    background: $color-bg-primary;
+    border: 2rpx solid #e2e8f0;
+
+    &--active {
+      background: rgba(37, 99, 235, 0.1);
+      border-color: $color-primary;
+    }
+
+    &-text {
+      font-size: $font-size-sm;
+      color: $color-text-secondary;
+    }
+
+    &--active &-text {
+      color: $color-primary;
+      font-weight: 500;
+    }
+  }
+
+  &__category-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-sm;
+  }
+
+  &__category-chip {
+    padding: $spacing-sm $spacing-md;
+    border-radius: 999rpx;
+    background: $color-bg-primary;
+    border: 2rpx solid #e2e8f0;
+
+    &--active {
+      background: $color-bg-primary;
+    }
+
+    &-text {
+      font-size: $font-size-sm;
+    }
+  }
+}

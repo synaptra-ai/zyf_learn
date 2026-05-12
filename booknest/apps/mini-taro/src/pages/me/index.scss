@@ -1,0 +1,98 @@
+.me {
+  min-height: 100vh;
+  background: $color-bg-secondary;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    padding: $spacing-xl $spacing-lg;
+    background: $color-primary;
+  }
+
+  &__avatar {
+    width: 120rpx;
+    height: 120rpx;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    &-text {
+      font-size: $font-size-xxl;
+      font-weight: 700;
+      color: $color-text-white;
+    }
+  }
+
+  &__info {
+    margin-left: $spacing-lg;
+  }
+
+  &__name {
+    display: block;
+    font-size: $font-size-xl;
+    font-weight: 700;
+    color: $color-text-white;
+  }
+
+  &__email {
+    display: block;
+    margin-top: 8rpx;
+    font-size: $font-size-sm;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  &__stats {
+    display: flex;
+    padding: $spacing-lg;
+    background: $color-bg-primary;
+    margin-bottom: $spacing-md;
+  }
+
+  &__stat {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    &-num {
+      font-size: $font-size-xxl;
+      font-weight: 700;
+      color: $color-primary;
+    }
+
+    &-label {
+      margin-top: 8rpx;
+      font-size: $font-size-sm;
+      color: $color-text-muted;
+    }
+  }
+
+  &__menu {
+    background: $color-bg-primary;
+
+    &-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: $spacing-lg;
+      border-bottom: 1rpx solid $color-bg-tertiary;
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+
+    &-text {
+      font-size: $font-size-md;
+      color: $color-text-primary;
+    }
+
+    &-arrow {
+      font-size: $font-size-xl;
+      color: $color-text-muted;
+    }
+  }
+}

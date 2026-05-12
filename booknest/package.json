@@ -1,0 +1,11 @@
+{
+  "name": "booknest-monorepo",
+  "private": true,
+  "version": "0.0.1",
+  "description": "BookNest - 全栈书籍管理应用",
+  "scripts": {
+    "dev:mini": "pnpm --filter @booknest/mini-taro dev:weapp",
+    "dev:mini:h5": "pnpm --filter @booknest/mini-taro dev:h5",
+    "build:mini": "pnpm --filter @booknest/mini-taro build:weapp"
+  }
+}

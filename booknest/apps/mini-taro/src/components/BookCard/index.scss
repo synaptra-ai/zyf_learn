@@ -1,0 +1,57 @@
+.book-card {
+  display: flex;
+  padding: $spacing-md;
+  border-radius: $border-radius-lg;
+  background: $color-bg-primary;
+  box-shadow: $shadow-md;
+  margin-bottom: $spacing-md;
+
+  &__cover {
+    width: 128rpx;
+    height: 176rpx;
+    border-radius: $border-radius-md;
+    background: $color-bg-tertiary;
+    flex-shrink: 0;
+  }
+
+  &__body {
+    flex: 1;
+    margin-left: $spacing-md;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  &__title {
+    display: block;
+    font-size: $font-size-lg;
+    font-weight: 600;
+    color: $color-text-primary;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__author {
+    display: block;
+    margin-top: 8rpx;
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    margin-top: 12rpx;
+    gap: $spacing-sm;
+  }
+
+  &__category {
+    font-size: $font-size-xs;
+    font-weight: 500;
+  }
+}

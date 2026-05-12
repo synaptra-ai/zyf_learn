@@ -1,0 +1,51 @@
+.page {
+  min-height: 100vh;
+  background: $color-bg-secondary;
+  padding-bottom: 140rpx;
+
+  &__header {
+    padding: $spacing-lg $spacing-lg $spacing-md;
+    background: $color-bg-primary;
+  }
+
+  &__title {
+    display: block;
+    font-size: $font-size-xxl;
+    font-weight: 700;
+    color: $color-text-primary;
+  }
+
+  &__subtitle {
+    display: block;
+    margin-top: 8rpx;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+  }
+}
+
+.book-list {
+  padding: $spacing-md $spacing-lg;
+  max-height: calc(100vh - 200rpx);
+}
+
+.fab {
+  position: fixed;
+  right: $spacing-lg;
+  bottom: 180rpx;
+  width: 112rpx;
+  height: 112rpx;
+  border-radius: 50%;
+  background: $color-primary;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: $shadow-lg;
+  z-index: 99;
+
+  &__text {
+    color: $color-text-white;
+    font-size: $font-size-xxl;
+    font-weight: 300;
+    line-height: 1;
+  }
+}

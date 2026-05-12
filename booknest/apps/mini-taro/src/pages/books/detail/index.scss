@@ -1,0 +1,122 @@
+.detail {
+  min-height: 100vh;
+  background: $color-bg-secondary;
+  padding-bottom: 160rpx;
+
+  &__header {
+    display: flex;
+    padding: $spacing-lg;
+    background: $color-bg-primary;
+  }
+
+  &__cover {
+    width: 200rpx;
+    height: 280rpx;
+    border-radius: $border-radius-md;
+    background: $color-bg-tertiary;
+    flex-shrink: 0;
+  }
+
+  &__info {
+    flex: 1;
+    margin-left: $spacing-lg;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  &__title {
+    display: block;
+    font-size: $font-size-xl;
+    font-weight: 700;
+    color: $color-text-primary;
+    line-height: 1.3;
+  }
+
+  &__author {
+    display: block;
+    margin-top: 12rpx;
+    font-size: $font-size-md;
+    color: $color-text-secondary;
+  }
+
+  &__section {
+    margin-top: $spacing-md;
+    padding: $spacing-lg;
+    background: $color-bg-primary;
+
+    &-title {
+      display: block;
+      font-size: $font-size-lg;
+      font-weight: 600;
+      color: $color-text-primary;
+      margin-bottom: $spacing-md;
+    }
+  }
+
+  &__desc {
+    font-size: $font-size-md;
+    color: $color-text-secondary;
+    line-height: 1.8;
+  }
+
+  &__meta {
+    &-row {
+      display: flex;
+      justify-content: space-between;
+      padding: $spacing-sm 0;
+      border-bottom: 1rpx solid $color-bg-tertiary;
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+
+    &-label {
+      font-size: $font-size-md;
+      color: $color-text-muted;
+    }
+
+    &-value {
+      font-size: $font-size-md;
+      color: $color-text-primary;
+      font-weight: 500;
+    }
+  }
+
+  &__actions {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: $spacing-md $spacing-lg;
+    padding-bottom: calc(#{$spacing-md} + env(safe-area-inset-bottom));
+    background: $color-bg-primary;
+    box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.04);
+    display: flex;
+    gap: $spacing-md;
+  }
+
+  &__btn {
+    flex: 1;
+    height: 88rpx;
+    border-radius: $border-radius-lg;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &--primary {
+      background: $color-primary;
+    }
+
+    &--danger {
+      background: $color-danger;
+    }
+
+    &-text {
+      color: $color-text-white;
+      font-size: $font-size-lg;
+      font-weight: 600;
+    }
+  }
+}

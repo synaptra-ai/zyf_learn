@@ -1,0 +1,35 @@
+.safe-area-button {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding-bottom: env(safe-area-inset-bottom);
+  background: $color-bg-primary;
+  z-index: 100;
+
+  &__inner {
+    padding: $spacing-md $spacing-lg;
+  }
+
+  &__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 88rpx;
+    border-radius: $border-radius-lg;
+
+    &--primary {
+      background: $color-primary;
+    }
+
+    &--danger {
+      background: $color-danger;
+    }
+  }
+
+  &__text {
+    color: $color-text-white;
+    font-size: $font-size-lg;
+    font-weight: 600;
+  }
+}
