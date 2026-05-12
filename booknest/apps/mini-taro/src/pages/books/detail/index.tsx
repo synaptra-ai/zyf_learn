@@ -12,11 +12,13 @@ export default function BookDetailPage() {
   return (
     <View className="detail">
       <View className="detail__header">
-        <Image
-          className="detail__cover"
-          src={book.coverUrl || '/assets/default-cover.png'}
-          mode="aspectFill"
-        />
+        {book.coverUrl ? (
+          <Image className="detail__cover" src={book.coverUrl} mode="aspectFill" />
+        ) : (
+          <View className="detail__cover detail__cover--placeholder">
+            <Text className="detail__cover-text">{book.title[0]}</Text>
+          </View>
+        )}
         <View className="detail__info">
           <Text className="detail__title">{book.title}</Text>
           <Text className="detail__author">{book.author}</Text>

@@ -15,12 +15,13 @@ export function BookCard({ book }: BookCardProps) {
 
   return (
     <View className="book-card" onClick={handleOpen}>
-      <Image
-        className="book-card__cover"
-        src={book.coverUrl || '/assets/default-cover.png'}
-        mode="aspectFill"
-        lazyLoad
-      />
+      {book.coverUrl ? (
+        <Image className="book-card__cover" src={book.coverUrl} mode="aspectFill" lazyLoad />
+      ) : (
+        <View className="book-card__cover book-card__cover--placeholder">
+          <Text className="book-card__cover-text">{book.title[0]}</Text>
+        </View>
+      )}
       <View className="book-card__body">
         <Text className="book-card__title">{book.title}</Text>
         <Text className="book-card__author">{book.author}</Text>

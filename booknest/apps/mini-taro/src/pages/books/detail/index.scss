@@ -15,6 +15,19 @@
     border-radius: $border-radius-md;
     background: $color-bg-tertiary;
     flex-shrink: 0;
+
+    &--placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: $color-primary;
+    }
+
+    &-text {
+      font-size: 88rpx;
+      font-weight: 700;
+      color: $color-text-white;
+    }
   }
 
   &__info {
