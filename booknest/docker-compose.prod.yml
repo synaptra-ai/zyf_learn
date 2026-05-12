@@ -40,6 +40,10 @@ services:
       CORS_ORIGINS: ${CORS_ORIGINS}
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      OSS_ACCESS_KEY_ID: ${OSS_ACCESS_KEY_ID}
+      OSS_ACCESS_KEY_SECRET: ${OSS_ACCESS_KEY_SECRET}
+      OSS_BUCKET: ${OSS_BUCKET}
+      OSS_REGION: ${OSS_REGION}
     depends_on:
       postgres:
         condition: service_healthy

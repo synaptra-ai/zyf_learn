@@ -142,6 +142,10 @@ jobs:
             JWT_SECRET=${{ secrets.JWT_SECRET }}
             DOMAIN=${{ secrets.ECS_HOST }}
             CORS_ORIGINS=http://${{ secrets.ECS_HOST }}
+            OSS_ACCESS_KEY_ID=${{ secrets.OSS_ACCESS_KEY_ID }}
+            OSS_ACCESS_KEY_SECRET=${{ secrets.OSS_ACCESS_KEY_SECRET }}
+            OSS_BUCKET=${{ secrets.OSS_BUCKET }}
+            OSS_REGION=${{ secrets.OSS_REGION }}
             ENVEOF
 
             docker compose -f docker-compose.prod.yml down
