@@ -40,3 +40,9 @@ prisma/migrations/
 
 # Docker
 docker-compose.override.yml
+
+# Generated files
+backend/src/generated/
+backend/tsconfig.tsbuildinfo
+apps/mini-taro/.swc/
+LEARNING.md
