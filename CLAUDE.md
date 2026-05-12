@@ -239,15 +239,26 @@ Prisma enums: `BookStatus` (OWNED, READING, FINISHED, WISHLIST), `UserRole` (USE
 ### 技术栈
 - Taro 4 + React 18 + TypeScript
 - Zustand 状态管理
+- TanStack React Query 5 数据获取
 - Sass (rpx + SCSS variables)
 - NutUI React (Taro 组件库，后续引入)
 - pnpm workspace 管理
+
+### 关键文件 (src/)
+- `config/env.ts` — API 基础地址 (Taro defineConstants 注入)
+- `services/request.ts` — Taro.request adapter (token/workspace header/401 处理)
+- `services/auth.ts` — 微信登录服务
+- `services/books.ts` — Book API 服务
+- `hooks/use-books.ts` — Book React Query hooks
+- `stores/auth-store.ts` — 认证状态 (Zustand + Taro.getStorage)
+- `stores/workspace-store.ts` — 当前 Workspace (Zustand + Taro.getStorage)
+- `mocks/books.ts` — Mock 数据 (Day 12 遗留，已切换真实 API)
 
 ### 页面路由
 - `pages/index/index` — 书架首页 (TabBar)
 - `pages/categories/index` — 分类管理 (TabBar)
 - `pages/me/index` — 我的 (TabBar)
-- `pages/login/index` — 登录 (占位页)
+- `pages/login/index` — 登录 (微信一键登录 + 邮箱登录)
 - `pages/books/detail/index` — 书籍详情 (navigateTo, params: id)
 - `pages/books/form/index` — 添加/编辑书籍 (navigateTo, params: id 可选)
 
@@ -257,16 +268,17 @@ Prisma enums: `BookStatus` (OWNED, READING, FINISHED, WISHLIST), `UserRole` (USE
 ### 项目结构
 ```
 booknest/
-├── apps/mini-taro/    # Taro 小程序 (pnpm)
-├── packages/domain/   # 共享领域类型 (@booknest/domain)
-├── frontend/          # Web 前端 (npm)
-├── backend/           # 后端 (npm)
-└── docs/              # 文档 (含迁移地图)
+├── apps/mini-taro/       # Taro 小程序 (pnpm)
+├── packages/domain/      # 共享领域类型 (@booknest/domain)
+├── packages/api-contract/ # OpenAPI 生成类型 (@booknest/api-contract)
+├── frontend/             # Web 前端 (npm)
+├── backend/              # 后端 (npm)
+└── docs/                 # 文档 (含迁移地图)
 ```
 
 ### 构建产物
 - `apps/mini-taro/dist/` — 微信开发者工具导入此目录
-- 当前使用 mock 数据，未接入真实 API (Day 13)
+- 当前使用 mock 数据，未接入真实 API (Day 13) → 已接入真实 API
 
 ## Tech Stack by Day
 
@@ -284,6 +296,7 @@ booknest/
 | 10 | Prisma 多租户 / RBAC / Workspace / Invitation / AuditLog |
 | 11 | BullMQ / 订单状态机 / 模拟支付 / CSV 导入导出 / 并发防超卖 |
 | 12 | Taro 4 / React 18 / TypeScript / Sass / pnpm workspace / Zustand |
+| 13 | Taro.request / React Query / 微信登录 / OpenAPI 类型 / code2Session / JWT |
 
 ## 部署
 
@@ -337,7 +350,7 @@ booknest/
 
 | Day | 内容 | 状态 |
 |-----|------|------|
-| Day 13 | 微信登录 + UnionID + Taro request adapter | 待实施 |
+| Day 13 | 微信登录 + UnionID + Taro request adapter | 已完成 |
 | Day 14 | 业务迁移 (RBAC/上传/分享) | 待实施 |
 | Day 15 | 微信支付 + 订单 + 票务 | 待实施 |
 | Day 16 | 订阅消息 + 客服 + 内容安全 | 待实施 |
