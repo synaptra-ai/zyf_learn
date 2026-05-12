@@ -40,6 +40,10 @@ services:
       CORS_ORIGINS: ${CORS_ORIGINS}
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      OSS_ACCESS_KEY_ID: ${OSS_ACCESS_KEY_ID}
+      OSS_ACCESS_KEY_SECRET: ${OSS_ACCESS_KEY_SECRET}
+      OSS_BUCKET: ${OSS_BUCKET}
+      OSS_REGION: ${OSS_REGION}
     depends_on:
       postgres:
         condition: service_healthy
@@ -55,7 +59,7 @@ services:
         VITE_API_URL: /api/v1
     restart: always
     ports:
-      - "80:80"
+      - "3000:80"
     networks:
       - booknest-proxy
 

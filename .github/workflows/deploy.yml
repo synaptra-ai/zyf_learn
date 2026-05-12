@@ -140,8 +140,12 @@ jobs:
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             DB_NAME=booknest
             JWT_SECRET=${{ secrets.JWT_SECRET }}
-            DOMAIN=${{ secrets.ECS_HOST }}
-            CORS_ORIGINS=http://${{ secrets.ECS_HOST }}
+            DOMAIN=zyfcloud.cn
+            CORS_ORIGINS=https://zyfcloud.cn,https://www.zyfcloud.cn
+            OSS_ACCESS_KEY_ID=${{ secrets.OSS_ACCESS_KEY_ID }}
+            OSS_ACCESS_KEY_SECRET=${{ secrets.OSS_ACCESS_KEY_SECRET }}
+            OSS_BUCKET=${{ secrets.OSS_BUCKET }}
+            OSS_REGION=${{ secrets.OSS_REGION }}
             ENVEOF
 
             docker compose -f docker-compose.prod.yml down
@@ -188,7 +192,7 @@ jobs:
             done
 
             curl -f http://localhost:4000/health
-            curl -f http://localhost/health
+            curl -f http://localhost:3000/health
 
             docker image prune -f
 

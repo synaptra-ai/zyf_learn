@@ -243,9 +243,15 @@ Prisma enums: `BookStatus` (OWNED, READING, FINISHED, WISHLIST), `UserRole` (USE
 - `frontend/Dockerfile` — 前端容器 (node → nginx)
 - `backend/Dockerfile` — 后端容器 (Prisma migrate + Node)
 - `frontend/nginx.conf` — SPA 路由 + API 反向代理
-- `deploy/nginx.conf` — 宿主机 Nginx 配置
+- `deploy/nginx.conf` — 宿主机 Nginx 全局配置
+- `deploy/booknest.conf` — ECS Nginx 站点配置 (HTTPS + 反向代理)
 - `deploy/.env.production.example` — 生产环境变量模板
 - `ARCHITECTURE.md` — 项目架构文档
+
+### 域名 & HTTPS
+- 域名: zyfcloud.cn (阿里云 DNS 解析 → 139.224.246.39)
+- SSL: Let's Encrypt + Certbot 自动续期
+- Nginx 配置: /etc/nginx/sites-available/booknest
 
 ## Current State
 

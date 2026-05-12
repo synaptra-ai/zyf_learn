@@ -33,6 +33,7 @@ services:
       PORT: 4000
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      FORCE_DB_RESET: "true"
       OSS_ACCESS_KEY_ID: ${OSS_ACCESS_KEY_ID}
       OSS_ACCESS_KEY_SECRET: ${OSS_ACCESS_KEY_SECRET}
       OSS_BUCKET: ${OSS_BUCKET}
