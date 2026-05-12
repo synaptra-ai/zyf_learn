@@ -45,4 +45,3 @@ docker-compose.override.yml
 backend/src/generated/
 backend/tsconfig.tsbuildinfo
 apps/mini-taro/.swc/
-LEARNING.md

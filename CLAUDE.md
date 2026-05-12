@@ -297,6 +297,7 @@ booknest/
 | 11 | BullMQ / 订单状态机 / 模拟支付 / CSV 导入导出 / 并发防超卖 |
 | 12 | Taro 4 / React 18 / TypeScript / Sass / pnpm workspace / Zustand |
 | 13 | Taro.request / React Query / 微信登录 / OpenAPI 类型 / code2Session / JWT |
+| 14 | Workspace 切换 / RBAC 前端权限 / Book CRUD 表单 / 分页筛选 / 封面上传 / 分享 |
 
 ## 部署
 
@@ -351,7 +352,7 @@ booknest/
 | Day | 内容 | 状态 |
 |-----|------|------|
 | Day 13 | 微信登录 + UnionID + Taro request adapter | 已完成 |
-| Day 14 | 业务迁移 (RBAC/上传/分享) | 待实施 |
+| Day 14 | 业务迁移 (RBAC/上传/分享) | 进行中 (Step 1-5 完成) |
 | Day 15 | 微信支付 + 订单 + 票务 | 待实施 |
 | Day 16 | 订阅消息 + 客服 + 内容安全 | 待实施 |
 | Day 17 | 分包优化 + 性能调优 | 待实施 |
