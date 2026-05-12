@@ -17,6 +17,13 @@ BookNest is a full-stack book collection management app, structured as an 11-day
 - **Day 9** (`tasks/day9-playwright-e2e-ci.md`): Playwright E2E 自动化测试 — 登录/CRUD/评论/上传/权限测试 + CI 回归
 - **Day 10** (`tasks/day10-multitenancy-rbac.md`): 多租户 SaaS — Workspace/RBAC/成员邀请/审计日志
 - **Day 11** (`tasks/day11-orders-queue-db.md`): 订单状态机 + 模拟支付 + BullMQ 队列 + 数据库并发
+- **Day 12** (`tasks/day12-taro-web-migration.md`): Taro 工程搭建 + Web 功能迁移 + 核心 UI 迁移 (微信小程序)
+- **Day 13** (`tasks/day13-api-wechat-login-unionid.md`): 微信登录 + UnionID + Taro request adapter
+- **Day 14** (`tasks/day14-business-rbac-upload-share.md`): 业务迁移 (RBAC/上传/分享)
+- **Day 15** (`tasks/day15-wechat-pay-order-ticket.md`): 微信支付 + 订单 + 票务
+- **Day 16** (`tasks/day16-subscribe-customer-service-content-security.md`): 订阅消息 + 客服 + 内容安全
+- **Day 17** (`tasks/day17-subpackages-performance.md`): 分包优化 + 性能调优
+- **Day 18** (`tasks/day18-mini-ci-review-release.md`): CI/CD + 代码审查 + 发布上线
 
 ## Development Commands
 
@@ -60,6 +67,18 @@ docker compose up -d                    # PostgreSQL + Redis + Backend + Fronten
 docker compose -f docker-compose.prod.yml up -d --build
 ```
 
+### 小程序 (`booknest/apps/mini-taro/`)
+
+```bash
+pnpm dev:weapp       # 构建 + watch 微信小程序
+pnpm dev:h5          # 构建 + watch H5 (浏览器调试)
+pnpm build:weapp     # 生产构建微信小程序
+```
+
+根目录快捷命令：`pnpm dev:mini` / `pnpm dev:mini:h5` / `pnpm build:mini`
+
+依赖管理使用 pnpm workspace，后端和 Web 前端继续用 npm。
+
 PostgreSQL 也可单独运行：host port 5433 → container port 5432:
 ```bash
 docker run -d --name booknest-pg \
@@ -79,6 +98,11 @@ Frontend:
 Backend:
   Route → Controller (request handling) → Service (business logic) → Prisma (DB access)
   Schema: Zod schemas define request/response validation + OpenAPI registration
+
+Mini Program (Taro):
+  Component (Taro UI) → Page (Taro route) → Hook (data) → Taro.request (HTTP)
+  State: Zustand stores + React Query cache
+  Shared: packages/domain (领域类型), packages/permissions (RBAC)
 ```
 
 ## Key Conventions
@@ -88,6 +112,8 @@ Backend:
 - Backend source: `booknest/backend/src/` with subdirs `controllers/`, `services/`, `routes/`, `middleware/`, `schemas/`, `lib/`, `utils/`
 - Backend workers: `booknest/backend/src/workers/`
 - Backend scripts: `booknest/backend/scripts/`
+- Mini Program source: `booknest/apps/mini-taro/src/` with subdirs `pages/`, `components/`, `services/`, `stores/`, `hooks/`, `types/`, `config/`, `mocks/`, `utils/`, `assets/`
+- Shared packages: `booknest/packages/domain/` (领域类型), `booknest/packages/permissions/` (RBAC)
 - Prisma schema: `booknest/backend/prisma/schema.prisma`
 - OpenAPI generated: `booknest/backend/generated/openapi.json`
 - TypeScript strict mode enabled (`noUnusedLocals`, `noUnusedParameters`, `noFallthroughCasesInSwitch`)
@@ -208,6 +234,40 @@ Prisma enums: `BookStatus` (OWNED, READING, FINISHED, WISHLIST), `UserRole` (USE
 - **单元测试**: 6 个 Vitest 测试文件，MSW mock API，不需要启动真实后端
 - **E2E 测试**: Playwright 测试覆盖登录、书籍 CRUD、评论、上传、权限
 
+## 小程序 (mini-taro/)
+
+### 技术栈
+- Taro 4 + React 19 + TypeScript
+- Zustand 状态管理
+- Sass (rpx + SCSS variables)
+- NutUI React (Taro 组件库，后续引入)
+- pnpm workspace 管理
+
+### 页面路由
+- `pages/index/index` — 书架首页 (TabBar)
+- `pages/categories/index` — 分类管理 (TabBar)
+- `pages/me/index` — 我的 (TabBar)
+- `pages/login/index` — 登录 (占位页)
+- `pages/books/detail/index` — 书籍详情 (navigateTo, params: id)
+- `pages/books/form/index` — 添加/编辑书籍 (navigateTo, params: id 可选)
+
+### 迁移组件
+- BookCard、StatusBadge、EmptyState、LoadingState、SafeAreaButton
+
+### 项目结构
+```
+booknest/
+├── apps/mini-taro/    # Taro 小程序 (pnpm)
+├── packages/domain/   # 共享领域类型 (@booknest/domain)
+├── frontend/          # Web 前端 (npm)
+├── backend/           # 后端 (npm)
+└── docs/              # 文档 (含迁移地图)
+```
+
+### 构建产物
+- `apps/mini-taro/dist/` — 微信开发者工具导入此目录
+- 当前使用 mock 数据，未接入真实 API (Day 13)
+
 ## Tech Stack by Day
 
 | Day | Stack |
@@ -223,6 +283,7 @@ Prisma enums: `BookStatus` (OWNED, READING, FINISHED, WISHLIST), `UserRole` (USE
 | 9 | Playwright / @playwright/test / GitHub Actions E2E |
 | 10 | Prisma 多租户 / RBAC / Workspace / Invitation / AuditLog |
 | 11 | BullMQ / 订单状态机 / 模拟支付 / CSV 导入导出 / 并发防超卖 |
+| 12 | Taro 4 / React 19 / TypeScript / Sass / pnpm workspace / Zustand |
 
 ## 部署
 
@@ -270,7 +331,15 @@ Prisma enums: `BookStatus` (OWNED, READING, FINISHED, WISHLIST), `UserRole` (USE
 | Day 9 | Playwright E2E 测试 (auth, book-crud, review, upload, permission) | 已完成 |
 | Day 10 | 多租户 SaaS (Workspace/RBAC/Invitation/AuditLog) | 已完成 |
 | Day 11 | 订单状态机 + 模拟支付 + BullMQ 队列 + CSV 导入导出 | 已完成 |
+| Day 12 | Taro 工程搭建 + 核心 UI 迁移 (mock 数据) | 已完成 |
 
 ### 待实施
 
-所有 Day 1-11 任务已完成。
+| Day | 内容 | 状态 |
+|-----|------|------|
+| Day 13 | 微信登录 + UnionID + Taro request adapter | 待实施 |
+| Day 14 | 业务迁移 (RBAC/上传/分享) | 待实施 |
+| Day 15 | 微信支付 + 订单 + 票务 | 待实施 |
+| Day 16 | 订阅消息 + 客服 + 内容安全 | 待实施 |
+| Day 17 | 分包优化 + 性能调优 | 待实施 |
+| Day 18 | CI/CD + 代码审查 + 发布上线 | 待实施 |
