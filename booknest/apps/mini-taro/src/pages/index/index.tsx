@@ -4,13 +4,32 @@ import { BookCard } from '@/components/BookCard'
 import { EmptyState } from '@/components/EmptyState'
 import { LoadingState } from '@/components/LoadingState'
 import { useBooks } from '@/hooks/use-books'
+import { useAuthStore } from '@/stores/auth-store'
 import { useWorkspaceStore } from '@/stores/workspace-store'
 import './index.scss'
 
 export default function IndexPage() {
+  const token = useAuthStore((s) => s.token)
   const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId)
   const { data, isLoading } = useBooks(activeWorkspaceId)
   const books = data?.items ?? []
+
+  if (!token) {
+    return (
+      <View className="page">
+        <View className="page__header">
+          <Text className="page__title">BookNest Mini</Text>
+          <Text className="page__subtitle">你的团队书架</Text>
+        </View>
+        <EmptyState
+          title="请先登录"
+          description="登录后查看你的书架"
+          actionText="去登录"
+          onAction={() => Taro.navigateTo({ url: '/pages/login/index' })}
+        />
+      </View>
+    )
+  }
 
   return (
     <View className="page">
