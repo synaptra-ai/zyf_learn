@@ -1,4 +1,4 @@
-@import "./assets/variables.scss";
+@use "./assets/variables.scss" as *;
 
 page {
   font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, 'PingFang SC',
