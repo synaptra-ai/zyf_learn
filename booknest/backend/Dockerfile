@@ -16,4 +16,4 @@ COPY --from=builder /app/prisma.config.ts ./
 RUN npx prisma generate
 
 EXPOSE 4000
-CMD ["sh", "-c", "if [ \"$FORCE_DB_RESET\" = \"true\" ]; then npx prisma db push --force-reset --accept-data-loss; else npx prisma db push --accept-data-loss; fi && node dist/index.js"]
+CMD ["sh", "-c", "if [ \"$FORCE_DB_RESET\" = \"true\" ]; then npx prisma db push --force-reset --accept-data-loss && npx tsx prisma/seed.ts; else npx prisma db push --accept-data-loss; fi && node dist/index.js"]
