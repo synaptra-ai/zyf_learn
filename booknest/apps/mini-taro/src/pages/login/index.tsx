@@ -1,19 +1,51 @@
-import { Input, Text, View } from '@tarojs/components'
-import Taro from '@tarojs/taro'
+import { Button, Input, Text, View } from '@tarojs/components'
+import Taro, { useRouter } from '@tarojs/taro'
 import { useState } from 'react'
+import { loginByWechat } from '@/services/auth'
+import { request } from '@/services/request'
 import './index.scss'
 
 export default function LoginPage() {
+  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  const handleLogin = () => {
+  const handleWechatLogin = async () => {
+    try {
+      setLoading(true)
+      await loginByWechat()
+      const redirect = router.params.redirect
+      Taro.redirectTo({ url: redirect ? decodeURIComponent(redirect) : '/pages/index/index' })
+    } catch {
+      // request adapter 已 showToast
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleEmailLogin = async () => {
     if (!email || !password) {
       Taro.showToast({ title: '请输入邮箱和密码', icon: 'none' })
       return
     }
-    Taro.showToast({ title: '登录成功 (mock)', icon: 'success' })
-    setTimeout(() => Taro.switchTab({ url: '/pages/index/index' }), 1500)
+    try {
+      setLoading(true)
+      const res = await request<{ token: string; user: { id: string; email: string; nickname: string } }>({
+        url: '/api/v1/auth/login',
+        method: 'POST',
+        data: { email, password },
+        auth: false,
+      })
+      const { useAuthStore } = await import('@/stores/auth-store')
+      useAuthStore.getState().setSession(res)
+      const redirect = router.params.redirect
+      Taro.redirectTo({ url: redirect ? decodeURIComponent(redirect) : '/pages/index/index' })
+    } catch {
+      // request adapter 已 showToast
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -46,9 +78,18 @@ export default function LoginPage() {
           />
         </View>
 
-        <View className="login__btn" onClick={handleLogin}>
-          <Text className="login__btn-text">登录</Text>
+        <View className="login__btn" onClick={handleEmailLogin}>
+          <Text className="login__btn-text">{loading ? '登录中...' : '邮箱登录'}</Text>
         </View>
+
+        <Button
+          className="login__wechat-btn"
+          type="primary"
+          onClick={handleWechatLogin}
+          disabled={loading}
+        >
+          微信一键登录
+        </Button>
       </View>
     </View>
   )
