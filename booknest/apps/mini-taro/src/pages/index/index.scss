@@ -21,11 +21,54 @@
     font-size: $font-size-sm;
     color: $color-text-muted;
   }
+
+  &__filters {
+    padding: $spacing-sm $spacing-lg;
+    background: $color-bg-primary;
+  }
+
+  &__search {
+    width: 100%;
+    height: 72rpx;
+    background: $color-bg-tertiary;
+    border-radius: $border-radius-lg;
+    padding: 0 $spacing-md;
+    font-size: $font-size-md;
+    margin-bottom: $spacing-sm;
+  }
+
+  &__status-bar {
+    white-space: nowrap;
+    margin-bottom: $spacing-sm;
+  }
+
+  &__status-chip {
+    display: inline-block;
+    padding: 8rpx 24rpx;
+    margin-right: $spacing-sm;
+    border-radius: $border-radius-full;
+    background: $color-bg-tertiary;
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+
+    &--active {
+      background: $color-primary;
+      color: $color-text-white;
+    }
+  }
+
+  &__nomore {
+    display: block;
+    text-align: center;
+    padding: $spacing-md;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+  }
 }
 
 .book-list {
   padding: $spacing-md $spacing-lg;
-  max-height: calc(100vh - 200rpx);
+  max-height: calc(100vh - 320rpx);
 }
 
 .fab {
