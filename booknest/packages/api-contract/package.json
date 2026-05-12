@@ -1,0 +1,12 @@
+{
+  "name": "@booknest/api-contract",
+  "version": "0.0.1",
+  "type": "module",
+  "main": "src/openapi.ts",
+  "scripts": {
+    "generate": "openapi-typescript ../../backend/generated/openapi.json -o src/openapi.ts"
+  },
+  "devDependencies": {
+    "openapi-typescript": "latest"
+  }
+}
