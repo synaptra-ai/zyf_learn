@@ -1,13 +1,17 @@
 import { Image, Text, View } from '@tarojs/components'
 import Taro, { useRouter } from '@tarojs/taro'
-import { useState } from 'react'
 import { StatusBadge } from '@/components/StatusBadge'
-import { mockBooks } from '@/mocks/books'
+import { LoadingState } from '@/components/LoadingState'
+import { useBook } from '@/hooks/use-books'
 import './index.scss'
 
 export default function BookDetailPage() {
   const router = useRouter()
-  const book = mockBooks.find((b) => b.id === router.params.id) || mockBooks[0]
+  const { data: book, isLoading } = useBook(router.params.id!)
+
+  if (isLoading || !book) {
+    return <LoadingState text="加载中..." />
+  }
 
   return (
     <View className="detail">

@@ -2,11 +2,15 @@ import { ScrollView, Text, View } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { BookCard } from '@/components/BookCard'
 import { EmptyState } from '@/components/EmptyState'
-import { mockBooks } from '@/mocks/books'
+import { LoadingState } from '@/components/LoadingState'
+import { useBooks } from '@/hooks/use-books'
+import { useWorkspaceStore } from '@/stores/workspace-store'
 import './index.scss'
 
 export default function IndexPage() {
-  const books = mockBooks
+  const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId)
+  const { data, isLoading } = useBooks(activeWorkspaceId)
+  const books = data?.items ?? []
 
   return (
     <View className="page">
@@ -15,7 +19,9 @@ export default function IndexPage() {
         <Text className="page__subtitle">从 Web 迁移到微信小程序</Text>
       </View>
 
-      {books.length > 0 ? (
+      {isLoading ? (
+        <LoadingState text="加载中..." />
+      ) : books.length > 0 ? (
         <ScrollView scrollY className="book-list">
           {books.map((book) => (
             <BookCard key={book.id} book={book} />
