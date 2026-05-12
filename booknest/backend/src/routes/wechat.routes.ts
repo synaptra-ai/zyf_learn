@@ -1,4 +1,5 @@
 import crypto from 'node:crypto'
+import bcrypt from 'bcrypt'
 import { Router } from 'express'
 import { z } from 'zod'
 import prisma from '../lib/prisma'
@@ -28,7 +29,7 @@ wechatRouter.post('/login', async (req, res, next) => {
       },
       create: {
         email: virtualEmail,
-        passwordHash: await import('bcrypt').then((b) => b.hash(crypto.randomUUID(), 10)),
+        passwordHash: await bcrypt.hash(crypto.randomUUID(), 10),
         name: '微信用户',
         wechatOpenId: session.openid,
         wechatUnionId: session.unionid,
