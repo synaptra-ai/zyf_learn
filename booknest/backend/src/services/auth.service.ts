@@ -11,7 +11,7 @@ interface TokenPayload {
   role: string
 }
 
-function generateToken(payload: TokenPayload): string {
+export function generateToken(payload: TokenPayload): string {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' })
 }
 
