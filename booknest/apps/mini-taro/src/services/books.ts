@@ -16,6 +16,17 @@ export interface PageResult<T> {
   total: number
 }
 
+export interface BookFormInput {
+  title: string
+  author: string
+  description?: string
+  status: string
+  categoryId?: string
+  isbn?: string
+  pageCount?: number
+  publishedDate?: string
+}
+
 export function listBooks(params: ListBooksParams) {
   return request<PageResult<Book>>({
     url: '/api/v1/books',
@@ -31,16 +42,16 @@ export function getBook(id: string) {
   })
 }
 
-export function createBook(data: Partial<Book>) {
-  return request<Book>({
+export function createBook(data: BookFormInput) {
+  return request<Book, BookFormInput>({
     url: '/api/v1/books',
     method: 'POST',
     data,
   })
 }
 
-export function updateBook(id: string, data: Partial<Book>) {
-  return request<Book>({
+export function updateBook(id: string, data: Partial<BookFormInput>) {
+  return request<Book, Partial<BookFormInput>>({
     url: `/api/v1/books/${id}`,
     method: 'PUT',
     data,
@@ -48,7 +59,7 @@ export function updateBook(id: string, data: Partial<Book>) {
 }
 
 export function deleteBook(id: string) {
-  return request<void>({
+  return request<{ id: string }>({
     url: `/api/v1/books/${id}`,
     method: 'DELETE',
   })
