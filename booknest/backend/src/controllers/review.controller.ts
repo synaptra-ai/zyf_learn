@@ -5,7 +5,7 @@ import { ResponseUtil } from '../utils/response'
 export const reviewController = {
   async create(req: Request, res: Response, next: NextFunction) {
     try {
-      const review = await reviewService.create(req.user!.id, req.params.bookId as string, req.body)
+      const review = await reviewService.create(req.user!.id, req.params.bookId as string, req.workspace?.id, req.body)
       ResponseUtil.success(res, review, '创建成功', 201)
     } catch (err) {
       next(err)

@@ -3,6 +3,9 @@
   background: $color-bg-secondary;
 
   &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     padding: $spacing-lg;
     background: $color-bg-primary;
   }
@@ -11,6 +14,75 @@
     font-size: $font-size-xl;
     font-weight: 700;
     color: $color-text-primary;
+  }
+
+  &__toolbar {
+    display: flex;
+    justify-content: flex-end;
+    padding: $spacing-sm $spacing-lg;
+    background: $color-bg-primary;
+    border-bottom: 2rpx solid $color-bg-tertiary;
+  }
+
+  &__add-btn {
+    padding: 12rpx 24rpx;
+    background: $color-primary;
+    border-radius: $border-radius-md;
+  }
+
+  &__add-btn-text {
+    font-size: $font-size-md;
+    color: #fff;
+  }
+
+  &__form {
+    margin: $spacing-md $spacing-lg;
+    padding: $spacing-lg;
+    background: $color-bg-primary;
+    border-radius: $border-radius-lg;
+    box-shadow: $shadow-sm;
+  }
+
+  &__form-input {
+    width: 100%;
+    padding: $spacing-md;
+    border: 2rpx solid #e2e8f0;
+    border-radius: $border-radius-md;
+    font-size: $font-size-md;
+    box-sizing: border-box;
+  }
+
+  &__color-picker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16rpx;
+    margin-top: $spacing-md;
+  }
+
+  &__color-dot {
+    width: 56rpx;
+    height: 56rpx;
+    border-radius: 50%;
+    border: 4rpx solid transparent;
+
+    &--active {
+      border-color: $color-text-primary;
+      transform: scale(1.15);
+    }
+  }
+
+  &__form-submit {
+    margin-top: $spacing-md;
+    padding: $spacing-md;
+    background: $color-primary;
+    border-radius: $border-radius-md;
+    text-align: center;
+  }
+
+  &__form-submit-text {
+    font-size: $font-size-md;
+    color: #fff;
+    font-weight: 600;
   }
 
   &__list {
@@ -50,6 +122,16 @@
       margin-top: 4rpx;
       font-size: $font-size-sm;
       color: $color-text-muted;
+    }
+
+    &-delete {
+      padding: 8rpx 20rpx;
+      margin-left: $spacing-sm;
+    }
+
+    &-delete-text {
+      font-size: $font-size-sm;
+      color: $color-danger;
     }
   }
 }

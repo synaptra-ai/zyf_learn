@@ -2,6 +2,7 @@ import crypto from 'crypto'
 import prisma from '../lib/prisma'
 import { ApiError } from '../utils/errors'
 import { verifyPaymentSignature, signPaymentPayload, MockPaymentPayload } from '../lib/mockPayment'
+import { sendSubscribeMessage } from './wechat/subscribe-message.service'
 
 export async function createMockPaymentCallback(orderId: string) {
   const order = await prisma.order.findUnique({ where: { id: orderId } })
@@ -116,4 +117,17 @@ export async function handlePaymentCallback(payload: MockPaymentPayload, signatu
 
     return { idempotent: false, order: paidOrder, ticket }
   })
+}
+
+// 支付成功后触发订阅消息
+export async function notifyPaymentSuccess(userId: string, activityTitle: string, ticketCode: string) {
+  try {
+    await sendSubscribeMessage({
+      userId,
+      templateId: 'SIGNUP_SUCCESS',
+      data: { thing1: { value: activityTitle }, character_string2: { value: ticketCode } },
+    })
+  } catch (err) {
+    console.warn('[subscribe] 报名成功通知发送失败:', (err as Error).message)
+  }
 }

@@ -1,0 +1,156 @@
+.act-detail {
+  min-height: 100vh;
+  background: $color-bg-secondary;
+  padding-bottom: calc(env(safe-area-inset-bottom) + 140rpx);
+
+  &__header {
+    padding: $spacing-lg;
+    background: $color-bg-primary;
+  }
+
+  &__title {
+    display: block;
+    font-size: $font-size-xl;
+    font-weight: 700;
+    color: $color-text-primary;
+  }
+
+  &__tags {
+    margin-top: $spacing-sm;
+  }
+
+  &__tag {
+    font-size: $font-size-sm;
+    padding: 4rpx 16rpx;
+    border-radius: $border-radius-sm;
+
+    &--status {
+      color: $color-success;
+      background: rgba(16, 185, 129, 0.1);
+    }
+  }
+
+  &__info {
+    margin: $spacing-md $spacing-lg;
+    background: $color-bg-primary;
+    border-radius: $border-radius-lg;
+    padding: $spacing-lg;
+    box-shadow: $shadow-sm;
+  }
+
+  &__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-sm 0;
+
+    &:not(:last-child) {
+      border-bottom: 2rpx solid #f1f5f9;
+    }
+  }
+
+  &__label {
+    font-size: $font-size-md;
+    color: $color-text-muted;
+  }
+
+  &__value {
+    font-size: $font-size-md;
+    color: $color-text-primary;
+  }
+
+  &__price {
+    font-size: $font-size-lg;
+    font-weight: 700;
+    color: $color-primary;
+  }
+
+  &__desc-section {
+    margin: 0 $spacing-lg;
+    background: $color-bg-primary;
+    border-radius: $border-radius-lg;
+    padding: $spacing-lg;
+    box-shadow: $shadow-sm;
+  }
+
+  &__section-title {
+    display: block;
+    font-size: $font-size-lg;
+    font-weight: 600;
+    color: $color-text-primary;
+    margin-bottom: $spacing-md;
+  }
+
+  &__desc {
+    font-size: $font-size-md;
+    color: $color-text-secondary;
+    line-height: 1.8;
+  }
+
+  &__subscribe {
+    display: flex;
+    align-items: center;
+    margin: $spacing-md $spacing-lg;
+    padding: $spacing-md $spacing-lg;
+    background: $color-bg-primary;
+    border-radius: $border-radius-lg;
+    box-shadow: $shadow-sm;
+  }
+
+  &__subscribe-icon {
+    font-size: 40rpx;
+    margin-right: $spacing-md;
+  }
+
+  &__subscribe-text {
+    font-size: $font-size-md;
+    color: $color-primary;
+    font-weight: 500;
+  }
+
+  &__bottom {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $spacing-md $spacing-lg;
+    padding-bottom: calc($spacing-md + env(safe-area-inset-bottom));
+    background: $color-bg-primary;
+    box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.06);
+  }
+
+  &__bottom-info {
+    flex: 1;
+  }
+
+  &__bottom-price {
+    display: block;
+    font-size: $font-size-xl;
+    font-weight: 700;
+    color: $color-primary;
+  }
+
+  &__bottom-count {
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+  }
+
+  &__btn {
+    padding: $spacing-md $spacing-xl;
+    background: $color-primary;
+    border-radius: $border-radius-md;
+
+    &--disabled {
+      background: $color-text-muted;
+    }
+
+    &-text {
+      font-size: $font-size-lg;
+      color: #fff;
+      font-weight: 600;
+    }
+  }
+}

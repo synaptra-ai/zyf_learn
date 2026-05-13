@@ -1,15 +1,15 @@
-import { Image, Text, View } from '@tarojs/components'
+import { Image, Input, Text, Textarea, View } from '@tarojs/components'
 import Taro, { useShareAppMessage, useRouter } from '@tarojs/taro'
 import { useEffect, useState } from 'react'
 import { StatusBadge } from '@/components/StatusBadge'
 import { LoadingState } from '@/components/LoadingState'
-import { getBook } from '@/services/books'
-import type { Book } from '@booknest/domain'
-import { deleteBook } from '@/services/books'
+import { getBook, deleteBook } from '@/services/books'
+import { listReviews, createReview, type Review } from '@/services/reviews'
 import { listWorkspaces } from '@/services/workspaces'
 import { useAuthStore } from '@/stores/auth-store'
 import { useWorkspaceStore } from '@/stores/workspace-store'
 import { canEditBook, canDeleteBook } from '@/utils/permissions'
+import type { Book } from '@booknest/domain'
 import './index.scss'
 
 export default function BookDetailPage() {
@@ -19,12 +19,29 @@ export default function BookDetailPage() {
   const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId)
 
   const [book, setBook] = useState<Book | null>(null)
+  const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
   const [workspaces, setWorkspaces] = useState<any[]>([])
 
-  useEffect(() => {
-    getBook(id).then(setBook).catch(() => {}).finally(() => setLoading(false))
-  }, [id])
+  // 评论表单
+  const [rating, setRating] = useState(5)
+  const [comment, setComment] = useState('')
+  const [submittingReview, setSubmittingReview] = useState(false)
+
+  const loadData = async () => {
+    try {
+      const [bookData, reviewData] = await Promise.all([
+        getBook(id),
+        listReviews(id).catch(() => []),
+      ])
+      setBook(bookData)
+      setReviews(reviewData as Review[])
+    } catch {} finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => { loadData() }, [id])
 
   useEffect(() => {
     if (token) listWorkspaces().then(setWorkspaces).catch(() => {})
@@ -36,7 +53,7 @@ export default function BookDetailPage() {
 
   useShareAppMessage(() => ({
     title: book ? `推荐一本书：${book.title}` : 'BookNest 书籍详情',
-    path: `/pages/books/detail/index?id=${id}`,
+    path: `/sub/books/pages/detail/index?id=${id}`,
     imageUrl: book?.coverUrl || undefined,
   }))
 
@@ -53,9 +70,22 @@ export default function BookDetailPage() {
     } catch {}
   }
 
-  if (loading || !book) {
-    return <LoadingState text="加载中..." />
+  const handleSubmitReview = async () => {
+    if (!comment.trim()) return Taro.showToast({ title: '请输入评论内容', icon: 'none' })
+    if (submittingReview) return
+    setSubmittingReview(true)
+    try {
+      await createReview(id, { rating, comment: comment.trim() })
+      Taro.showToast({ title: '评论成功', icon: 'success' })
+      setComment('')
+      setRating(5)
+      loadData()
+    } catch {} finally {
+      setSubmittingReview(false)
+    }
   }
+
+  if (loading || !book) return <LoadingState text="加载中..." />
 
   return (
     <View className="detail">
@@ -107,14 +137,59 @@ export default function BookDetailPage() {
         </View>
       </View>
 
+      {/* 评论区 */}
+      <View className="detail__section">
+        <Text className="detail__section-title">评论 ({reviews.length})</Text>
+
+        {reviews.length > 0 ? (
+          <View className="detail__reviews">
+            {reviews.map((r) => (
+              <View key={r.id} className="detail__review">
+                <View className="detail__review-header">
+                  <Text className="detail__review-user">{r.user?.name || '用户'}</Text>
+                  <Text className="detail__review-stars">{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}</Text>
+                </View>
+                <Text className="detail__review-comment">{r.comment}</Text>
+              </View>
+            ))}
+          </View>
+        ) : (
+          <Text className="detail__empty-reviews">暂无评论</Text>
+        )}
+
+        {token && (
+          <View className="detail__review-form">
+            <View className="detail__rating">
+              {[1, 2, 3, 4, 5].map((n) => (
+                <Text
+                  key={n}
+                  className={`detail__star ${n <= rating ? 'detail__star--active' : ''}`}
+                  onClick={() => setRating(n)}
+                >
+                  ★
+                </Text>
+              ))}
+            </View>
+            <Textarea
+              className="detail__review-input"
+              placeholder="写下你的读后感..."
+              value={comment}
+              onInput={(e) => setComment(e.detail.value)}
+              maxlength={500}
+            />
+            <View className="detail__review-submit" onClick={handleSubmitReview}>
+              <Text className="detail__review-submit-text">{submittingReview ? '提交中...' : '发表评论'}</Text>
+            </View>
+          </View>
+        )}
+      </View>
+
       {(showEdit || showDelete) && (
         <View className="detail__actions">
           {showEdit && (
             <View
               className="detail__btn detail__btn--primary"
-              onClick={() =>
-                Taro.navigateTo({ url: `/sub/books/pages/form/index?id=${book.id}` })
-              }
+              onClick={() => Taro.navigateTo({ url: `/sub/books/pages/form/index?id=${book.id}` })}
             >
               <Text className="detail__btn-text">编辑</Text>
             </View>

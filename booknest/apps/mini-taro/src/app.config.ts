@@ -18,6 +18,10 @@ export default defineAppConfig({
       root: 'sub/admin',
       pages: ['pages/content-security/index'],
     },
+    {
+      root: 'sub/activities',
+      pages: ['pages/list/index', 'pages/detail/index'],
+    },
   ],
   window: {
     backgroundTextStyle: 'light',

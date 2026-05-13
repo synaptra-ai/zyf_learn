@@ -366,14 +366,13 @@ booknest/
 | Day 10 | 多租户 SaaS (Workspace/RBAC/Invitation/AuditLog) | 已完成 |
 | Day 11 | 订单状态机 + 模拟支付 + BullMQ 队列 + CSV 导入导出 | 已完成 |
 | Day 12 | Taro 工程搭建 + 核心 UI 迁移 (mock 数据) | 已完成 |
-
-### 待实施
-
-| Day | 内容 | 状态 |
-|-----|------|------|
 | Day 13 | 微信登录 + UnionID + Taro request adapter | 已完成 |
 | Day 14 | 业务迁移 (RBAC/上传/分享) | 已完成 |
 | Day 15 | 微信支付 + 订单 + 票务 | 已完成 |
 | Day 16 | 订阅消息 + 客服 + 内容安全 | 已完成 |
 | Day 17 | 分包优化 + 性能调优 | 已完成 |
 | Day 18 | CI/CD + 代码审查 + 发布上线 | 已完成 |
+
+### 待实施
+
+无 — Day 1-18 全部完成。

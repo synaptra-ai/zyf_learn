@@ -2,6 +2,7 @@ import { Text, View } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useEffect, useState } from 'react'
 import { request } from '@/services/request'
+import { recordCustomerServiceEvent } from '@/services/customer-service'
 import { LoadingState } from '@/components/LoadingState'
 import './index.scss'
 
@@ -101,6 +102,20 @@ export default function ContentSecurityPage() {
                 </View>
                 <View className="cs-admin__btn cs-admin__btn--reject" onClick={() => handleReject(item.id)}>
                   <Text className="cs-admin__btn-text">驳回</Text>
+                </View>
+                <View
+                  className="cs-admin__btn cs-admin__btn--cs"
+                  onClick={async () => {
+                    await recordCustomerServiceEvent({
+                      scene: 'CONTENT_REVIEW',
+                      refType: item.targetType,
+                      refId: item.targetId || undefined,
+                      payload: { checkId: item.id, status: item.status },
+                    })
+                    Taro.showToast({ title: '客服上下文已记录', icon: 'none' })
+                  }}
+                >
+                  <Text className="cs-admin__btn-text">联系客服</Text>
                 </View>
               </View>
             )}

@@ -1,0 +1,83 @@
+.act-list {
+  min-height: 100vh;
+  background: $color-bg-secondary;
+  padding-bottom: env(safe-area-inset-bottom);
+
+  &__header {
+    padding: $spacing-lg;
+    background: $color-bg-primary;
+  }
+
+  &__title {
+    font-size: $font-size-xl;
+    font-weight: 700;
+    color: $color-text-primary;
+  }
+
+  &__cards {
+    padding: $spacing-md $spacing-lg;
+  }
+
+  &__card {
+    background: $color-bg-primary;
+    border-radius: $border-radius-lg;
+    padding: $spacing-lg;
+    margin-bottom: $spacing-md;
+    box-shadow: $shadow-sm;
+
+    &-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    &-title {
+      font-size: $font-size-lg;
+      font-weight: 600;
+      color: $color-text-primary;
+      flex: 1;
+    }
+
+    &-status {
+      font-size: $font-size-sm;
+      color: $color-success;
+      background: rgba(16, 185, 129, 0.1);
+      padding: 4rpx 16rpx;
+      border-radius: $border-radius-sm;
+    }
+
+    &-desc {
+      display: block;
+      margin-top: $spacing-sm;
+      font-size: $font-size-sm;
+      color: $color-text-secondary;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    &-bottom {
+      display: flex;
+      align-items: center;
+      margin-top: $spacing-md;
+      gap: $spacing-md;
+    }
+
+    &-price {
+      font-size: $font-size-lg;
+      font-weight: 700;
+      color: $color-primary;
+    }
+
+    &-count {
+      font-size: $font-size-sm;
+      color: $color-text-muted;
+    }
+
+    &-time {
+      font-size: $font-size-sm;
+      color: $color-text-muted;
+      margin-left: auto;
+    }
+  }
+}

@@ -68,6 +68,7 @@ export default function BookFormPage() {
         pageCount: editBook.pageCount || undefined,
         publishedDate: editBook.publishedDate || '',
       })
+      if (editBook.coverUrl) setTempCoverPath(editBook.coverUrl)
     }
   }, [editBook])
 
@@ -82,7 +83,10 @@ export default function BookFormPage() {
 
     setSubmitting(true)
     try {
-      const book = isEdit ? await updateBook(editId!, form) : await createBook(form)
+      const cleaned = Object.fromEntries(
+        Object.entries(form).filter(([, v]) => v !== '' && v !== undefined)
+      ) as BookFormInput
+      const book = isEdit ? await updateBook(editId!, cleaned) : await createBook(cleaned)
       if (tempCoverPath) {
         await uploadCover(book.id, tempCoverPath)
       }

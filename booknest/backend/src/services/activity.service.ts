@@ -1,5 +1,6 @@
 import prisma from '../lib/prisma'
 import { writeAuditLog } from './audit.service'
+import { checkTextSecurity } from './content-security/text-security.service'
 import { ApiError } from '../utils/errors'
 
 export async function listActivities(workspaceId: string) {
@@ -13,6 +14,17 @@ export async function listActivities(workspaceId: string) {
 }
 
 export async function createActivity(userId: string, workspaceId: string, data: any) {
+  const textToCheck = [data.title, data.description].filter(Boolean).join(' ')
+  if (textToCheck) {
+    const check = await checkTextSecurity({
+      content: textToCheck,
+      userId,
+      workspaceId,
+      targetType: 'ACTIVITY',
+    })
+    if (check.status === 'REJECT') throw new ApiError(400, '活动内容包含违规信息，请修改')
+  }
+
   const activity = await prisma.activity.create({
     data: {
       ...data,

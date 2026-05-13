@@ -6,6 +6,7 @@ import { EmptyState } from '@/components/EmptyState'
 import { LoadingState } from '@/components/LoadingState'
 import { WorkspaceSwitcher } from '@/components/WorkspaceSwitcher'
 import { listBooks } from '@/services/books'
+import { listCategories } from '@/services/categories'
 import { useAuthStore } from '@/stores/auth-store'
 import { useWorkspaceStore } from '@/stores/workspace-store'
 import { listWorkspaces } from '@/services/workspaces'
@@ -28,6 +29,8 @@ export default function IndexPage() {
   const [debouncedKeyword, setDebouncedKeyword] = useState('')
   const debounceTimer = useRef<ReturnType<typeof setTimeout>>()
   const [status, setStatus] = useState('')
+  const [categoryId, setCategoryId] = useState('')
+  const [categories, setCategories] = useState<any[]>([])
   const [page, setPage] = useState(1)
   const [items, setItems] = useState<any[]>([])
   const [hasMore, setHasMore] = useState(true)
@@ -39,6 +42,10 @@ export default function IndexPage() {
     if (!token) return
     listWorkspaces().then(setWorkspaces).catch(() => {})
   }, [token])
+
+  useEffect(() => {
+    if (activeWorkspaceId) listCategories().then(setCategories).catch(() => {})
+  }, [activeWorkspaceId])
 
   const activeRole = workspaces.find((w) => w.id === activeWorkspaceId)?.members[0]?.role
   const showFab = canCreateBook(activeRole)
@@ -53,6 +60,7 @@ export default function IndexPage() {
         pageSize: PAGE_SIZE,
         keyword: debouncedKeyword || undefined,
         status: status || undefined,
+        categoryId: categoryId || undefined,
       })
       if (reset || page === 1) {
         setItems(res.items)
@@ -69,7 +77,7 @@ export default function IndexPage() {
     if (activeWorkspaceId) {
       fetchBooks(true)
     }
-  }, [activeWorkspaceId, debouncedKeyword, status])
+  }, [activeWorkspaceId, debouncedKeyword, status, categoryId])
 
   useEffect(() => {
     if (page > 1 && activeWorkspaceId) {
@@ -156,6 +164,25 @@ export default function IndexPage() {
             </View>
           ))}
         </ScrollView>
+        {categories.length > 0 && (
+          <ScrollView scrollX className="page__status-bar">
+            <View
+              className={`page__status-chip ${categoryId === '' ? 'page__status-chip--active' : ''}`}
+              onClick={() => { setCategoryId(''); setPage(1) }}
+            >
+              <Text>全部分类</Text>
+            </View>
+            {categories.map((cat: any) => (
+              <View
+                key={cat.id}
+                className={`page__status-chip ${categoryId === cat.id ? 'page__status-chip--active' : ''}`}
+                onClick={() => { setCategoryId(cat.id); setPage(1) }}
+              >
+                <Text>{cat.name}</Text>
+              </View>
+            ))}
+          </ScrollView>
+        )}
       </View>
 
       {!activeWorkspaceId ? (

@@ -34,8 +34,16 @@ wechatPayRouter.post('/mock-callback', authenticate, async (req, res, next) => {
   try {
     const { orderId } = req.body
     if (!orderId) throw new ApiError(400, '缺少 orderId')
-    const { createMockPaymentCallback } = await import('../services/payment.service')
+    const { createMockPaymentCallback, notifyPaymentSuccess } = await import('../services/payment.service')
     const result = await createMockPaymentCallback(orderId)
+    if (!result.idempotent && result.ticket && result.order) {
+      const order = await import('../lib/prisma').then(m => m.default.order.findUnique({
+        where: { id: orderId }, include: { activity: true, user: true }
+      }))
+      if (order?.activity && order.user) {
+        await notifyPaymentSuccess(order.userId, order.activity.title, result.ticket.code)
+      }
+    }
     res.json({ code: 0, message: 'ok', data: result })
   } catch (error) {
     next(error)

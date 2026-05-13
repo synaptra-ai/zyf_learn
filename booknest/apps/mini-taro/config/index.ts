@@ -18,7 +18,7 @@ export default defineConfig(async (merge) => {
     outputRoot: 'dist',
     plugins: ['@tarojs/plugin-framework-react'],
     defineConstants: {
-      'process.env.TARO_APP_API_URL': JSON.stringify(process.env.TARO_APP_API_URL || 'https://zyfcloud.cn'),
+      'process.env.TARO_APP_API_URL': JSON.stringify(process.env.TARO_APP_API_URL || 'http://192.168.31.244:4000'),
     },
     copy: { patterns: [], options: {} },
     framework: 'react',
