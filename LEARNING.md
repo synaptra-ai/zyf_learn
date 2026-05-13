@@ -1004,3 +1004,105 @@ PaymentEvent 模型新增字段：
 13. 返回书籍列表 → React Query 缓存 → 渲染页面
 14. 同时 useSocket 建立 WebSocket 连接，等待实时通知
 ```
+
+---
+
+## Day 16：订阅消息 + 客服消息 + 内容安全风控
+
+### 16.1 订阅消息
+
+**做了什么**：用户可订阅活动提醒，后端记录授权并触发消息发送
+
+```
+流程：
+  1. 小程序调用 Taro.requestSubscribeMessage({tmplIds}) → 用户授权/拒绝
+  2. 授权结果 POST /api/v1/subscriptions/record → 保存到 SubscriptionRecord 表
+  3. 业务事件触发时（支付成功/活动开始）→ sendSubscribeMessage 发送消息
+
+数据模型 — SubscriptionRecord：
+  userId / workspaceId / templateId / scene / status(ACCEPTED/REJECTED/BANNED) / rawResult
+
+消息发送服务 — subscribe-message.service.ts：
+  mock 模式：console.log 打印发送内容
+  real 模式：调微信 API /cgi-bin/message/subscribe/send
+
+关键原则：
+  "一次授权一次触达" — 用户每次授权只能发一条消息
+  不能滥发，必须记录用户授权和业务场景
+```
+
+### 16.2 微信 access_token 缓存
+
+```
+wechat-token.service.ts：
+  1. 先查 Redis 缓存 wechat:access_token
+  2. 没有缓存 → 调微信 API /cgi-bin/token 换取
+  3. 存入 Redis，TTL = expires_in - 300秒（提前5分钟过期）
+  4. 所有需要 access_token 的服务都调用此函数
+```
+
+### 16.3 客服入口与上下文
+
+```
+客服入口位置：
+  我的页 — 联系客服（通用咨询）
+  支付失败页 — 联系客服（带 orderId 上下文）
+
+上下文记录：
+  POST /api/v1/customer-service/events
+  → CustomerServiceEvent 表记录 scene/refType/refId/payload
+
+Taro 客服 API：
+  Taro.openCustomerServiceChat({extInfo, corpId})
+  或 Button openType="contact" sessionFrom 携带上下文
+```
+
+### 16.4 文本内容安全检测
+
+```
+检测时机：
+  书籍创建/编辑 → checkTextSecurity(title + description)
+  → PASS：允许创建
+  → REJECT：返回 400 "内容包含违规信息"
+  → REVIEW：记录但不拦截（可扩展）
+
+检测服务 — text-security.service.ts：
+  mock 模式：正则匹配 /敏感|违法|spam/i
+  real 模式：调微信 API /wxa/msg_sec_check
+
+结果保存：
+  ContentSecurityCheck 表 — targetType/contentType/contentHash/status/rawResult
+```
+
+### 16.5 图片内容安全检测（异步）
+
+```
+流程：
+  上传封面 → OSS 保存成功 → BullMQ content-security 队列
+  → Worker 异步检测图片 → PASS/REVIEW/REJECT
+  → REJECT：自动隐藏封面（coverUrl = null）
+  → 写 AuditLog
+
+队列：
+  contentSecurityQueue.add('image-check', {userId, workspaceId, targetType, targetId, imageUrl})
+
+Worker：
+  handleImageCheckJob → checkImageSecurity → 更新状态 + 审计日志
+```
+
+### 16.6 人工复核
+
+```
+后端 — /api/v1/admin/content-security：
+  GET / — 查询 REVIEW/REJECT 内容列表
+  POST /:id/approve — 通过（改为 PASS）
+  POST /:id/reject — 驳回（图片类自动隐藏封面）
+
+RBAC：
+  requireWorkspaceRole('ADMIN') — 仅 ADMIN/OWNER 可访问
+
+小程序端 — pages/admin/content-security/index：
+  Tab 切换 REVIEW/REJECT/ALL
+  卡片列表显示 targetType/contentType/时间
+  通过/驳回按钮 + 确认弹窗
+```

@@ -153,6 +153,9 @@ Prisma enums: `BookStatus` (OWNED, READING, FINISHED, WISHLIST), `UserRole` (USE
 - `/api/v1/payments` — 模拟支付回调
 - `/api/v1/imports` — CSV 异步导入
 - `/api/v1/exports/books` — CSV 导出
+- `/api/v1/subscriptions` — 订阅消息授权记录
+- `/api/v1/customer-service` — 客服上下文记录
+- `/api/v1/admin/content-security` — 内容安全审核管理 (ADMIN+)
 - `/health` — 健康检查
 - `/health/detailed` — 详细健康检查 (DB + Redis)
 - `/api-docs` — Swagger UI
@@ -252,6 +255,8 @@ Prisma enums: `BookStatus` (OWNED, READING, FINISHED, WISHLIST), `UserRole` (USE
 - `services/upload.ts` — 封面上传服务 (Taro.chooseMedia + Taro.uploadFile)
 - `services/pay.ts` — 微信支付服务 (prepay + mock 支付 + requestPayment)
 - `services/orders.ts` — 订单查询服务
+- `services/subscription.ts` — 订阅消息服务 (requestSubscribeMessage + 授权记录)
+- `services/customer-service.ts` — 客服上下文记录服务
 - `stores/auth-store.ts` — 认证状态 (Zustand + Taro.getStorage)
 - `stores/workspace-store.ts` — 当前 Workspace (Zustand + Taro.getStorage)
 - `utils/permissions.ts` — RBAC 前端 helper (canCreateBook/canEditBook/canDeleteBook)
@@ -265,6 +270,7 @@ Prisma enums: `BookStatus` (OWNED, READING, FINISHED, WISHLIST), `UserRole` (USE
 - `pages/books/detail/index` — 书籍详情 (navigateTo, params: id, 支持分享)
 - `pages/books/form/index` — 添加/编辑书籍 (navigateTo, params: id 可选, 支持封面上传)
 - `pages/orders/result/index` — 订单支付结果 (redirectTo, params: orderId, 轮询状态)
+- `pages/admin/content-security/index` — 内容审核管理 (navigateTo, ADMIN+)
 
 ### 迁移组件
 - BookCard、StatusBadge、EmptyState、LoadingState、SafeAreaButton、WorkspaceSwitcher
@@ -304,6 +310,7 @@ booknest/
 | 13 | Taro.request / React Query / 微信登录 / OpenAPI 类型 / code2Session / JWT |
 | 14 | Workspace 切换 / RBAC 前端权限 / Book CRUD 表单 / 分页筛选 / 封面上传 / 分享 |
 | 15 | 微信支付 mock prepay / requestPayment / 支付回调幂等 / Ticket 发放 / 订单结果页轮询 / OrderStatus FAILED |
+| 16 | 订阅消息 / 客服入口 / 内容安全检测 (文本+图片) / BullMQ 异步图片检测 / 人工复核 / AuditLog |
 
 ## 部署
 
@@ -360,6 +367,6 @@ booknest/
 | Day 13 | 微信登录 + UnionID + Taro request adapter | 已完成 |
 | Day 14 | 业务迁移 (RBAC/上传/分享) | 已完成 |
 | Day 15 | 微信支付 + 订单 + 票务 | 已完成 |
-| Day 16 | 订阅消息 + 客服 + 内容安全 | 待实施 |
+| Day 16 | 订阅消息 + 客服 + 内容安全 | 已完成 |
 | Day 17 | 分包优化 + 性能调优 | 待实施 |
 | Day 18 | CI/CD + 代码审查 + 发布上线 | 待实施 |
