@@ -1,6 +1,6 @@
 import { Input, ScrollView, Text, View } from '@tarojs/components'
 import Taro, { usePullDownRefresh, useReachBottom } from '@tarojs/taro'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { BookCard } from '@/components/BookCard'
 import { EmptyState } from '@/components/EmptyState'
 import { LoadingState } from '@/components/LoadingState'
@@ -25,6 +25,8 @@ export default function IndexPage() {
   }, [])
 
   const [keyword, setKeyword] = useState('')
+  const [debouncedKeyword, setDebouncedKeyword] = useState('')
+  const debounceTimer = useRef<ReturnType<typeof setTimeout>>()
   const [status, setStatus] = useState('')
   const [page, setPage] = useState(1)
   const [items, setItems] = useState<any[]>([])
@@ -49,7 +51,7 @@ export default function IndexPage() {
       const res = await listBooks({
         page: reset ? 1 : page,
         pageSize: PAGE_SIZE,
-        keyword: keyword || undefined,
+        keyword: debouncedKeyword || undefined,
         status: status || undefined,
       })
       if (reset || page === 1) {
@@ -67,7 +69,7 @@ export default function IndexPage() {
     if (activeWorkspaceId) {
       fetchBooks(true)
     }
-  }, [activeWorkspaceId, keyword, status])
+  }, [activeWorkspaceId, debouncedKeyword, status])
 
   useEffect(() => {
     if (page > 1 && activeWorkspaceId) {
@@ -96,7 +98,11 @@ export default function IndexPage() {
 
   const handleSearch = (value: string) => {
     setKeyword(value)
-    setPage(1)
+    if (debounceTimer.current) clearTimeout(debounceTimer.current)
+    debounceTimer.current = setTimeout(() => {
+      setDebouncedKeyword(value)
+      setPage(1)
+    }, 300)
   }
 
   const statusFilters = [

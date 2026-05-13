@@ -1,3 +1,4 @@
+import React from 'react'
 import { Image, Text, View } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import type { Book } from '@booknest/domain'
@@ -8,13 +9,13 @@ interface BookCardProps {
   book: Book
 }
 
-export function BookCard({ book }: BookCardProps) {
+export const BookCard = React.memo(function BookCard({ book }: BookCardProps) {
   const handleOpen = () => {
     Taro.navigateTo({ url: `/sub/books/pages/detail/index?id=${book.id}` })
   }
 
   return (
-    <View className="book-card" onClick={handleOpen}>
+    <View className="book-card" onClick={handleOpen} compileMode>
       {book.coverUrl ? (
         <Image className="book-card__cover" src={book.coverUrl} mode="aspectFill" lazyLoad />
       ) : (
@@ -39,4 +40,4 @@ export function BookCard({ book }: BookCardProps) {
       </View>
     </View>
   )
-}
+})
