@@ -1106,3 +1106,84 @@ RBAC：
   卡片列表显示 targetType/contentType/时间
   通过/驳回按钮 + 确认弹窗
 ```
+
+---
+
+## Day 17：分包优化 + 性能调优 + 多端适配
+
+### 17.1 分包拆分
+
+**做了什么**：将非核心页面从主包拆到分包，架构更清晰
+
+```
+主包 (4 个页面)：
+  pages/index/index     — 书架首页 (TabBar)
+  pages/categories/index — 分类管理 (TabBar)
+  pages/me/index         — 我的 (TabBar)
+  pages/login/index      — 登录
+
+sub/books 分包 (2 个页面)：
+  pages/detail/index  — 书籍详情
+  pages/form/index    — 添加/编辑书籍
+
+sub/orders 分包 (1 个页面)：
+  pages/result/index  — 订单支付结果
+
+sub/admin 分包 (1 个页面)：
+  pages/content-security/index — 内容审核管理
+
+配置：app.config.ts subPackages + preloadRule
+```
+
+### 17.2 长列表优化
+
+```
+React.memo：
+  BookCard 组件用 React.memo 包裹，避免列表重渲染时所有 item 重新计算
+
+compileMode：
+  BookCard 根 View 添加 compileMode 属性
+  Taro 半编译模式，减少虚拟 DOM 层开销
+
+debounce：
+  搜索输入防抖 300ms，减少 API 请求
+  用 useRef 保存 timer，避免闭包问题
+```
+
+### 17.3 图片优化
+
+```
+OSS 缩略图：
+  getCoverThumbUrl(url, width=240) — 生成缩略图 URL
+  ?x-oss-process=image/resize,w_240/quality,q_80/format,webp
+  列表用 240px 宽缩略图，减少带宽
+
+lazyLoad：
+  Image 组件 lazyLoad 属性，延迟加载屏幕外图片
+```
+
+### 17.4 Taro Prerender + CompileMode 实验
+
+```
+Prerender：
+  config/index.ts mini.prerender.include: ['pages/index/index']
+  构建时预渲染首页骨架，减少白屏时间
+  编译日志显示 "页面 pages/index/index 预渲染成功"
+
+CompileMode：
+  config/index.ts mini.experimental.compileMode: true
+  对 BookCard 等高频组件启用半编译模式
+```
+
+### 17.5 多端适配
+
+```
+platform/ 目录集中管理平台差异：
+  index.ts — isWeapp() / isH5() 判断
+  weapp.ts — Taro.login / requestPayment / requestSubscribeMessage
+  h5.ts — mock 降级实现
+
+原则：
+  平台差异不散落在页面代码中
+  weapp 是主目标，h5 允许少量差异
+```

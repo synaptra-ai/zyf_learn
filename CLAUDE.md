@@ -260,17 +260,22 @@ Prisma enums: `BookStatus` (OWNED, READING, FINISHED, WISHLIST), `UserRole` (USE
 - `stores/auth-store.ts` — 认证状态 (Zustand + Taro.getStorage)
 - `stores/workspace-store.ts` — 当前 Workspace (Zustand + Taro.getStorage)
 - `utils/permissions.ts` — RBAC 前端 helper (canCreateBook/canEditBook/canDeleteBook)
-- `mocks/books.ts` — Mock 数据 (Day 12 遗留，已切换真实 API)
+- `utils/image.ts` — 图片优化工具 (OSS 缩略图 URL)
+- `platform/index.ts` — 平台适配 (isWeapp/isH5)
+- `platform/weapp.ts` — 微信小程序特有能力
+- `platform/h5.ts` — H5 端降级实现
 
-### 页面路由
+### 页面路由 (主包)
 - `pages/index/index` — 书架首页 (TabBar)
 - `pages/categories/index` — 分类管理 (TabBar)
 - `pages/me/index` — 我的 (TabBar)
 - `pages/login/index` — 登录 (微信一键登录 + 邮箱登录)
-- `pages/books/detail/index` — 书籍详情 (navigateTo, params: id, 支持分享)
-- `pages/books/form/index` — 添加/编辑书籍 (navigateTo, params: id 可选, 支持封面上传)
-- `pages/orders/result/index` — 订单支付结果 (redirectTo, params: orderId, 轮询状态)
-- `pages/admin/content-security/index` — 内容审核管理 (navigateTo, ADMIN+)
+
+### 页面路由 (分包)
+- `sub/books/pages/detail/index` — 书籍详情 (分包, 支持分享)
+- `sub/books/pages/form/index` — 添加/编辑书籍 (分包, 支持封面上传)
+- `sub/orders/pages/result/index` — 订单支付结果 (分包, 轮询状态)
+- `sub/admin/pages/content-security/index` — 内容审核管理 (分包, ADMIN+)
 
 ### 迁移组件
 - BookCard、StatusBadge、EmptyState、LoadingState、SafeAreaButton、WorkspaceSwitcher
@@ -311,6 +316,7 @@ booknest/
 | 14 | Workspace 切换 / RBAC 前端权限 / Book CRUD 表单 / 分页筛选 / 封面上传 / 分享 |
 | 15 | 微信支付 mock prepay / requestPayment / 支付回调幂等 / Ticket 发放 / 订单结果页轮询 / OrderStatus FAILED |
 | 16 | 订阅消息 / 客服入口 / 内容安全检测 (文本+图片) / BullMQ 异步图片检测 / 人工复核 / AuditLog |
+| 17 | subPackages 分包 / preloadRule 预加载 / React.memo / compileMode / debounce / OSS 缩略图 / Prerender / 平台适配 |
 
 ## 部署
 
@@ -368,5 +374,5 @@ booknest/
 | Day 14 | 业务迁移 (RBAC/上传/分享) | 已完成 |
 | Day 15 | 微信支付 + 订单 + 票务 | 已完成 |
 | Day 16 | 订阅消息 + 客服 + 内容安全 | 已完成 |
-| Day 17 | 分包优化 + 性能调优 | 待实施 |
+| Day 17 | 分包优化 + 性能调优 | 已完成 |
 | Day 18 | CI/CD + 代码审查 + 发布上线 | 待实施 |
