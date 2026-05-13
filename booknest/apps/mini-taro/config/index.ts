@@ -33,6 +33,15 @@ export default defineConfig(async (merge) => {
       '@': resolve(__dirname, '..', 'src'),
     },
     mini: {
+      experimental: {
+        compileMode: true,
+      },
+      prerender: {
+        include: ['pages/index/index'],
+        mock: {
+          PRERENDER: true,
+        },
+      },
       postcss: {
         pxtransform: { enable: true, config: {} },
         cssModules: {
