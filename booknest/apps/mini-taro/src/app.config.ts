@@ -36,4 +36,14 @@ export default defineAppConfig({
       { pagePath: 'pages/me/index', text: '我的' },
     ],
   },
+  preloadRule: {
+    'pages/index/index': {
+      network: 'all',
+      packages: ['sub/books'],
+    },
+    'pages/me/index': {
+      network: 'all',
+      packages: ['sub/admin'],
+    },
+  },
 })
