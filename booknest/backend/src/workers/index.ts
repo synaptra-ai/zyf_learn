@@ -5,6 +5,7 @@ import { logger } from '../utils/logger'
 import { Worker, queueConnection } from '../lib/queue'
 import { handleExpireOrderJob } from './order.worker'
 import { handleBookImportJob } from './import.worker'
+import { handleImageCheckJob } from './content-security.worker'
 
 new Worker(
   'order',
@@ -21,6 +22,16 @@ new Worker(
   async (job) => {
     if (job.name === 'book-import') {
       await handleBookImportJob(job.data)
+    }
+  },
+  { connection: queueConnection },
+)
+
+new Worker(
+  'content-security',
+  async (job) => {
+    if (job.name === 'image-check') {
+      await handleImageCheckJob(job.data)
     }
   },
   { connection: queueConnection },

@@ -10,8 +10,10 @@ export const queueConnection = new IORedis({
 
 export const orderQueue = new Queue('order', { connection: queueConnection })
 export const importQueue = new Queue('import', { connection: queueConnection })
+export const contentSecurityQueue = new Queue('content-security', { connection: queueConnection })
 
 export const orderQueueEvents = new QueueEvents('order', { connection: queueConnection })
 export const importQueueEvents = new QueueEvents('import', { connection: queueConnection })
+export const contentSecurityQueueEvents = new QueueEvents('content-security', { connection: queueConnection })
 
 export { Worker }

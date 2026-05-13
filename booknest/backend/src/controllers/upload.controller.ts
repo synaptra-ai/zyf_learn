@@ -9,7 +9,12 @@ export const uploadController = {
         ResponseUtil.error(res, '请选择文件', 400)
         return
       }
-      const book = await uploadService.uploadCover(req.user!.id, req.params.id as string, req.file)
+      const book = await uploadService.uploadCover(
+        req.user!.id,
+        req.params.id as string,
+        req.file,
+        req.workspace?.id,
+      )
       ResponseUtil.success(res, book, '封面上传成功')
     } catch (err) {
       next(err)
