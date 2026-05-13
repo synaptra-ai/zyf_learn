@@ -21,6 +21,8 @@ wechatRouter.post('/login', async (req, res, next) => {
 
     const virtualEmail = `wechat_${crypto.createHash('sha256').update(session.openid).digest('hex').slice(0, 12)}@mini.booknest.local`
 
+    const existing = await prisma.user.findUnique({ where: { wechatOpenId: session.openid } })
+
     const user = await prisma.user.upsert({
       where: { wechatOpenId: session.openid },
       update: {
@@ -36,6 +38,17 @@ wechatRouter.post('/login', async (req, res, next) => {
         wechatSessionKeyHash: hashSessionKey(session.session_key),
       },
     })
+
+    if (!existing) {
+      await prisma.workspace.create({
+        data: {
+          name: '我的书架',
+          members: {
+            create: { userId: user.id, role: 'OWNER' },
+          },
+        },
+      })
+    }
 
     const token = generateToken({ id: user.id, email: user.email, role: user.role })
 

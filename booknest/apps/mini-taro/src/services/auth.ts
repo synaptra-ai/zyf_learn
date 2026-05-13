@@ -1,6 +1,7 @@
 import Taro from '@tarojs/taro'
 import { request } from './request'
 import { useAuthStore } from '@/stores/auth-store'
+import { useWorkspaceStore } from '@/stores/workspace-store'
 
 interface LoginResponse {
   token: string
@@ -23,6 +24,7 @@ export async function loginByWechat() {
     auth: false,
   })
 
+  useWorkspaceStore.getState().setActiveWorkspace(null)
   useAuthStore.getState().setSession(session)
   return session
 }

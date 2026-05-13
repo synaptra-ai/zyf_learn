@@ -2,8 +2,8 @@ import Taro from '@tarojs/taro'
 import { request } from './request'
 
 const TEMPLATE_IDS = {
-  activityReminder: process.env.TARO_APP_SUBSCRIBE_TEMPLATE_ACTIVITY || 'mock-template-activity',
-  signupSuccess: process.env.TARO_APP_SUBSCRIBE_TEMPLATE_SIGNUP || 'mock-template-signup',
+  activityReminder: 'mock-template-activity',
+  signupSuccess: 'mock-template-signup',
 }
 
 export async function subscribeActivityReminder(activityId: string) {

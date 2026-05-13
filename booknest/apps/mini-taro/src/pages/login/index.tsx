@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { loginByWechat } from '@/services/auth'
 import { request } from '@/services/request'
 import { useAuthStore } from '@/stores/auth-store'
+import { useWorkspaceStore } from '@/stores/workspace-store'
 import './index.scss'
 
 export default function LoginPage() {
@@ -52,6 +53,7 @@ export default function LoginPage() {
         data: { email, password },
         auth: false,
       })
+      useWorkspaceStore.getState().setActiveWorkspace(null)
       useAuthStore.getState().setSession({ token: res.token, user: { id: res.user.id, email: res.user.email, nickname: res.user.name } })
       navigateAfterLogin()
     } catch {
