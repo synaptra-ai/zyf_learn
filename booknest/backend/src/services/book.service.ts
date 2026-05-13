@@ -4,6 +4,7 @@ import { cache } from '../lib/cache'
 import { notifyUser } from '../lib/socket'
 import { ApiError } from '../utils/errors'
 import { writeAuditLog } from './audit.service'
+import { checkTextSecurity } from './content-security/text-security.service'
 
 interface ListParams {
   page?: number
@@ -68,6 +69,20 @@ export const bookService = {
   },
 
   async create(userId: string, workspaceId: string, data: any) {
+    // 文本内容安全检测
+    const textToCheck = [data.title, data.description].filter(Boolean).join(' ')
+    if (textToCheck) {
+      const check = await checkTextSecurity({
+        content: textToCheck,
+        userId,
+        workspaceId,
+        targetType: 'BOOK',
+      })
+      if (check.status === 'REJECT') {
+        throw new ApiError(400, '内容包含违规信息，请修改后重新提交')
+      }
+    }
+
     const book = await prisma.book.create({
       data: {
         title: data.title,
@@ -102,6 +117,21 @@ export const bookService = {
   async update(userId: string, workspaceId: string, role: WorkspaceRole, bookId: string, data: any) {
     const book = await prisma.book.findFirst({ where: { id: bookId, workspaceId } })
     if (!book) throw new ApiError(404, '书籍不存在')
+
+    // 文本内容安全检测
+    const textToCheck = [data.title, data.description].filter(Boolean).join(' ')
+    if (textToCheck) {
+      const check = await checkTextSecurity({
+        content: textToCheck,
+        userId,
+        workspaceId,
+        targetType: 'BOOK',
+        targetId: bookId,
+      })
+      if (check.status === 'REJECT') {
+        throw new ApiError(400, '内容包含违规信息，请修改后重新提交')
+      }
+    }
 
     const canEdit = ['OWNER', 'ADMIN'].includes(role) || (role === 'MEMBER' && book.userId === userId)
     if (!canEdit) throw new ApiError(403, '无权编辑该书籍')
