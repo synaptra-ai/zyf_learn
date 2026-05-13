@@ -1,0 +1,60 @@
+name: Mini Program CI
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Mini program version'
+        required: true
+        default: '0.0.1'
+      desc:
+        description: 'Upload description'
+        required: false
+        default: 'BookNest Mini Pro trial build'
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/mini-taro/**'
+      - 'packages/**'
+      - '.github/workflows/mini-program.yml'
+
+jobs:
+  build-and-upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: booknest
+
+      - name: Typecheck mini
+        run: pnpm --filter @booknest/mini-taro typecheck
+        working-directory: booknest
+
+      - name: Build weapp
+        run: pnpm --filter @booknest/mini-taro build:weapp
+        working-directory: booknest
+
+      - name: Upload mini program trial version
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          WECHAT_MINI_APP_ID: ${{ secrets.WECHAT_MINI_APP_ID }}
+          WECHAT_MINI_PRIVATE_KEY: ${{ secrets.WECHAT_MINI_PRIVATE_KEY }}
+          MINI_UPLOAD_VERSION: ${{ github.event.inputs.version }}
+          MINI_UPLOAD_DESC: ${{ github.event.inputs.desc }}
+        run: pnpm --filter @booknest/mini-taro mini:upload
+        working-directory: booknest
