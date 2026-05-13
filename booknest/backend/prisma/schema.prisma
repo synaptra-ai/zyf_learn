@@ -336,3 +336,49 @@ model ImportJob {
   @@index([workspaceId, createdAt])
   @@map("import_jobs")
 }
+
+model SubscriptionRecord {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  workspaceId String?  @map("workspace_id")
+  templateId  String   @map("template_id")
+  scene       String
+  status      String
+  rawResult   Json?    @map("raw_result")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([userId, templateId, scene])
+  @@map("subscription_records")
+}
+
+model ContentSecurityCheck {
+  id           String   @id @default(cuid())
+  workspaceId  String?  @map("workspace_id")
+  userId       String?  @map("user_id")
+  targetType   String   @map("target_type")
+  targetId     String?  @map("target_id")
+  contentType  String   @map("content_type")
+  contentHash  String   @map("content_hash")
+  status       String
+  provider     String   @default("WECHAT")
+  rawResult    Json?    @map("raw_result")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@index([targetType, targetId])
+  @@index([status])
+  @@map("content_security_checks")
+}
+
+model CustomerServiceEvent {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  workspaceId String?  @map("workspace_id")
+  scene       String
+  refType     String?  @map("ref_type")
+  refId       String?  @map("ref_id")
+  payload     Json?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([userId, scene])
+  @@map("customer_service_events")
+}
