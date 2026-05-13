@@ -60,6 +60,7 @@
     "@tarojs/webpack5-runner": "4.2.0",
     "@types/react": "^18.3.28",
     "babel-preset-taro": "4.2.0",
+    "miniprogram-ci": "^2.1.31",
     "react-refresh": "^0.14.2",
     "sass": "^1.80.0",
     "typescript": "^5.7.0",
