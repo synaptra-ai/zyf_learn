@@ -9,6 +9,7 @@ import orderRoutes from './order.routes'
 import paymentRoutes from './payment.routes'
 import importRoutes from './import.routes'
 import { wechatRouter } from './wechat.routes'
+import { wechatPayRouter } from './wechat-pay.routes'
 import { exportBooks } from '../controllers/export.controller'
 import { authenticate } from '../middleware/auth'
 import { resolveWorkspace } from '../middleware/workspace'
@@ -24,6 +25,7 @@ router.use('/orders', orderRoutes)
 router.use('/payments', paymentRoutes)
 router.use('/imports', importRoutes)
 router.use('/wechat', wechatRouter)
+router.use('/wechat-pay', wechatPayRouter)
 router.get('/exports/books', authenticate, resolveWorkspace, exportBooks)
 
 export default router
