@@ -171,14 +171,14 @@ export default function IndexPage() {
           title="还没有书籍"
           description="点击下方按钮添加第一本书"
           actionText="添加书籍"
-          onAction={() => Taro.navigateTo({ url: '/pages/books/form/index' })}
+          onAction={() => Taro.navigateTo({ url: '/sub/books/pages/form/index' })}
         />
       )}
 
       {showFab && (
         <View
           className="fab"
-          onClick={() => Taro.navigateTo({ url: '/pages/books/form/index' })}
+          onClick={() => Taro.navigateTo({ url: '/sub/books/pages/form/index' })}
         >
           <Text className="fab__text">+</Text>
         </View>

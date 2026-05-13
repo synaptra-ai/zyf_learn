@@ -88,7 +88,7 @@ export default function BookFormPage() {
       }
       Taro.showToast({ title: '保存成功', icon: 'success' })
       setTimeout(() => {
-        Taro.redirectTo({ url: `/pages/books/detail/index?id=${book.id}` })
+        Taro.redirectTo({ url: `/sub/books/pages/detail/index?id=${book.id}` })
       }, 1000)
     } catch {
       // request adapter 已 showToast

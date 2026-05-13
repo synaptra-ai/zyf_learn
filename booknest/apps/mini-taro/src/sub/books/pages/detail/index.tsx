@@ -113,7 +113,7 @@ export default function BookDetailPage() {
             <View
               className="detail__btn detail__btn--primary"
               onClick={() =>
-                Taro.navigateTo({ url: `/pages/books/form/index?id=${book.id}` })
+                Taro.navigateTo({ url: `/sub/books/pages/form/index?id=${book.id}` })
               }
             >
               <Text className="detail__btn-text">编辑</Text>

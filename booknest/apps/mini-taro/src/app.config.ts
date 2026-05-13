@@ -4,10 +4,20 @@ export default defineAppConfig({
     'pages/categories/index',
     'pages/me/index',
     'pages/login/index',
-    'pages/books/detail/index',
-    'pages/books/form/index',
-    'pages/orders/result/index',
-    'pages/admin/content-security/index',
+  ],
+  subPackages: [
+    {
+      root: 'sub/books',
+      pages: ['pages/detail/index', 'pages/form/index'],
+    },
+    {
+      root: 'sub/orders',
+      pages: ['pages/result/index'],
+    },
+    {
+      root: 'sub/admin',
+      pages: ['pages/content-security/index'],
+    },
   ],
   window: {
     backgroundTextStyle: 'light',

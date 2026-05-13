@@ -32,7 +32,7 @@ export default function MePage() {
       <View className="me__menu">
         <View
           className="me__menu-item"
-          onClick={() => Taro.navigateTo({ url: '/pages/admin/content-security/index' })}
+          onClick={() => Taro.navigateTo({ url: '/sub/admin/pages/content-security/index' })}
         >
           <Text className="me__menu-text">内容审核管理</Text>
           <Text className="me__menu-arrow">›</Text>

@@ -10,7 +10,7 @@ interface BookCardProps {
 
 export function BookCard({ book }: BookCardProps) {
   const handleOpen = () => {
-    Taro.navigateTo({ url: `/pages/books/detail/index?id=${book.id}` })
+    Taro.navigateTo({ url: `/sub/books/pages/detail/index?id=${book.id}` })
   }
 
   return (
