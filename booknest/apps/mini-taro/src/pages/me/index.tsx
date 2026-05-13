@@ -14,12 +14,7 @@ export default function MePage() {
 
   const handleCustomerService = async () => {
     await recordCustomerServiceEvent({ scene: 'GENERAL_INQUIRY' })
-    Taro.openCustomerServiceChat({
-      extInfo: { url: '' },
-      corpId: process.env.TARO_APP_WECHAT_CORP_ID || '',
-    }).catch(() => {
-      Taro.showToast({ title: '请使用客服消息功能', icon: 'none' })
-    })
+    Taro.showToast({ title: '客服上下文已记录', icon: 'success' })
   }
 
   return (
