@@ -1,12 +1,11 @@
 import { Input, ScrollView, Text, View } from '@tarojs/components'
 import Taro, { usePullDownRefresh, useReachBottom } from '@tarojs/taro'
 import { useEffect, useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
 import { BookCard } from '@/components/BookCard'
 import { EmptyState } from '@/components/EmptyState'
 import { LoadingState } from '@/components/LoadingState'
 import { WorkspaceSwitcher } from '@/components/WorkspaceSwitcher'
-import { useBooks } from '@/hooks/use-books'
+import { listBooks } from '@/services/books'
 import { useAuthStore } from '@/stores/auth-store'
 import { useWorkspaceStore } from '@/stores/workspace-store'
 import { listWorkspaces } from '@/services/workspaces'
@@ -19,46 +18,62 @@ export default function IndexPage() {
   const token = useAuthStore((s) => s.token)
   const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId)
   const setActiveWorkspace = useWorkspaceStore((s) => s.setActiveWorkspace)
+
+  useEffect(() => {
+    useAuthStore.getState().hydrate()
+    useWorkspaceStore.getState().hydrate()
+  }, [])
+
   const [keyword, setKeyword] = useState('')
   const [status, setStatus] = useState('')
   const [page, setPage] = useState(1)
   const [items, setItems] = useState<any[]>([])
   const [hasMore, setHasMore] = useState(true)
+  const [booksLoading, setBooksLoading] = useState(false)
 
-  const { data: workspaces = [] } = useQuery({
-    queryKey: ['workspaces'],
-    queryFn: listWorkspaces,
-    enabled: Boolean(token),
-  })
+  const [workspaces, setWorkspaces] = useState<any[]>([])
+
+  useEffect(() => {
+    if (!token) return
+    listWorkspaces().then(setWorkspaces).catch(() => {})
+  }, [token])
 
   const activeRole = workspaces.find((w) => w.id === activeWorkspaceId)?.members[0]?.role
   const showFab = canCreateBook(activeRole)
 
-  const { data, isLoading, refetch, isFetching } = useBooks(activeWorkspaceId, {
-    page,
-    pageSize: PAGE_SIZE,
-    keyword: keyword || undefined,
-    status: status || undefined,
-  })
-
-  // 累积分页数据
-  useEffect(() => {
-    if (!data) return
-    if (page === 1) {
-      setItems(data.items)
-    } else {
-      setItems((prev) => [...prev, ...data.items])
+  // 获取书籍列表
+  const fetchBooks = async (reset = false) => {
+    if (!activeWorkspaceId) return
+    setBooksLoading(true)
+    try {
+      const res = await listBooks({
+        page: reset ? 1 : page,
+        pageSize: PAGE_SIZE,
+        keyword: keyword || undefined,
+        status: status || undefined,
+      })
+      if (reset || page === 1) {
+        setItems(res.items)
+      } else {
+        setItems((prev) => [...prev, ...res.items])
+      }
+      setHasMore(res.items.length >= PAGE_SIZE)
+    } catch {} finally {
+      setBooksLoading(false)
     }
-    setHasMore(data.items.length >= PAGE_SIZE)
-  }, [data, page])
+  }
 
-  // 切换 workspace 重置
   useEffect(() => {
-    setPage(1)
-    setItems([])
-    setKeyword('')
-    setStatus('')
-  }, [activeWorkspaceId])
+    if (activeWorkspaceId) {
+      fetchBooks(true)
+    }
+  }, [activeWorkspaceId, keyword, status])
+
+  useEffect(() => {
+    if (page > 1 && activeWorkspaceId) {
+      fetchBooks()
+    }
+  }, [page])
 
   // 自动选择第一个 workspace
   useEffect(() => {
@@ -69,12 +84,12 @@ export default function IndexPage() {
 
   usePullDownRefresh(async () => {
     setPage(1)
-    await refetch()
+    await fetchBooks(true)
     Taro.stopPullDownRefresh()
   })
 
   useReachBottom(() => {
-    if (hasMore && !isFetching) {
+    if (hasMore && !booksLoading) {
       setPage((prev) => prev + 1)
     }
   })
@@ -139,14 +154,14 @@ export default function IndexPage() {
 
       {!activeWorkspaceId ? (
         <LoadingState text="加载中..." />
-      ) : isLoading && page === 1 ? (
+      ) : booksLoading && page === 1 ? (
         <LoadingState text="加载中..." />
       ) : items.length > 0 ? (
         <ScrollView scrollY className="book-list">
           {items.map((book) => (
             <BookCard key={book.id} book={book} />
           ))}
-          {isFetching && <LoadingState text="加载更多..." />}
+          {booksLoading && <LoadingState text="加载更多..." />}
           {!hasMore && items.length > PAGE_SIZE && (
             <Text className="page__nomore">没有更多了</Text>
           )}

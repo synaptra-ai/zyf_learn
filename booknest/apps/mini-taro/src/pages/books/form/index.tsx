@@ -1,10 +1,11 @@
-import { Input, Text, Textarea, View } from '@tarojs/components'
+import { Image, Input, Text, Textarea, View } from '@tarojs/components'
 import Taro, { useRouter } from '@tarojs/taro'
 import { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import type { BookStatus } from '@booknest/domain'
 import { createBook, updateBook, getBook, type BookFormInput } from '@/services/books'
 import { listCategories } from '@/services/categories'
+import { chooseCoverImage, uploadCover } from '@/services/upload'
 import { useWorkspaceStore } from '@/stores/workspace-store'
 import { SafeAreaButton } from '@/components/SafeAreaButton'
 import './index.scss'
@@ -51,6 +52,7 @@ export default function BookFormPage() {
     publishedDate: '',
   })
   const [submitting, setSubmitting] = useState(false)
+  const [tempCoverPath, setTempCoverPath] = useState('')
 
   useEffect(() => {
     if (editBook) {
@@ -79,6 +81,9 @@ export default function BookFormPage() {
     setSubmitting(true)
     try {
       const book = isEdit ? await updateBook(editId!, form) : await createBook(form)
+      if (tempCoverPath) {
+        await uploadCover(book.id, tempCoverPath)
+      }
       Taro.showToast({ title: '保存成功', icon: 'success' })
       setTimeout(() => {
         Taro.redirectTo({ url: `/pages/books/detail/index?id=${book.id}` })
@@ -167,6 +172,27 @@ export default function BookFormPage() {
           placeholder="输入页数（可选）"
           onInput={(e) => update('pageCount', e.detail.value ? Number(e.detail.value) : undefined)}
         />
+      </View>
+
+      <View className="form__group">
+        <Text className="form__label">封面图片</Text>
+        <View
+          className="form__cover-uploader"
+          onClick={async () => {
+            try {
+              const path = await chooseCoverImage()
+              setTempCoverPath(path)
+            } catch {}
+          }}
+        >
+          {tempCoverPath ? (
+            <Image className="form__cover-preview" src={tempCoverPath} mode="aspectFill" />
+          ) : (
+            <View className="form__cover-placeholder">
+              <Text className="form__cover-placeholder-text">选择封面</Text>
+            </View>
+          )}
+        </View>
       </View>
 
       <View className="form__group">

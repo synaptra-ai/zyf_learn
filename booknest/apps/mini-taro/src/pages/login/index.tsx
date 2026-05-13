@@ -3,6 +3,7 @@ import Taro, { useRouter } from '@tarojs/taro'
 import { useState } from 'react'
 import { loginByWechat } from '@/services/auth'
 import { request } from '@/services/request'
+import { useAuthStore } from '@/stores/auth-store'
 import './index.scss'
 
 export default function LoginPage() {
@@ -15,15 +16,14 @@ export default function LoginPage() {
     const redirect = router.params.redirect
     if (redirect) {
       const url = decodeURIComponent(redirect)
-      // TabBar 页面必须用 switchTab
       const tabbarPages = ['/pages/index/index', '/pages/categories/index', '/pages/me/index']
       if (tabbarPages.some((p) => url.startsWith(p))) {
-        Taro.switchTab({ url })
+        Taro.reLaunch({ url })
       } else {
         Taro.redirectTo({ url })
       }
     } else {
-      Taro.switchTab({ url: '/pages/index/index' })
+      Taro.reLaunch({ url: '/pages/index/index' })
     }
   }
 
@@ -46,14 +46,13 @@ export default function LoginPage() {
     }
     try {
       setLoading(true)
-      const res = await request<{ token: string; user: { id: string; email: string; nickname: string } }>({
+      const res = await request<{ token: string; user: { id: string; email: string; name: string } }>({
         url: '/api/v1/auth/login',
         method: 'POST',
         data: { email, password },
         auth: false,
       })
-      const { useAuthStore } = await import('@/stores/auth-store')
-      useAuthStore.getState().setSession(res)
+      useAuthStore.getState().setSession({ token: res.token, user: { id: res.user.id, email: res.user.email, nickname: res.user.name } })
       navigateAfterLogin()
     } catch {
       // request adapter 已 showToast

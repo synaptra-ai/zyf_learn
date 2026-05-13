@@ -88,4 +88,33 @@
       font-size: $font-size-sm;
     }
   }
+
+  &__cover-uploader {
+    width: 200rpx;
+    height: 280rpx;
+    border-radius: $border-radius-md;
+    overflow: hidden;
+  }
+
+  &__cover-preview {
+    width: 200rpx;
+    height: 280rpx;
+    border-radius: $border-radius-md;
+  }
+
+  &__cover-placeholder {
+    width: 200rpx;
+    height: 280rpx;
+    border: 2rpx dashed #cbd5e1;
+    border-radius: $border-radius-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $color-bg-primary;
+
+    &-text {
+      font-size: $font-size-sm;
+      color: $color-text-muted;
+    }
+  }
 }

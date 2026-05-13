@@ -1,13 +1,50 @@
 import { Image, Text, View } from '@tarojs/components'
-import Taro, { useRouter } from '@tarojs/taro'
+import Taro, { useShareAppMessage, useRouter } from '@tarojs/taro'
+import { useQuery } from '@tanstack/react-query'
 import { StatusBadge } from '@/components/StatusBadge'
 import { LoadingState } from '@/components/LoadingState'
 import { useBook } from '@/hooks/use-books'
+import { deleteBook } from '@/services/books'
+import { listWorkspaces } from '@/services/workspaces'
+import { useAuthStore } from '@/stores/auth-store'
+import { useWorkspaceStore } from '@/stores/workspace-store'
+import { canEditBook, canDeleteBook } from '@/utils/permissions'
 import './index.scss'
 
 export default function BookDetailPage() {
   const router = useRouter()
-  const { data: book, isLoading } = useBook(router.params.id!)
+  const id = router.params.id!
+  const token = useAuthStore((s) => s.token)
+  const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId)
+  const { data: book, isLoading } = useBook(id)
+
+  const { data: workspaces = [] } = useQuery({
+    queryKey: ['workspaces'],
+    queryFn: listWorkspaces,
+    enabled: Boolean(token),
+  })
+  const activeRole = workspaces.find((w) => w.id === activeWorkspaceId)?.members?.[0]?.role
+  const showEdit = canEditBook(activeRole)
+  const showDelete = canDeleteBook(activeRole)
+
+  useShareAppMessage(() => ({
+    title: book ? `推荐一本书：${book.title}` : 'BookNest 书籍详情',
+    path: `/pages/books/detail/index?id=${id}`,
+    imageUrl: book?.coverUrl || undefined,
+  }))
+
+  const handleDelete = async () => {
+    const { confirm } = await Taro.showModal({
+      title: '确认删除',
+      content: `确定要删除《${book?.title}》吗？`,
+    })
+    if (!confirm) return
+    try {
+      await deleteBook(id)
+      Taro.showToast({ title: '已删除', icon: 'success' })
+      setTimeout(() => Taro.navigateBack(), 1000)
+    } catch {}
+  }
 
   if (isLoading || !book) {
     return <LoadingState text="加载中..." />
@@ -63,16 +100,25 @@ export default function BookDetailPage() {
         </View>
       </View>
 
-      <View className="detail__actions">
-        <View
-          className="detail__btn detail__btn--primary"
-          onClick={() =>
-            Taro.navigateTo({ url: `/pages/books/form/index?id=${book.id}` })
-          }
-        >
-          <Text className="detail__btn-text">编辑</Text>
+      {(showEdit || showDelete) && (
+        <View className="detail__actions">
+          {showEdit && (
+            <View
+              className="detail__btn detail__btn--primary"
+              onClick={() =>
+                Taro.navigateTo({ url: `/pages/books/form/index?id=${book.id}` })
+              }
+            >
+              <Text className="detail__btn-text">编辑</Text>
+            </View>
+          )}
+          {showDelete && (
+            <View className="detail__btn detail__btn--danger" onClick={handleDelete}>
+              <Text className="detail__btn-text">删除</Text>
+            </View>
+          )}
         </View>
-      </View>
+      )}
     </View>
   )
 }

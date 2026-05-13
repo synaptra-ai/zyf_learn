@@ -2,11 +2,13 @@ import { Text, View } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useQuery } from '@tanstack/react-query'
 import { listWorkspaces } from '@/services/workspaces'
+import { useAuthStore } from '@/stores/auth-store'
 import { useWorkspaceStore } from '@/stores/workspace-store'
 import './index.scss'
 
 export function WorkspaceSwitcher() {
-  const { data = [] } = useQuery({ queryKey: ['workspaces'], queryFn: listWorkspaces })
+  const token = useAuthStore((s) => s.token)
+  const { data = [] } = useQuery({ queryKey: ['workspaces'], queryFn: listWorkspaces, enabled: Boolean(token) })
   const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId)
   const setActiveWorkspaceId = useWorkspaceStore((s) => s.setActiveWorkspace)
 
