@@ -317,6 +317,7 @@ booknest/
 | 15 | 微信支付 mock prepay / requestPayment / 支付回调幂等 / Ticket 发放 / 订单结果页轮询 / OrderStatus FAILED |
 | 16 | 订阅消息 / 客服入口 / 内容安全检测 (文本+图片) / BullMQ 异步图片检测 / 人工复核 / AuditLog |
 | 17 | subPackages 分包 / preloadRule 预加载 / React.memo / compileMode / debounce / OSS 缩略图 / Prerender / 平台适配 |
+| 18 | miniprogram-ci / GitHub Actions CI / 环境隔离 / 体验版上传 / 审核清单 / 灰度发布 / 回滚计划 |
 
 ## 部署
 
@@ -375,4 +376,4 @@ booknest/
 | Day 15 | 微信支付 + 订单 + 票务 | 已完成 |
 | Day 16 | 订阅消息 + 客服 + 内容安全 | 已完成 |
 | Day 17 | 分包优化 + 性能调优 | 已完成 |
-| Day 18 | CI/CD + 代码审查 + 发布上线 | 待实施 |
+| Day 18 | CI/CD + 代码审查 + 发布上线 | 已完成 |

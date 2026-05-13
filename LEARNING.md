@@ -1187,3 +1187,83 @@ platform/ 目录集中管理平台差异：
   平台差异不散落在页面代码中
   weapp 是主目标，h5 允许少量差异
 ```
+
+---
+
+## Day 18：CI/CD + 体验版 + 灰度发布 + 审核策略
+
+### 18.1 环境隔离
+
+```
+config/env.ts：
+  通过 Taro.getAccountInfoSync() 获取当前小程序环境
+  develop → localhost:4000（本地开发）
+  trial → zyfcloud.cn（体验版/审核）
+  release → zyfcloud.cn（正式版）
+
+API_BASE_URL 自动切换，request.ts 无需修改
+```
+
+### 18.2 miniprogram-ci 上传
+
+```
+安装：pnpm add -D miniprogram-ci
+
+scripts/upload.cjs：
+  从环境变量读取 WECHAT_MINI_APP_ID + WECHAT_MINI_PRIVATE_KEY
+  写入临时 private.key → 上传 → 删除密钥文件
+  版本号和描述可通过环境变量配置
+
+安全要点：
+  密钥绝不提交到 Git（.gitignore 已排除 *.key）
+  CI 环境从 GitHub Secrets 注入
+  上传完成后立即删除临时密钥文件
+```
+
+### 18.3 GitHub Actions CI
+
+```
+.github/workflows/mini-program.yml：
+  触发条件：push to main (paths: mini-taro/**) 或 workflow_dispatch
+  步骤：checkout → setup node → pnpm install → typecheck → build weapp → upload
+  upload 步骤仅在 workflow_dispatch 时执行（需要 Secrets）
+
+GitHub Secrets：
+  WECHAT_MINI_APP_ID — 小程序 AppID
+  WECHAT_MINI_PRIVATE_KEY — 上传密钥内容
+```
+
+### 18.4 审核策略
+
+```
+审核关键点：
+  1. 测试账号要稳定 — 审核员需要能直接体验核心功能
+  2. 支付说明清楚 — mock 模式或极小金额
+  3. 内容安全必须展示拦截能力
+  4. 客服入口要可用
+  5. 无测试文案、无调试按钮暴露
+
+文档产出：
+  TRIAL_ACCEPTANCE_CHECKLIST.md — 体验版验收清单
+  WECHAT_REVIEW_CHECKLIST.md — 微信审核检查清单
+  RELEASE_PLAN.md — 灰度发布计划
+  ROLLBACK_PLAN.md — 回滚计划
+  FINAL_DEMO_SCRIPT.md — 演示脚本
+```
+
+### 18.5 灰度发布与回滚
+
+```
+灰度发布策略：
+  CI 上传 → 内部验收 → 提交审核 → 小比例灰度 → 观察指标 → 全量
+
+回滚方案：
+  小程序：后台回退到上一版本
+  后端：GitHub Actions 回滚到稳定 commit
+  紧急开关：WECHAT_PAY_ENABLED / CONTENT_SECURITY_STRICT / MINI_MAINTENANCE_MODE
+
+观察指标：
+  登录失败率 > 5% → 暂停
+  支付失败率 > 5% → 检查支付回调
+  API 5xx > 1% → 回滚
+```
