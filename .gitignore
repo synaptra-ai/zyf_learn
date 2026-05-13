@@ -45,3 +45,8 @@ docker-compose.override.yml
 backend/src/generated/
 backend/tsconfig.tsbuildinfo
 apps/mini-taro/.swc/
+
+# WeChat mini program private keys
+*.key
+private.*.key
+apps/mini-taro/private.key
