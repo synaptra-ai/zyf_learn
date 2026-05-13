@@ -3,6 +3,7 @@ import Taro, { useRouter } from '@tarojs/taro'
 import { useEffect, useState } from 'react'
 import { getOrder, type Order } from '@/services/orders'
 import { LoadingState } from '@/components/LoadingState'
+import { recordCustomerServiceEvent } from '@/services/customer-service'
 import './index.scss'
 
 const STATUS_MAP: Record<string, { text: string; color: string }> = {
@@ -70,6 +71,22 @@ export default function OrderResultPage() {
         </View>
       )}
       <View className="order-result__actions">
+        {(order.status === 'FAILED' || order.status === 'EXPIRED' || order.status === 'CANCELLED') && (
+          <View
+            className="order-result__btn order-result__btn--secondary"
+            onClick={async () => {
+              await recordCustomerServiceEvent({
+                scene: 'PAYMENT_FAILED',
+                refType: 'ORDER',
+                refId: order.id,
+                payload: { status: order.status },
+              })
+              Taro.showToast({ title: '客服上下文已记录', icon: 'none' })
+            }}
+          >
+            <Text className="order-result__btn-text">联系客服</Text>
+          </View>
+        )}
         <View
           className="order-result__btn"
           onClick={() => Taro.switchTab({ url: '/pages/index/index' })}
