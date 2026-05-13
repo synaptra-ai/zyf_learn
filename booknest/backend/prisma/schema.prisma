@@ -282,9 +282,14 @@ model PaymentEvent {
   rawPayload Json    @map("raw_payload")
   createdAt DateTime @default(now()) @map("created_at")
 
+  transactionId String? @map("transaction_id")
+  outTradeNo    String? @map("out_trade_no")
+  eventType     String? @map("event_type")
+
   orderId String @map("order_id")
   order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
+  @@unique([provider, transactionId])
   @@index([orderId])
   @@map("payment_events")
 }
