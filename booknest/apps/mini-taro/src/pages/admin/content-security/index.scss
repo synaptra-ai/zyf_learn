@@ -1,0 +1,112 @@
+@use "@/assets/variables" as *;
+
+.cs-admin {
+  min-height: 100vh;
+  background: $color-bg-primary;
+
+  &__tabs {
+    display: flex;
+    padding: $spacing-md;
+    gap: $spacing-sm;
+    background: $color-bg-primary;
+    border-bottom: 1rpx solid $color-bg-tertiary;
+  }
+
+  &__tab {
+    flex: 1;
+    height: 64rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $border-radius-md;
+    background: $color-bg-tertiary;
+
+    &--active {
+      background: $color-primary;
+    }
+  }
+
+  &__tab-text {
+    font-size: $font-size-sm;
+    color: $color-text-white;
+  }
+
+  &__empty {
+    padding: 200rpx 0;
+    text-align: center;
+  }
+
+  &__empty-text {
+    font-size: $font-size-md;
+    color: $color-text-muted;
+  }
+
+  &__item {
+    margin: $spacing-md;
+    padding: $spacing-lg;
+    background: $color-bg-primary;
+    border-radius: $border-radius-md;
+    border: 1rpx solid $color-bg-tertiary;
+  }
+
+  &__item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-sm;
+  }
+
+  &__item-type {
+    font-size: $font-size-md;
+    font-weight: 600;
+    color: $color-text-primary;
+  }
+
+  &__item-status {
+    font-size: $font-size-sm;
+    color: $color-primary;
+    padding: 4rpx 16rpx;
+    border-radius: 20rpx;
+    background: rgba(37, 99, 235, 0.1);
+  }
+
+  &__item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4rpx;
+    margin-bottom: $spacing-md;
+  }
+
+  &__item-label {
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+  }
+
+  &__item-actions {
+    display: flex;
+    gap: $spacing-md;
+  }
+
+  &__btn {
+    flex: 1;
+    height: 72rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $border-radius-md;
+
+    &--approve {
+      background: #10b981;
+    }
+
+    &--reject {
+      background: #ef4444;
+    }
+  }
+
+  &__btn-text {
+    font-size: $font-size-md;
+    font-weight: 600;
+    color: $color-text-white;
+  }
+}

@@ -7,6 +7,7 @@ export default defineAppConfig({
     'pages/books/detail/index',
     'pages/books/form/index',
     'pages/orders/result/index',
+    'pages/admin/content-security/index',
   ],
   window: {
     backgroundTextStyle: 'light',

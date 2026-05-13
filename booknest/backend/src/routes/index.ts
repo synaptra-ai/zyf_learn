@@ -12,6 +12,7 @@ import { wechatRouter } from './wechat.routes'
 import { wechatPayRouter } from './wechat-pay.routes'
 import { subscriptionRouter } from './subscription.routes'
 import { customerServiceRouter } from './customer-service.routes'
+import { adminRouter } from './admin.routes'
 import { exportBooks } from '../controllers/export.controller'
 import { authenticate } from '../middleware/auth'
 import { resolveWorkspace } from '../middleware/workspace'
@@ -30,6 +31,7 @@ router.use('/wechat', wechatRouter)
 router.use('/wechat-pay', wechatPayRouter)
 router.use('/subscriptions', subscriptionRouter)
 router.use('/customer-service', customerServiceRouter)
+router.use('/admin', adminRouter)
 router.get('/exports/books', authenticate, resolveWorkspace, exportBooks)
 
 export default router

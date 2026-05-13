@@ -1,11 +1,13 @@
 import { Text, View } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useAuthStore } from '@/stores/auth-store'
+import { useWorkspaceStore } from '@/stores/workspace-store'
 import { recordCustomerServiceEvent } from '@/services/customer-service'
 import './index.scss'
 
 export default function MePage() {
   const user = useAuthStore((s) => s.user)
+  const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId)
 
   const handleLogout = () => {
     useAuthStore.getState().logout()
@@ -35,6 +37,13 @@ export default function MePage() {
       </View>
 
       <View className="me__menu">
+        <View
+          className="me__menu-item"
+          onClick={() => Taro.navigateTo({ url: '/pages/admin/content-security/index' })}
+        >
+          <Text className="me__menu-text">内容审核管理</Text>
+          <Text className="me__menu-arrow">›</Text>
+        </View>
         <View className="me__menu-item" onClick={handleCustomerService}>
           <Text className="me__menu-text">联系客服</Text>
           <Text className="me__menu-arrow">›</Text>
