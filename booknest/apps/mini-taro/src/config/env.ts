@@ -1,7 +1,7 @@
 import Taro from '@tarojs/taro'
 
 const API_MAP: Record<string, string> = {
-  develop: 'http://localhost:4000',
+  develop: process.env.TARO_APP_API_URL || 'http://localhost:4000',
   trial: 'https://zyfcloud.cn',
   release: 'https://zyfcloud.cn',
 }
