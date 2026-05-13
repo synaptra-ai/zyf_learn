@@ -1,9 +1,9 @@
 import { Image, Input, Text, Textarea, View } from '@tarojs/components'
 import Taro, { useRouter } from '@tarojs/taro'
 import { useEffect, useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
 import type { BookStatus } from '@booknest/domain'
 import { createBook, updateBook, getBook, type BookFormInput } from '@/services/books'
+import type { Book } from '@booknest/domain'
 import { listCategories } from '@/services/categories'
 import { chooseCoverImage, uploadCover } from '@/services/upload'
 import { useWorkspaceStore } from '@/stores/workspace-store'
@@ -30,16 +30,18 @@ export default function BookFormPage() {
   const isEdit = Boolean(editId)
   const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId)
 
-  const { data: editBook } = useQuery({
-    queryKey: ['books', 'detail', editId],
-    queryFn: () => getBook(editId!),
-    enabled: isEdit,
-  })
+  const [editBook, setEditBook] = useState<Book | null>(null)
+  const [categories, setCategories] = useState<any[]>([])
 
-  const { data: categories = [] } = useQuery({
-    queryKey: ['categories', activeWorkspaceId],
-    queryFn: listCategories,
-  })
+  useEffect(() => {
+    if (isEdit && editId) {
+      getBook(editId).then(setEditBook).catch(() => {})
+    }
+  }, [editId, isEdit])
+
+  useEffect(() => {
+    listCategories().then(setCategories).catch(() => {})
+  }, [activeWorkspaceId])
 
   const [form, setForm] = useState<BookFormInput>({
     title: '',

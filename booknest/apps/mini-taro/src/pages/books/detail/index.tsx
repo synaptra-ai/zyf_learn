@@ -1,9 +1,10 @@
 import { Image, Text, View } from '@tarojs/components'
 import Taro, { useShareAppMessage, useRouter } from '@tarojs/taro'
-import { useQuery } from '@tanstack/react-query'
+import { useEffect, useState } from 'react'
 import { StatusBadge } from '@/components/StatusBadge'
 import { LoadingState } from '@/components/LoadingState'
-import { useBook } from '@/hooks/use-books'
+import { getBook } from '@/services/books'
+import type { Book } from '@booknest/domain'
 import { deleteBook } from '@/services/books'
 import { listWorkspaces } from '@/services/workspaces'
 import { useAuthStore } from '@/stores/auth-store'
@@ -16,13 +17,19 @@ export default function BookDetailPage() {
   const id = router.params.id!
   const token = useAuthStore((s) => s.token)
   const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId)
-  const { data: book, isLoading } = useBook(id)
 
-  const { data: workspaces = [] } = useQuery({
-    queryKey: ['workspaces'],
-    queryFn: listWorkspaces,
-    enabled: Boolean(token),
-  })
+  const [book, setBook] = useState<Book | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [workspaces, setWorkspaces] = useState<any[]>([])
+
+  useEffect(() => {
+    getBook(id).then(setBook).catch(() => {}).finally(() => setLoading(false))
+  }, [id])
+
+  useEffect(() => {
+    if (token) listWorkspaces().then(setWorkspaces).catch(() => {})
+  }, [token])
+
   const activeRole = workspaces.find((w) => w.id === activeWorkspaceId)?.members?.[0]?.role
   const showEdit = canEditBook(activeRole)
   const showDelete = canDeleteBook(activeRole)
@@ -46,7 +53,7 @@ export default function BookDetailPage() {
     } catch {}
   }
 
-  if (isLoading || !book) {
+  if (loading || !book) {
     return <LoadingState text="加载中..." />
   }
 
