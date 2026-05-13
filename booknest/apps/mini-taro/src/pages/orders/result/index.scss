@@ -1,0 +1,78 @@
+@use "@/assets/variables" as *;
+
+.order-result {
+  min-height: 100vh;
+  background: $color-bg-primary;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 200rpx;
+
+  &__icon {
+    margin-bottom: $spacing-lg;
+  }
+
+  &__status {
+    font-size: $font-size-xl;
+    font-weight: 600;
+    margin-bottom: $spacing-md;
+  }
+
+  &__title {
+    font-size: $font-size-lg;
+    color: $color-text-primary;
+    margin-bottom: $spacing-sm;
+  }
+
+  &__amount {
+    font-size: $font-size-xxl;
+    font-weight: 700;
+    color: $color-primary;
+    margin-bottom: $spacing-xl;
+  }
+
+  &__ticket {
+    background: $color-bg-tertiary;
+    padding: $spacing-md $spacing-lg;
+    border-radius: $border-radius-md;
+    margin-bottom: $spacing-xl;
+    text-align: center;
+  }
+
+  &__ticket-label {
+    display: block;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    margin-bottom: $spacing-xs;
+  }
+
+  &__ticket-code {
+    display: block;
+    font-size: $font-size-lg;
+    font-weight: 700;
+    color: $color-primary;
+    letter-spacing: 2rpx;
+  }
+
+  &__actions {
+    width: 100%;
+    padding: 0 $spacing-xl;
+    margin-top: $spacing-xl;
+  }
+
+  &__btn {
+    width: 100%;
+    height: 88rpx;
+    border-radius: $border-radius-lg;
+    background: $color-primary;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__btn-text {
+    color: $color-text-white;
+    font-size: $font-size-lg;
+    font-weight: 600;
+  }
+}

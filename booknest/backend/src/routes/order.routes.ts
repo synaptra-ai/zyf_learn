@@ -10,6 +10,7 @@ const router = Router()
 router.use(authenticate, resolveWorkspace)
 
 router.get('/my', orderController.listMyOrders)
+router.get('/:id', orderController.getById)
 router.post(
   '/',
   validateBody(z.object({ activityId: z.string().uuid() })),

@@ -16,4 +16,12 @@ export const orderController = {
       ResponseUtil.success(res, orders)
     } catch (err) { next(err) }
   },
+
+  async getById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const orderId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id!
+      const order = await orderService.getOrder(orderId, req.user!.id)
+      ResponseUtil.success(res, order)
+    } catch (err) { next(err) }
+  },
 }
