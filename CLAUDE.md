@@ -249,9 +249,12 @@ Prisma enums: `BookStatus` (OWNED, READING, FINISHED, WISHLIST), `UserRole` (USE
 - `services/request.ts` — Taro.request adapter (token/workspace header/401 处理)
 - `services/auth.ts` — 微信登录服务
 - `services/books.ts` — Book API 服务
-- `hooks/use-books.ts` — Book React Query hooks
+- `services/upload.ts` — 封面上传服务 (Taro.chooseMedia + Taro.uploadFile)
+- `services/pay.ts` — 微信支付服务 (prepay + mock 支付 + requestPayment)
+- `services/orders.ts` — 订单查询服务
 - `stores/auth-store.ts` — 认证状态 (Zustand + Taro.getStorage)
 - `stores/workspace-store.ts` — 当前 Workspace (Zustand + Taro.getStorage)
+- `utils/permissions.ts` — RBAC 前端 helper (canCreateBook/canEditBook/canDeleteBook)
 - `mocks/books.ts` — Mock 数据 (Day 12 遗留，已切换真实 API)
 
 ### 页面路由
@@ -259,11 +262,12 @@ Prisma enums: `BookStatus` (OWNED, READING, FINISHED, WISHLIST), `UserRole` (USE
 - `pages/categories/index` — 分类管理 (TabBar)
 - `pages/me/index` — 我的 (TabBar)
 - `pages/login/index` — 登录 (微信一键登录 + 邮箱登录)
-- `pages/books/detail/index` — 书籍详情 (navigateTo, params: id)
-- `pages/books/form/index` — 添加/编辑书籍 (navigateTo, params: id 可选)
+- `pages/books/detail/index` — 书籍详情 (navigateTo, params: id, 支持分享)
+- `pages/books/form/index` — 添加/编辑书籍 (navigateTo, params: id 可选, 支持封面上传)
+- `pages/orders/result/index` — 订单支付结果 (redirectTo, params: orderId, 轮询状态)
 
 ### 迁移组件
-- BookCard、StatusBadge、EmptyState、LoadingState、SafeAreaButton
+- BookCard、StatusBadge、EmptyState、LoadingState、SafeAreaButton、WorkspaceSwitcher
 
 ### 项目结构
 ```
@@ -279,6 +283,7 @@ booknest/
 ### 构建产物
 - `apps/mini-taro/dist/` — 微信开发者工具导入此目录
 - 当前使用 mock 数据，未接入真实 API (Day 13) → 已接入真实 API
+- 注意：Taro 环境中 React Query useQuery 不触发查询，所有页面改用 useState + useEffect 直接调 API
 
 ## Tech Stack by Day
 
@@ -298,6 +303,7 @@ booknest/
 | 12 | Taro 4 / React 18 / TypeScript / Sass / pnpm workspace / Zustand |
 | 13 | Taro.request / React Query / 微信登录 / OpenAPI 类型 / code2Session / JWT |
 | 14 | Workspace 切换 / RBAC 前端权限 / Book CRUD 表单 / 分页筛选 / 封面上传 / 分享 |
+| 15 | 微信支付 mock prepay / requestPayment / 支付回调幂等 / Ticket 发放 / 订单结果页轮询 / OrderStatus FAILED |
 
 ## 部署
 
@@ -352,8 +358,8 @@ booknest/
 | Day | 内容 | 状态 |
 |-----|------|------|
 | Day 13 | 微信登录 + UnionID + Taro request adapter | 已完成 |
-| Day 14 | 业务迁移 (RBAC/上传/分享) | 进行中 (Step 1-5 完成) |
-| Day 15 | 微信支付 + 订单 + 票务 | 待实施 |
+| Day 14 | 业务迁移 (RBAC/上传/分享) | 已完成 |
+| Day 15 | 微信支付 + 订单 + 票务 | 已完成 |
 | Day 16 | 订阅消息 + 客服 + 内容安全 | 待实施 |
 | Day 17 | 分包优化 + 性能调优 | 待实施 |
 | Day 18 | CI/CD + 代码审查 + 发布上线 | 待实施 |

@@ -872,6 +872,116 @@ POST /api/v1/wechat/bind（需要 authenticate 中间件）：
 
 ---
 
+## Day 15：微信支付 + 订单 + 票务
+
+### 15.1 微信支付架构（Mock 模式）
+
+**做了什么**：搭建微信支付完整链路，本地用 mock 模式模拟
+
+```
+支付流程：
+  小程序端 → createPrepay(orderId) → 后端生成预支付参数
+    → mock 模式：Taro.showModal 模拟支付 → mock-callback 触发真实事务
+    → 线上模式：Taro.requestPayment 调起微信支付 → 微信回调通知
+
+后端架构：
+  wechat-pay.config.ts — 配置 + 类型定义（PayParams, WechatPayConfig）
+  mock-pay.service.ts — mock 模式生成假支付参数
+  wechat-pay.service.ts — createWechatPrepay（校验订单 → 委托 mock/real）
+
+路由：
+  POST /api/v1/wechat-pay/prepay — 生成预支付参数
+  POST /api/v1/wechat-pay/mock-callback — 模拟支付成功回调
+```
+
+### 15.2 支付回调与事务
+
+```
+mock-callback 处理链路：
+  1. 查询订单 → 校验 status === 'PENDING'
+  2. 复用 handlePaymentCallback（Day 11 已实现的事务）：
+     → $transaction 内：
+       - 更新订单状态为 PAID
+       - 创建 Ticket（code 随机生成）
+       - 创建 PaymentEvent 记录（provider/mock, transactionId, eventType）
+  3. 返回更新后的订单
+
+幂等保证：
+  同一订单多次回调 → status 已不是 PENDING → 跳过处理
+  PaymentEvent 有 @@unique([provider, transactionId]) 约束防重复
+```
+
+### 15.3 小程序支付服务
+
+```
+services/pay.ts：
+  createPrepay(orderId) → POST /wechat-pay/prepay → 拿到支付参数
+  payOrder(orderId) → 完整支付流程：
+    1. createPrepay 拿参数
+    2. params.mock === true → showModal 模拟 → mock-callback
+    3. params.mock === false → Taro.requestPayment 调起真实微信支付
+
+services/orders.ts：
+  getOrder(orderId) → GET /orders/:id
+  createOrder(activityId) → POST /orders
+```
+
+### 15.4 订单结果页（轮询）
+
+```
+pages/orders/result/index.tsx：
+  进入页面 → 拿到 orderId 参数
+  → 首次请求 getOrder(orderId)
+  → 如果 status === 'PENDING' → 每 2 秒轮询
+  → status 变为 PAID/FAILED/CANCELLED/EXPIRED → 停止轮询
+
+UI 状态映射：
+  PAID → ✅ "报名成功，Ticket 已生成"（绿色）+ 显示 Ticket Code
+  PENDING → ⏳ "支付确认中，请稍候"（黄色）
+  FAILED → ❌ "支付失败，请重新支付"（红色）
+  CANCELLED/EXPIRED → ❌ 灰色提示
+
+清理机制：
+  useEffect 返回 clearInterval → 组件卸载时停止轮询
+```
+
+### 15.5 Prisma Schema 变更
+
+```
+OrderStatus 枚举新增：FAILED
+
+PaymentEvent 模型新增字段：
+  transactionId String? — 第三方交易号
+  outTradeNo String? — 商户订单号
+  eventType String? — 事件类型 (PAID/REFUND 等)
+  @@unique([provider, transactionId]) — 幂等约束
+```
+
+### 15.6 React Query 不兼容 Taro 的解决方案
+
+```
+问题：
+  useQuery({queryKey, queryFn, enabled: true}) 在 Taro 小程序中
+  queryFn 永远不会触发，isLoading 始终 false，data 始终 undefined
+
+解决方案：
+  所有页面改用 useState + useEffect 直接调 API：
+    const [data, setData] = useState(null)
+    useEffect(() => { apiCall().then(setData) }, [deps])
+
+影响范围：
+  - pages/index/index.tsx — 书籍列表
+  - pages/books/detail/index.tsx — 书籍详情
+  - pages/books/form/index.tsx — 书籍表单
+  - pages/orders/result/index.tsx — 订单结果（直接用此模式）
+
+登录跳转改用 reLaunch：
+  switchTab 不触发组件重新挂载 → Zustand store 状态不更新
+  reLaunch 会销毁所有页面重新加载 → 状态正确初始化
+```
+
+---
+
 ## 完整数据流总结
 
 ### 用户登录后浏览书籍的完整链路
