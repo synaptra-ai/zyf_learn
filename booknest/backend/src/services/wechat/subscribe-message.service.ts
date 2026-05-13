@@ -28,7 +28,7 @@ export async function sendSubscribeMessage(input: SendSubscribeMessageInput) {
     },
   )
 
-  const result = await res.json()
+  const result = (await res.json()) as { errcode: number; errmsg?: string; [key: string]: any }
   if (result.errcode !== 0) {
     throw new Error(`发送订阅消息失败：${result.errmsg || result.errcode}`)
   }

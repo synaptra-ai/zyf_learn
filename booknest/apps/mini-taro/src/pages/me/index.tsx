@@ -1,13 +1,11 @@
 import { Text, View } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useAuthStore } from '@/stores/auth-store'
-import { useWorkspaceStore } from '@/stores/workspace-store'
 import { recordCustomerServiceEvent } from '@/services/customer-service'
 import './index.scss'
 
 export default function MePage() {
   const user = useAuthStore((s) => s.user)
-  const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId)
 
   const handleLogout = () => {
     useAuthStore.getState().logout()

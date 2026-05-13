@@ -10,7 +10,7 @@ export async function subscribeActivityReminder(activityId: string) {
   const tmplId = TEMPLATE_IDS.activityReminder
   const result = await Taro.requestSubscribeMessage({
     tmplIds: [tmplId],
-  })
+  } as any)
 
   await request({
     url: '/api/v1/subscriptions/record',
@@ -31,7 +31,7 @@ export async function subscribeSignupSuccess(orderId: string) {
   const tmplId = TEMPLATE_IDS.signupSuccess
   const result = await Taro.requestSubscribeMessage({
     tmplIds: [tmplId],
-  })
+  } as any)
 
   await request({
     url: '/api/v1/subscriptions/record',
