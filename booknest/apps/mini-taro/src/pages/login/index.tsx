@@ -84,7 +84,8 @@ export default function LoginPage() {
           <Text className="login__label">密码</Text>
           <Input
             className="login__input"
-            type="safe-password"
+            type="text"
+            password
             placeholder="请输入密码"
             value={password}
             onInput={(e) => setPassword(e.detail.value)}
