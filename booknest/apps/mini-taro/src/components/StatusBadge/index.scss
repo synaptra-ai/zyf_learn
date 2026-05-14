@@ -2,27 +2,27 @@
   display: inline-flex;
   align-items: center;
   padding: 4rpx 16rpx;
-  border-radius: 999rpx;
+  border-radius: $border-radius-full;
   font-size: $font-size-xs;
 
   &--owned {
-    background: rgba(37, 99, 235, 0.1);
+    background: rgba(196, 149, 106, 0.12);
     .status-badge__text { color: $color-primary; }
   }
 
   &--reading {
-    background: rgba(245, 158, 11, 0.1);
+    background: rgba(232, 150, 122, 0.12);
     .status-badge__text { color: $color-warning; }
   }
 
   &--finished {
-    background: rgba(16, 185, 129, 0.1);
+    background: rgba(107, 175, 141, 0.12);
     .status-badge__text { color: $color-success; }
   }
 
   &--wishlist {
-    background: rgba(139, 92, 246, 0.1);
-    .status-badge__text { color: #8b5cf6; }
+    background: rgba(212, 165, 116, 0.12);
+    .status-badge__text { color: $color-accent; }
   }
 
   &__text {
