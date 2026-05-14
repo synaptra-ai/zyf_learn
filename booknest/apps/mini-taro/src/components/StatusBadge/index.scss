@@ -6,23 +6,23 @@
   font-size: $font-size-xs;
 
   &--owned {
-    background: rgba(196, 149, 106, 0.12);
-    .status-badge__text { color: $color-primary; }
+    background: rgba(139, 115, 85, 0.08);
+    .status-badge__text { color: $color-primary-dark; }
   }
 
   &--reading {
-    background: rgba(232, 150, 122, 0.12);
+    background: rgba(212, 149, 106, 0.08);
     .status-badge__text { color: $color-warning; }
   }
 
   &--finished {
-    background: rgba(107, 175, 141, 0.12);
+    background: rgba(107, 159, 125, 0.08);
     .status-badge__text { color: $color-success; }
   }
 
   &--wishlist {
-    background: rgba(212, 165, 116, 0.12);
-    .status-badge__text { color: $color-accent; }
+    background: rgba(153, 153, 153, 0.08);
+    .status-badge__text { color: $color-text-secondary; }
   }
 
   &__text {
