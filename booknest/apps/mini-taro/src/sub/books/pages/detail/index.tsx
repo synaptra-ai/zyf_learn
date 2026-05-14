@@ -89,17 +89,20 @@ export default function BookDetailPage() {
 
   return (
     <View className="detail">
-      <View className="detail__header">
+      <View className="detail__hero">
         {book.coverUrl ? (
-          <Image className="detail__cover" src={book.coverUrl} mode="aspectFill" />
-        ) : (
-          <View className="detail__cover detail__cover--placeholder">
-            <Text className="detail__cover-text">{book.title[0]}</Text>
-          </View>
-        )}
-        <View className="detail__info">
-          <Text className="detail__title">{book.title}</Text>
-          <Text className="detail__author">{book.author}</Text>
+          <Image className="detail__hero-bg" src={book.coverUrl} mode="aspectFill" />
+        ) : null}
+        <View className="detail__hero-content">
+          {book.coverUrl ? (
+            <Image className="detail__hero-cover" src={book.coverUrl} mode="aspectFill" />
+          ) : (
+            <View className="detail__hero-cover detail__hero-cover--placeholder">
+              <Text className="detail__hero-cover-text">{book.title[0]}</Text>
+            </View>
+          )}
+          <Text className="detail__hero-title">{book.title}</Text>
+          <Text className="detail__hero-author">{book.author}</Text>
           <StatusBadge status={book.status} />
         </View>
       </View>
