@@ -1,19 +1,34 @@
-// Colors
-$color-primary: #2563eb;
-$color-primary-light: #3b82f6;
-$color-primary-dark: #1d4ed8;
-$color-success: #10b981;
-$color-warning: #f59e0b;
-$color-danger: #ef4444;
+// ===== 亚朵风格设计系统 =====
 
-$color-text-primary: #0f172a;
-$color-text-secondary: #475569;
-$color-text-muted: #94a3b8;
+// Colors — Light
+$color-primary: #C4956A;
+$color-primary-light: #D4A574;
+$color-primary-dark: #A87D55;
+$color-accent: #D4A574;
+
+$color-success: #6BAF8D;
+$color-warning: #E8967A;
+$color-danger: #D46B6B;
+
+$color-text-primary: #2D2A26;
+$color-text-secondary: #6B6560;
+$color-text-muted: #A09A94;
 $color-text-white: #ffffff;
 
-$color-bg-primary: #ffffff;
-$color-bg-secondary: #f8fafc;
-$color-bg-tertiary: #f1f5f9;
+$color-bg-primary: #FFFFFF;
+$color-bg-secondary: #FAF8F5;
+$color-bg-tertiary: #F0ECE8;
+$color-bg-card: #FFFFFF;
+
+// Colors — Dark Mode
+$color-dark-bg-primary: #1A1816;
+$color-dark-bg-secondary: #1A1816;
+$color-dark-bg-tertiary: #2A2622;
+$color-dark-bg-card: #2A2622;
+$color-dark-text-primary: #F0ECE8;
+$color-dark-text-secondary: #9A9490;
+$color-dark-text-muted: #6B6560;
+$color-dark-border: #3A3632;
 
 // Spacing
 $spacing-xs: 8rpx;
@@ -22,17 +37,20 @@ $spacing-md: 24rpx;
 $spacing-lg: 32rpx;
 $spacing-xl: 48rpx;
 
-// Border
+// Border Radius
 $border-radius-sm: 12rpx;
 $border-radius-md: 16rpx;
 $border-radius-lg: 24rpx;
-$border-radius-xl: 32rpx;
+$border-radius-pill: 48rpx;
 $border-radius-full: 9999rpx;
 
-// Shadow
-$shadow-sm: 0 4rpx 12rpx rgba(15, 23, 42, 0.04);
-$shadow-md: 0 8rpx 24rpx rgba(15, 23, 42, 0.06);
-$shadow-lg: 0 16rpx 48rpx rgba(15, 23, 42, 0.08);
+// Shadows — Light
+$shadow-card: 0 4rpx 24rpx rgba(45, 42, 38, 0.06);
+$shadow-fab: 0 8rpx 32rpx rgba(196, 149, 106, 0.2);
+$shadow-modal: 0 16rpx 64rpx rgba(45, 42, 38, 0.12);
+$shadow-sm: 0 4rpx 12rpx rgba(45, 42, 38, 0.04);
+$shadow-md: 0 8rpx 24rpx rgba(45, 42, 38, 0.06);
+$shadow-lg: 0 16rpx 48rpx rgba(45, 42, 38, 0.08);
 
 // Font
 $font-size-xs: 22rpx;
@@ -41,3 +59,9 @@ $font-size-md: 30rpx;
 $font-size-lg: 34rpx;
 $font-size-xl: 40rpx;
 $font-size-xxl: 48rpx;
+$font-size-hero: 56rpx;
+
+// Transitions
+$transition-fast: 150ms ease-out;
+$transition-normal: 300ms ease-out;
+$transition-slow: 400ms ease-out;
