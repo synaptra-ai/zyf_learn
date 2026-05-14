@@ -21,18 +21,17 @@
     justify-content: flex-end;
     padding: $spacing-sm $spacing-lg;
     background: $color-bg-primary;
-    border-bottom: 2rpx solid $color-bg-tertiary;
+    border-bottom: 1rpx solid $color-bg-tertiary;
   }
 
   &__add-btn {
-    padding: 12rpx 24rpx;
-    background: $color-primary;
-    border-radius: $border-radius-md;
+    padding: 8rpx 0;
+    background: transparent;
   }
 
   &__add-btn-text {
     font-size: $font-size-md;
-    color: #fff;
+    color: $color-text-primary;
   }
 
   &__form {
@@ -40,13 +39,13 @@
     padding: $spacing-lg;
     background: $color-bg-primary;
     border-radius: $border-radius-lg;
-    box-shadow: $shadow-sm;
+    border: 1rpx solid $color-bg-tertiary;
   }
 
   &__form-input {
     width: 100%;
     padding: $spacing-md;
-    border: 2rpx solid #e2e8f0;
+    border: 1rpx solid $color-bg-tertiary;
     border-radius: $border-radius-md;
     font-size: $font-size-md;
     box-sizing: border-box;
@@ -74,33 +73,37 @@
   &__form-submit {
     margin-top: $spacing-md;
     padding: $spacing-md;
-    background: $color-primary;
+    background: $color-text-primary;
     border-radius: $border-radius-md;
     text-align: center;
   }
 
   &__form-submit-text {
     font-size: $font-size-md;
-    color: #fff;
+    color: $color-text-white;
     font-weight: 600;
   }
 
   &__list {
-    padding: $spacing-md $spacing-lg;
+    margin: $spacing-md $spacing-lg;
+    background: $color-bg-primary;
+    border-radius: $border-radius-lg;
+    overflow: hidden;
   }
 
   &__item {
     display: flex;
     align-items: center;
     padding: $spacing-md $spacing-lg;
-    background: $color-bg-primary;
-    border-radius: $border-radius-lg;
-    margin-bottom: $spacing-md;
-    box-shadow: $shadow-sm;
+    border-bottom: 1rpx solid $color-bg-tertiary;
+
+    &:last-child {
+      border-bottom: none;
+    }
 
     &-dot {
-      width: 32rpx;
-      height: 32rpx;
+      width: 24rpx;
+      height: 24rpx;
       border-radius: 50%;
       flex-shrink: 0;
     }
@@ -112,15 +115,15 @@
 
     &-name {
       display: block;
-      font-size: $font-size-lg;
-      font-weight: 600;
+      font-size: $font-size-md;
+      font-weight: 500;
       color: $color-text-primary;
     }
 
     &-count {
       display: block;
       margin-top: 4rpx;
-      font-size: $font-size-sm;
+      font-size: $font-size-xs;
       color: $color-text-muted;
     }
 
