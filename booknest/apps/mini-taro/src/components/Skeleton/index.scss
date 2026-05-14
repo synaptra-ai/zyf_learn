@@ -1,0 +1,83 @@
+$skeleton-color: $color-bg-tertiary;
+
+.skeleton-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-md;
+}
+
+.skeleton-card {
+  width: calc(50% - 8rpx);
+  border-radius: $border-radius-lg;
+  background: $color-bg-card;
+  overflow: hidden;
+
+  &__image {
+    width: 100%;
+    height: 320rpx;
+    background: $skeleton-color;
+  }
+
+  &__body {
+    padding: 16rpx 20rpx 24rpx;
+  }
+
+  &__title {
+    height: 32rpx;
+    width: 80%;
+    background: $skeleton-color;
+    border-radius: $border-radius-sm;
+    margin-bottom: 12rpx;
+  }
+
+  &__subtitle {
+    height: 24rpx;
+    width: 50%;
+    background: $skeleton-color;
+    border-radius: $border-radius-sm;
+  }
+}
+
+.skeleton-list {
+  padding: $spacing-md;
+
+  &__item {
+    height: 88rpx;
+    background: $skeleton-color;
+    border-radius: $border-radius-lg;
+    margin-bottom: $spacing-md;
+  }
+}
+
+.skeleton-detail {
+  padding: $spacing-lg;
+
+  &__hero {
+    width: 240rpx;
+    height: 340rpx;
+    margin: 0 auto $spacing-lg;
+    background: $skeleton-color;
+    border-radius: $border-radius-lg;
+  }
+
+  &__title {
+    height: 40rpx;
+    width: 60%;
+    background: $skeleton-color;
+    border-radius: $border-radius-sm;
+    margin-bottom: $spacing-md;
+  }
+
+  &__line {
+    height: 24rpx;
+    width: 100%;
+    background: $skeleton-color;
+    border-radius: $border-radius-sm;
+    margin-bottom: $spacing-sm;
+
+    &--short {
+      width: 40%;
+    }
+  }
+}

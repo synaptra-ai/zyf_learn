@@ -1,0 +1,28 @@
+.search-bar {
+  display: flex;
+  align-items: center;
+  height: 72rpx;
+  background: $color-bg-tertiary;
+  border-radius: $border-radius-pill;
+  padding: 0 $spacing-md;
+
+  &__icon {
+    font-size: $font-size-md;
+    margin-right: $spacing-sm;
+    flex-shrink: 0;
+  }
+
+  &__input {
+    flex: 1;
+    height: 100%;
+    font-size: $font-size-md;
+    color: $color-text-primary;
+  }
+
+  &__clear {
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    padding: 8rpx;
+    flex-shrink: 0;
+  }
+}
