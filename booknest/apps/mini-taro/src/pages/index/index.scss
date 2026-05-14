@@ -45,7 +45,7 @@
     transition: all $transition-fast;
 
     &--active {
-      background: $color-primary;
+      background: $color-text-primary;
       color: $color-text-white;
     }
   }
@@ -66,8 +66,15 @@
   gap: $spacing-sm;
   max-height: calc(100vh - 340rpx);
 
-  .book-card {
+  // featured cards: 2 columns
+  .book-card--featured {
     width: calc(50% - 8rpx);
+    flex-shrink: 0;
+  }
+
+  // grid cards: 3 columns
+  .book-card--grid {
+    width: calc(33.33% - 12rpx);
     flex-shrink: 0;
   }
 }
@@ -79,7 +86,7 @@
   width: 112rpx;
   height: 112rpx;
   border-radius: $border-radius-pill;
-  background: $color-primary;
+  background: $color-text-primary;
   display: flex;
   align-items: center;
   justify-content: center;

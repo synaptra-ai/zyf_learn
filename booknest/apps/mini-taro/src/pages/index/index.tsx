@@ -197,8 +197,8 @@ export default function IndexPage() {
         <LoadingState text="加载中..." />
       ) : items.length > 0 ? (
         <ScrollView scrollY className="book-grid">
-          {items.map((book) => (
-            <BookCard key={book.id} book={book} />
+          {items.map((book, idx) => (
+            <BookCard key={book.id} book={book} variant={idx < 2 ? 'featured' : 'grid'} />
           ))}
           {booksLoading && <LoadingState text="加载更多..." />}
           {!hasMore && items.length > PAGE_SIZE && (
