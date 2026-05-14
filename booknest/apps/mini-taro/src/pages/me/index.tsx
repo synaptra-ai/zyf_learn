@@ -3,7 +3,6 @@ import Taro from '@tarojs/taro'
 import { useEffect, useState } from 'react'
 import { useAuthStore } from '@/stores/auth-store'
 import { useWorkspaceStore } from '@/stores/workspace-store'
-import { listWorkspaces } from '@/services/workspaces'
 import { recordCustomerServiceEvent } from '@/services/customer-service'
 import { WorkspaceSwitcher } from '@/components/WorkspaceSwitcher'
 import './index.scss'
@@ -12,13 +11,8 @@ export default function MePage() {
   const user = useAuthStore((s) => s.user)
   const token = useAuthStore((s) => s.token)
   const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId)
-  const [workspaces, setWorkspaces] = useState<any[]>([])
   const [bookCount, setBookCount] = useState(0)
   const [finishedCount, setFinishedCount] = useState(0)
-
-  useEffect(() => {
-    if (token) listWorkspaces().then(setWorkspaces).catch(() => {})
-  }, [token])
 
   useEffect(() => {
     if (activeWorkspaceId) {
