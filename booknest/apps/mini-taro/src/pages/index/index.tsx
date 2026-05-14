@@ -93,9 +93,11 @@ export default function IndexPage() {
     }
   }, [page])
 
-  // 自动选择第一个 workspace
+  // 自动选择第一个 workspace（或修正无效缓存）
   useEffect(() => {
-    if (workspaces.length > 0 && !activeWorkspaceId) {
+    if (workspaces.length === 0) return
+    const valid = workspaces.some((w) => w.id === activeWorkspaceId)
+    if (!activeWorkspaceId || !valid) {
       setActiveWorkspace(workspaces[0].id)
     }
   }, [workspaces, activeWorkspaceId, setActiveWorkspace])
