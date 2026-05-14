@@ -8,15 +8,16 @@ import './index.scss'
 
 interface BookCardProps {
   book: Book
+  variant?: 'featured' | 'grid'
 }
 
-export const BookCard = React.memo(function BookCard({ book }: BookCardProps) {
+export const BookCard = React.memo(function BookCard({ book, variant = 'grid' }: BookCardProps) {
   const handleOpen = () => {
     Taro.navigateTo({ url: `/sub/books/pages/detail/index?id=${book.id}` })
   }
 
   return (
-    <View className="book-card" onClick={handleOpen} compileMode>
+    <View className={`book-card book-card--${variant}`} onClick={handleOpen} compileMode>
       <View className="book-card__cover-wrap">
         {book.coverUrl ? (
           <Image
@@ -33,7 +34,9 @@ export const BookCard = React.memo(function BookCard({ book }: BookCardProps) {
       </View>
       <View className="book-card__body">
         <Text className="book-card__title">{book.title}</Text>
-        <Text className="book-card__author">{book.author}</Text>
+        {variant === 'featured' && (
+          <Text className="book-card__author">{book.author}</Text>
+        )}
       </View>
       <View className="book-card__badge">
         <StatusBadge status={book.status} />
