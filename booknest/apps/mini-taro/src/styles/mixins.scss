@@ -1,0 +1,63 @@
+@use "../assets/variables" as *;
+
+// Card base style
+@mixin card {
+  background: $color-bg-card;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-card;
+}
+
+// Pill/capsule button
+@mixin pill-button($bg: $color-primary, $color: $color-text-white) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16rpx 32rpx;
+  border-radius: $border-radius-pill;
+  background: $bg;
+  color: $color;
+  font-size: $font-size-md;
+  font-weight: 500;
+  transition: transform $transition-fast;
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+// Truncate text
+@mixin truncate($lines: 1) {
+  @if $lines == 1 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  } @else {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: $lines;
+    overflow: hidden;
+  }
+}
+
+// Safe area bottom padding
+@mixin safe-bottom($extra: 0rpx) {
+  padding-bottom: calc(#{$spacing-md} + #{$extra} + env(safe-area-inset-bottom));
+}
+
+// Horizontal scroll container
+@mixin scroll-x {
+  white-space: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+// Dark mode helper
+@mixin dark {
+  .dark & {
+    @content;
+  }
+}

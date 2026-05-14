@@ -1,0 +1,52 @@
+// Page transition
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+// Utility classes
+.animate-fade-in {
+  animation: fadeIn 300ms ease-out both;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 300ms ease-out both;
+}
+
+.animate-pulse {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+// Staggered list item entrance
+@for $i from 1 through 20 {
+  .animate-stagger-#{$i} {
+    animation: fadeInUp 300ms ease-out both;
+    animation-delay: #{$i * 50}ms;
+  }
+}

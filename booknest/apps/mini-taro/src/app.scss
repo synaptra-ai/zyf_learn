@@ -1,4 +1,5 @@
 @use "./assets/variables.scss" as *;
+@use "./styles/animations.scss";
 
 page {
   font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, 'PingFang SC',
@@ -6,8 +7,15 @@ page {
   font-size: $font-size-md;
   color: $color-text-primary;
   background-color: $color-bg-secondary;
+  -webkit-font-smoothing: antialiased;
 }
 
 .container {
   padding: $spacing-lg;
+}
+
+// Global utility: card press feedback
+.card-press:active {
+  transform: scale(0.98);
+  transition: transform $transition-fast;
 }

@@ -1,0 +1,18 @@
+// Dark mode overrides — applied via .dark class on page root
+@use "../assets/variables" as *;
+
+.dark {
+  background-color: $color-dark-bg-secondary !important;
+  color: $color-dark-text-primary;
+
+  // Text overrides
+  .text-primary { color: $color-dark-text-primary; }
+  .text-secondary { color: $color-dark-text-secondary; }
+  .text-muted { color: $color-dark-text-muted; }
+}
+
+@mixin dark-mode {
+  .dark & {
+    @content;
+  }
+}
