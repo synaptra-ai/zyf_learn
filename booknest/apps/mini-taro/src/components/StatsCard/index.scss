@@ -1,0 +1,27 @@
+.stats-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-lg $spacing-md;
+  background: linear-gradient(135deg, rgba(196, 149, 106, 0.08), rgba(196, 149, 106, 0.02));
+  border-radius: $border-radius-lg;
+
+  &__icon {
+    font-size: $font-size-xl;
+    margin-bottom: $spacing-sm;
+  }
+
+  &__value {
+    font-size: $font-size-hero;
+    font-weight: 700;
+    color: $color-accent;
+    line-height: 1;
+  }
+
+  &__label {
+    margin-top: $spacing-xs;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+  }
+}

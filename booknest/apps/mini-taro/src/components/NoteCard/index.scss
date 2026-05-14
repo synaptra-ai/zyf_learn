@@ -1,0 +1,32 @@
+.note-card {
+  padding: $spacing-md;
+  background: $color-bg-card;
+  border-radius: $border-radius-lg;
+  margin-bottom: $spacing-sm;
+
+  &__content {
+    font-size: $font-size-md;
+    color: $color-text-primary;
+    line-height: 1.7;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    margin-top: $spacing-sm;
+    gap: $spacing-sm;
+  }
+
+  &__page {
+    font-size: $font-size-xs;
+    color: $color-primary;
+    background: rgba(196, 149, 106, 0.1);
+    padding: 2rpx 12rpx;
+    border-radius: $border-radius-sm;
+  }
+
+  &__date {
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+  }
+}

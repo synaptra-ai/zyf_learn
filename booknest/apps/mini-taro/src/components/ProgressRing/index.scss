@@ -1,0 +1,45 @@
+.progress-ring {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  &__svg {
+    display: block;
+  }
+
+  &__progress {
+    transition: stroke-dashoffset $transition-normal;
+  }
+
+  &__text {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  &__percentage {
+    font-size: $font-size-lg;
+    font-weight: 700;
+    color: $color-text-primary;
+  }
+
+  &__label {
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+    margin-top: 4rpx;
+  }
+
+  &--sm {
+    .progress-ring__percentage {
+      font-size: $font-size-xs;
+    }
+  }
+
+  &--lg {
+    .progress-ring__percentage {
+      font-size: $font-size-xxl;
+    }
+  }
+}
