@@ -1,0 +1,209 @@
+.timeline-page {
+  min-height: 100vh;
+  background: $color-bg-primary;
+  padding-bottom: 200rpx;
+}
+
+.timeline-week {
+  margin: $spacing-lg;
+  padding: $spacing-lg;
+  background: $color-bg-card;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-card;
+
+  &__title {
+    display: block;
+    font-size: $font-size-md;
+    font-weight: 400;
+    color: $color-text-primary;
+    letter-spacing: 2rpx;
+    margin-bottom: $spacing-lg;
+  }
+
+  &__grid {
+    display: flex;
+    justify-content: space-between;
+    gap: $spacing-xs;
+  }
+
+  &__cell {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-xs;
+    padding: $spacing-sm 0;
+    border-radius: $border-radius-md;
+    background: $color-bg-warm;
+
+    &--met {
+      background: rgba(123, 166, 141, 0.2);
+    }
+
+    &--partial {
+      background: rgba(139, 115, 85, 0.1);
+    }
+
+    &--empty {
+      opacity: 0.5;
+    }
+  }
+
+  &__day-label {
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+  }
+
+  &__day-min {
+    font-size: $font-size-xs;
+    color: $color-text-secondary;
+    font-weight: 400;
+  }
+}
+
+.timeline-goal {
+  margin: 0 $spacing-lg $spacing-lg;
+  padding: $spacing-lg $spacing-xl;
+  background: $color-bg-card;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-sm;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  &__label {
+    font-size: $font-size-md;
+    color: $color-text-primary;
+    letter-spacing: 1rpx;
+  }
+
+  &__edit {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+
+  &__input {
+    width: 100rpx;
+    height: 60rpx;
+    border: 1rpx solid $color-bg-tertiary;
+    border-radius: $border-radius-sm;
+    text-align: center;
+    font-size: $font-size-sm;
+    color: $color-text-primary;
+  }
+
+  &__unit {
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+  }
+
+  &__save {
+    padding: 8rpx 24rpx;
+    background: $color-primary;
+    border-radius: $border-radius-full;
+
+    &:active { opacity: 0.8; }
+  }
+
+  &__save-text {
+    font-size: $font-size-xs;
+    color: $color-text-white;
+  }
+
+  &__display {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+
+  &__value {
+    font-size: $font-size-md;
+    color: $color-accent;
+    font-weight: 400;
+  }
+
+  &__edit-icon {
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+    letter-spacing: 1rpx;
+  }
+}
+
+.timeline-list {
+  padding: 0 $spacing-lg;
+}
+
+.timeline-day {
+  margin-bottom: $spacing-lg;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-md;
+    padding: 0 $spacing-sm;
+  }
+
+  &__date {
+    font-size: $font-size-md;
+    font-weight: 400;
+    color: $color-text-primary;
+    letter-spacing: 2rpx;
+  }
+
+  &__total {
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    letter-spacing: 1rpx;
+  }
+}
+
+.timeline-session {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md $spacing-lg;
+  margin-bottom: $spacing-sm;
+  background: $color-bg-card;
+  border-radius: $border-radius-md;
+  box-shadow: $shadow-sm;
+
+  &__cover {
+    width: 64rpx;
+    height: 80rpx;
+    border-radius: $border-radius-sm;
+    flex-shrink: 0;
+
+    &--placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: $color-bg-warm;
+      font-size: $font-size-sm;
+    }
+  }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__title {
+    display: block;
+    font-size: $font-size-md;
+    color: $color-text-primary;
+    letter-spacing: 1rpx;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  &__time {
+    display: block;
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+    margin-top: $spacing-xs;
+    letter-spacing: 1rpx;
+  }
+}

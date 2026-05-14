@@ -141,6 +141,107 @@ async function main() {
     }
   }
 
+  // ===== Reading Behavior Seed Data =====
+  console.log('🌱 Seeding reading behavior data...')
+
+  // Get all workspace members for reading goals
+  const members = await prisma.workspaceMember.findMany({
+    where: { workspaceId: workspace.id },
+  })
+
+  // Create reading goals for all members
+  for (const member of members) {
+    await prisma.readingGoal.upsert({
+      where: { userId_workspaceId: { userId: member.userId, workspaceId: member.workspaceId } },
+      update: {},
+      create: {
+        userId: member.userId,
+        workspaceId: member.workspaceId,
+        dailyGoalMinutes: 30,
+      },
+    })
+  }
+
+  // Get books for first workspace
+  const readingBooks = await prisma.book.findMany({
+    where: { workspaceId: workspace.id },
+    take: 5,
+  })
+
+  // Create sample reading sessions for the past 7 days
+  const now = new Date()
+
+  for (let dayOffset = 0; dayOffset < 7; dayOffset++) {
+    const day = new Date(now)
+    day.setDate(day.getDate() - dayOffset)
+    day.setHours(0, 0, 0, 0)
+
+    // Each day: 1-3 sessions on random books
+    const sessionsCount = dayOffset === 0 ? 1 : Math.floor(Math.random() * 3) + 1
+    for (let s = 0; s < sessionsCount && s < readingBooks.length; s++) {
+      const book = readingBooks[s]
+      const duration = Math.floor(Math.random() * 40) + 10 // 10-50 min
+      const startTime = new Date(day)
+      startTime.setHours(8 + s * 4, Math.floor(Math.random() * 30))
+
+      await prisma.readingSession.create({
+        data: {
+          userId: user.id,
+          bookId: book.id,
+          workspaceId: workspace.id,
+          startTime,
+          endTime: new Date(startTime.getTime() + duration * 60000),
+          durationMinutes: duration,
+        },
+      })
+    }
+
+    // Upsert daily summary
+    const dayStart = new Date(day)
+    const dayEnd = new Date(day.getTime() + 86400000)
+    const daySessions = await prisma.readingSession.findMany({
+      where: {
+        userId: user.id,
+        workspaceId: workspace.id,
+        startTime: { gte: dayStart, lt: dayEnd },
+      },
+    })
+    const totalMin = daySessions.reduce((sum: number, s: any) => sum + s.durationMinutes, 0)
+    const bookIds = [...new Set(daySessions.map((s: any) => s.bookId))]
+
+    const yesterday = new Date(day)
+    yesterday.setDate(yesterday.getDate() - 1)
+    const yesterdaySummary = await prisma.dailyReadingSummary.findUnique({
+      where: { userId_workspaceId_date: { userId: user.id, workspaceId: workspace.id, date: yesterday } },
+    })
+
+    await prisma.dailyReadingSummary.upsert({
+      where: { userId_workspaceId_date: { userId: user.id, workspaceId: workspace.id, date: day } },
+      update: {},
+      create: {
+        userId: user.id,
+        workspaceId: workspace.id,
+        date: day,
+        totalMinutes: totalMin,
+        streakDays: yesterdaySummary ? yesterdaySummary.streakDays + 1 : 1,
+        goalMet: totalMin >= 30,
+        bookCount: bookIds.length,
+      },
+    })
+  }
+
+  // Update some books with reading progress
+  for (const book of readingBooks.slice(0, 3)) {
+    await prisma.book.update({
+      where: { id: book.id },
+      data: {
+        readingProgress: Math.floor(Math.random() * 80) + 10,
+        totalReadingMinutes: Math.floor(Math.random() * 200) + 30,
+        lastReadAt: new Date(),
+      },
+    })
+  }
+
   console.log('Seed data created successfully!')
 }
 

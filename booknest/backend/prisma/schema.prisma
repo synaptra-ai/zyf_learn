@@ -79,6 +79,9 @@ model User {
   orders            Order[]
   tickets           Ticket[]
   importJobs        ImportJob[]
+  readingSessions    ReadingSession[]
+  dailySummaries     DailyReadingSummary[]
+  readingGoals       ReadingGoal[]
 
   @@map("users")
 }
@@ -99,6 +102,9 @@ model Workspace {
   orders      Order[]
   tickets     Ticket[]
   importJobs  ImportJob[]
+  readingSessions    ReadingSession[]
+  dailySummaries     DailyReadingSummary[]
+  readingGoals       ReadingGoal[]
 
   @@map("workspaces")
 }
@@ -181,6 +187,10 @@ model Book {
   categoryId String?   @map("category_id")
   category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   reviews    Review[]
+  readingSessions ReadingSession[]
+  readingProgress    Int       @default(0) @map("reading_progress")
+  lastReadAt         DateTime? @map("last_read_at") @db.Date
+  totalReadingMinutes Int      @default(0) @map("total_reading_minutes")
 
   @@index([workspaceId, status])
   @@index([workspaceId, createdAt])
@@ -220,6 +230,62 @@ model Review {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("reviews")
+}
+
+model ReadingSession {
+  id              String   @id @default(cuid())
+  startTime       DateTime @map("start_time")
+  endTime         DateTime @map("end_time")
+  durationMinutes Int      @map("duration_minutes")
+  note            String?  @db.Text
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  userId      String @map("user_id")
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  bookId      String @map("book_id")
+  book        Book   @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  workspaceId String    @map("workspace_id")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([workspaceId, createdAt])
+  @@map("reading_sessions")
+}
+
+model DailyReadingSummary {
+  id           String   @id @default(cuid())
+  date         DateTime @map("date") @db.Date
+  totalMinutes Int      @default(0) @map("total_minutes")
+  streakDays   Int      @default(0) @map("streak_days")
+  goalMet      Boolean  @default(false) @map("goal_met")
+  bookCount    Int      @default(0) @map("book_count")
+
+  userId      String @map("user_id")
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  workspaceId String    @map("workspace_id")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, workspaceId, date])
+  @@index([workspaceId, date])
+  @@map("daily_reading_summaries")
+}
+
+model ReadingGoal {
+  id               String  @id @default(cuid())
+  dailyGoalMinutes Int     @default(30) @map("daily_goal_minutes")
+  isActive         Boolean @default(true) @map("is_active")
+
+  userId      String @map("user_id")
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  workspaceId String    @map("workspace_id")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, workspaceId])
+  @@map("reading_goals")
 }
 
 model Activity {

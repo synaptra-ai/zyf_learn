@@ -1,0 +1,117 @@
+.reading-card {
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+  margin: $spacing-lg;
+  padding: $spacing-lg $spacing-xl;
+  background: $color-bg-card;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-card;
+
+  &__left {
+    flex-shrink: 0;
+    position: relative;
+    width: 120rpx;
+    height: 120rpx;
+  }
+
+  &__minutes-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4rpx;
+  }
+
+  &__minutes {
+    font-size: $font-size-xl;
+    font-weight: 300;
+    color: $color-text-primary;
+    letter-spacing: 2rpx;
+    line-height: 1;
+  }
+
+  &__unit {
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+    letter-spacing: 1rpx;
+    line-height: 1;
+  }
+
+  &__right {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__streak {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    margin-bottom: $spacing-xs;
+  }
+
+  &__streak-icon {
+    font-size: $font-size-md;
+  }
+
+  &__streak-text {
+    font-size: $font-size-sm;
+    color: $color-accent;
+    font-weight: 400;
+    letter-spacing: 1rpx;
+  }
+
+  &__goal-text {
+    display: block;
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    letter-spacing: 1rpx;
+    margin-bottom: $spacing-md;
+  }
+
+  &__goal-met {
+    display: block;
+    font-size: $font-size-xs;
+    color: $color-success;
+    letter-spacing: 2rpx;
+    margin-bottom: $spacing-sm;
+  }
+
+  &__actions {
+    display: flex;
+    gap: $spacing-sm;
+  }
+
+  &__btn {
+    padding: 12rpx 28rpx;
+    border-radius: $border-radius-full;
+    transition: all $transition-fast;
+
+    &--primary {
+      background: $color-primary;
+    }
+
+    &--ghost {
+      background: transparent;
+      border: 1rpx solid $color-primary;
+    }
+
+    &:active {
+      opacity: 0.8;
+      transform: scale(0.96);
+    }
+  }
+
+  &__btn-text {
+    font-size: $font-size-sm;
+    color: $color-text-white;
+    letter-spacing: 2rpx;
+
+    &--ghost {
+      color: $color-primary;
+    }
+  }
+}

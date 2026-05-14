@@ -22,6 +22,10 @@ export default defineAppConfig({
       root: 'sub/activities',
       pages: ['pages/list/index', 'pages/detail/index'],
     },
+    {
+      root: 'sub/reading',
+      pages: ['pages/timeline/index'],
+    },
   ],
   window: {
     backgroundTextStyle: 'light',
@@ -44,7 +48,7 @@ export default defineAppConfig({
   preloadRule: {
     'pages/index/index': {
       network: 'all',
-      packages: ['sub/books'],
+      packages: ['sub/books', 'sub/reading'],
     },
     'pages/me/index': {
       network: 'all',

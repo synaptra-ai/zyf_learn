@@ -4,8 +4,12 @@ import { useEffect, useRef, useState } from 'react'
 import { BookCard } from '@/components/BookCard'
 import { EmptyState } from '@/components/EmptyState'
 import { LoadingState } from '@/components/LoadingState'
+import { ReadingCard } from '@/components/ReadingCard'
+import { ReadingTimer } from '@/components/ReadingTimer'
 import { listBooks } from '@/services/books'
 import { listCategories } from '@/services/categories'
+import { getReadingSummary } from '@/services/reading'
+import type { ReadingSummary } from '@/services/reading'
 import { useAuthStore } from '@/stores/auth-store'
 import { useWorkspaceStore } from '@/stores/workspace-store'
 import { listWorkspaces } from '@/services/workspaces'
@@ -63,6 +67,9 @@ export default function IndexPage() {
   const [items, setItems] = useState<any[]>([])
   const [hasMore, setHasMore] = useState(true)
   const [booksLoading, setBooksLoading] = useState(false)
+
+  const [readingSummary, setReadingSummary] = useState<ReadingSummary | null>(null)
+  const [showTimer, setShowTimer] = useState(false)
 
   const [workspaces, setWorkspaces] = useState<any[]>([])
 
@@ -122,8 +129,19 @@ export default function IndexPage() {
     }
   }, [workspaces, activeWorkspaceId, setActiveWorkspace])
 
+  useEffect(() => {
+    if (!activeWorkspaceId) return
+    getReadingSummary().then(setReadingSummary).catch(() => {})
+  }, [activeWorkspaceId])
+
+  const refreshReading = () => {
+    if (!activeWorkspaceId) return
+    getReadingSummary().then(setReadingSummary).catch(() => {})
+  }
+
   usePullDownRefresh(async () => {
     setPage(1)
+    refreshReading()
     await fetchBooks(true)
     Taro.stopPullDownRefresh()
   })
@@ -184,6 +202,23 @@ export default function IndexPage() {
           <Text className="hero__quote">「{getQuote()}」</Text>
         </View>
       </View>
+
+      {readingSummary && (
+        <ReadingCard
+          todayMinutes={readingSummary.todayMinutes}
+          dailyGoal={readingSummary.dailyGoal}
+          streakDays={readingSummary.streakDays}
+          goalMet={readingSummary.goalMet}
+          onStartReading={() => setShowTimer(true)}
+          onViewTimeline={() => Taro.navigateTo({ url: '/sub/reading/pages/timeline/index' })}
+        />
+      )}
+      <ReadingTimer
+        books={items}
+        visible={showTimer}
+        onClose={() => setShowTimer(false)}
+        onComplete={() => { refreshReading(); fetchBooks(true) }}
+      />
 
       <View className="page__filters">
         <Input
