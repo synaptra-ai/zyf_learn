@@ -9,7 +9,6 @@ import './index.scss'
 
 export default function MePage() {
   const user = useAuthStore((s) => s.user)
-  const token = useAuthStore((s) => s.token)
   const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId)
   const [bookCount, setBookCount] = useState(0)
   const [finishedCount, setFinishedCount] = useState(0)
