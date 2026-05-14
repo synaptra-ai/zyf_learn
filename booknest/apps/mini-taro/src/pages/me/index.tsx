@@ -1,11 +1,37 @@
 import { Text, View } from '@tarojs/components'
 import Taro from '@tarojs/taro'
+import { useEffect, useState } from 'react'
 import { useAuthStore } from '@/stores/auth-store'
+import { useWorkspaceStore } from '@/stores/workspace-store'
+import { listWorkspaces } from '@/services/workspaces'
 import { recordCustomerServiceEvent } from '@/services/customer-service'
+import { WorkspaceSwitcher } from '@/components/WorkspaceSwitcher'
 import './index.scss'
 
 export default function MePage() {
   const user = useAuthStore((s) => s.user)
+  const token = useAuthStore((s) => s.token)
+  const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId)
+  const [workspaces, setWorkspaces] = useState<any[]>([])
+  const [bookCount, setBookCount] = useState(0)
+  const [finishedCount, setFinishedCount] = useState(0)
+
+  useEffect(() => {
+    if (token) listWorkspaces().then(setWorkspaces).catch(() => {})
+  }, [token])
+
+  useEffect(() => {
+    if (activeWorkspaceId) {
+      import('@/services/books').then(({ listBooks }) => {
+        listBooks({ page: 1, pageSize: 1 })
+          .then((res) => setBookCount(res.total || 0))
+          .catch(() => {})
+        listBooks({ page: 1, pageSize: 1, status: 'FINISHED' })
+          .then((res) => setFinishedCount(res.total || 0))
+          .catch(() => {})
+      })
+    }
+  }, [activeWorkspaceId])
 
   const handleLogout = () => {
     useAuthStore.getState().logout()
@@ -29,6 +55,21 @@ export default function MePage() {
         </View>
       </View>
 
+      <View className="me__stats">
+        <View className="me__stat">
+          <Text className="me__stat-num">{bookCount}</Text>
+          <Text className="me__stat-label">藏书</Text>
+        </View>
+        <View className="me__stat">
+          <Text className="me__stat-num">{finishedCount}</Text>
+          <Text className="me__stat-label">已读</Text>
+        </View>
+        <View className="me__stat">
+          <Text className="me__stat-num">0</Text>
+          <Text className="me__stat-label">连续天数</Text>
+        </View>
+      </View>
+
       <View className="me__menu">
         <View
           className="me__menu-item"
@@ -43,6 +84,10 @@ export default function MePage() {
         >
           <Text className="me__menu-text">内容审核管理</Text>
           <Text className="me__menu-arrow">›</Text>
+        </View>
+        <View className="me__menu-item">
+          <Text className="me__menu-text">Workspace</Text>
+          <WorkspaceSwitcher />
         </View>
         <View className="me__menu-item" onClick={handleCustomerService}>
           <Text className="me__menu-text">联系客服</Text>

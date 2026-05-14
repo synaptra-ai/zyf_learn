@@ -6,7 +6,7 @@
     display: flex;
     align-items: center;
     padding: $spacing-xl $spacing-lg;
-    background: $color-primary;
+    background: linear-gradient(135deg, $color-primary, $color-primary-dark);
   }
 
   &__avatar {
@@ -47,8 +47,13 @@
   &__stats {
     display: flex;
     padding: $spacing-lg;
-    background: $color-bg-primary;
-    margin-bottom: $spacing-md;
+    background: $color-bg-card;
+    margin: $spacing-md $spacing-md 0;
+    border-radius: $border-radius-lg;
+    box-shadow: $shadow-card;
+    margin-top: -$spacing-md;
+    position: relative;
+    z-index: 1;
   }
 
   &__stat {
@@ -60,7 +65,7 @@
     &-num {
       font-size: $font-size-xxl;
       font-weight: 700;
-      color: $color-primary;
+      color: $color-accent;
     }
 
     &-label {
@@ -71,7 +76,8 @@
   }
 
   &__menu {
-    background: $color-bg-primary;
+    margin-top: $spacing-md;
+    background: $color-bg-card;
 
     &-item {
       display: flex;
