@@ -25,13 +25,13 @@ export default defineAppConfig({
   ],
   window: {
     backgroundTextStyle: 'light',
-    navigationBarBackgroundColor: '#FAF8F5',
+    navigationBarBackgroundColor: '#FFFFFF',
     navigationBarTitleText: 'BookNest',
     navigationBarTextStyle: 'black',
   },
   tabBar: {
-    color: '#A09A94',
-    selectedColor: '#C4956A',
+    color: '#999999',
+    selectedColor: '#1A1A1A',
     backgroundColor: '#FFFFFF',
     borderStyle: 'white',
     list: [
