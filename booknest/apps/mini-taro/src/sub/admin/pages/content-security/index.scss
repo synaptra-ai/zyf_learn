@@ -96,11 +96,11 @@
     border-radius: $border-radius-md;
 
     &--approve {
-      background: #10b981;
+      background: $color-success;
     }
 
     &--reject {
-      background: #ef4444;
+      background: $color-danger;
     }
   }
 
