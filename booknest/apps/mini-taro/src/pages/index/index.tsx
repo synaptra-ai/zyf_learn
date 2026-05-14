@@ -1,4 +1,4 @@
-import { Input, ScrollView, Text, View } from '@tarojs/components'
+import { Image, Input, ScrollView, Text, View } from '@tarojs/components'
 import Taro, { usePullDownRefresh, useReachBottom } from '@tarojs/taro'
 import { useEffect, useRef, useState } from 'react'
 import { BookCard } from '@/components/BookCard'
@@ -20,6 +20,26 @@ const getGreeting = () => {
   if (hour < 12) return '早上好'
   if (hour < 18) return '下午好'
   return '晚上好'
+}
+
+const getQuote = () => {
+  const quotes = [
+    '愿今天也有一本书陪你入眠',
+    '每一页都是一次安静的旅行',
+    '书是灵魂的暖光',
+    '在文字里找到属于自己的角落',
+    '阅读，是最温柔的独处',
+    '翻开书页，世界就安静了',
+    '有些故事，只在安静时才能读懂',
+    '让书成为你今晚的月光',
+  ]
+  return quotes[new Date().getDate() % quotes.length]
+}
+
+const formatDate = () => {
+  const d = new Date()
+  const weekDays = ['日', '一', '二', '三', '四', '五', '六']
+  return `${d.getMonth() + 1}月${d.getDate()}日 · 星期${weekDays[d.getDay()]}`
 }
 
 export default function IndexPage() {
@@ -149,8 +169,20 @@ export default function IndexPage() {
 
   return (
     <View className="page">
-      <View className="page__greeting">
-        <Text className="page__greeting-text">{getGreeting()}，{user?.nickname || '读者'}</Text>
+      {/* Hero 氛围区 — 生活场景背景 */}
+      <View className="hero">
+        <Image
+          className="hero__bg"
+          src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=800&h=500&fit=crop"
+          mode="aspectFill"
+        />
+        <View className="hero__overlay" />
+        <View className="hero__light" />
+        <View className="hero__content">
+          <Text className="hero__date">{formatDate()}</Text>
+          <Text className="hero__greeting">{getGreeting()}，{user?.nickname || '读者'}</Text>
+          <Text className="hero__quote">「{getQuote()}」</Text>
+        </View>
       </View>
 
       <View className="page__filters">
@@ -198,7 +230,7 @@ export default function IndexPage() {
       ) : booksLoading && page === 1 ? (
         <LoadingState text="加载中..." />
       ) : items.length > 0 ? (
-        <ScrollView scrollY className="book-scroll">
+        <View>
           {items.length >= 2 && (
             <View className="book-featured">
               <BookCard book={items[0]} variant="featured" />
@@ -221,7 +253,7 @@ export default function IndexPage() {
           {!hasMore && items.length > PAGE_SIZE && (
             <Text className="page__nomore">没有更多了</Text>
           )}
-        </ScrollView>
+        </View>
       ) : (
         <EmptyState
           title="还没有书籍"

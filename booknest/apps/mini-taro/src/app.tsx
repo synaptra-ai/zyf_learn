@@ -1,27 +1,18 @@
-import { PropsWithChildren, useEffect } from 'react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { View } from '@tarojs/components'
+import { useEffect } from 'react'
 import { useAuthStore } from '@/stores/auth-store'
 import { useWorkspaceStore } from '@/stores/workspace-store'
 import { useThemeStore } from '@/stores/theme-store'
 import './app.scss'
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      staleTime: 30_000,
-    },
-  },
-})
-
-function App({ children }: PropsWithChildren) {
+function App({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     useAuthStore.getState().hydrate()
     useWorkspaceStore.getState().hydrate()
     useThemeStore.getState().hydrate()
   }, [])
 
-  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  return <View>{children}</View>
 }
 
 export default App

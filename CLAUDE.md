@@ -240,12 +240,17 @@ Prisma enums: `BookStatus` (OWNED, READING, FINISHED, WISHLIST), `UserRole` (USE
 ## 小程序 (mini-taro/)
 
 ### 技术栈
-- Taro 4 + React 18 + TypeScript
+- Taro 4.2.0 + React 18.3.1 + TypeScript
 - Zustand 状态管理
-- TanStack React Query 5 数据获取
-- Sass (rpx + SCSS variables)
-- NutUI React (Taro 组件库，后续引入)
+- Sass (rpx + SCSS variables) — 暖白生活方式设计系统 (MUJI/Kinfolk 风格)
 - pnpm workspace 管理
+- 自定义 TabBar (glassmorphism 风格)
+
+### 构建配置
+- compiler: webpack5, prebundle 已禁用
+- webpack: concatenateModules(false) + minimize(true) — 避免 scope hoisting 命名冲突
+- project.config.json: es6/enhance 已启用, useIsolateContext 已启用
+- 构建: `pnpm dev:weapp` (开发) / `pnpm build:weapp` (生产)
 
 ### 关键文件 (src/)
 - `config/env.ts` — API 基础地址 (Taro defineConstants 注入)
@@ -264,9 +269,11 @@ Prisma enums: `BookStatus` (OWNED, READING, FINISHED, WISHLIST), `UserRole` (USE
 - `platform/index.ts` — 平台适配 (isWeapp/isH5)
 - `platform/weapp.ts` — 微信小程序特有能力
 - `platform/h5.ts` — H5 端降级实现
+- `custom-tab-bar/index.tsx` — 自定义 TabBar (毛玻璃效果)
+- `assets/variables.scss` — 暖白设计系统 token (颜色/阴影/间距/圆角)
 
 ### 页面路由 (主包)
-- `pages/index/index` — 书架首页 (TabBar)
+- `pages/index/index` — 书架首页 (TabBar, 英雄区+每日一句+推荐)
 - `pages/categories/index` — 分类管理 (TabBar)
 - `pages/me/index` — 我的 (TabBar)
 - `pages/login/index` — 登录 (微信一键登录 + 邮箱登录)
@@ -278,7 +285,10 @@ Prisma enums: `BookStatus` (OWNED, READING, FINISHED, WISHLIST), `UserRole` (USE
 - `sub/admin/pages/content-security/index` — 内容审核管理 (分包, ADMIN+)
 
 ### 迁移组件
-- BookCard、StatusBadge、EmptyState、LoadingState、SafeAreaButton、WorkspaceSwitcher
+- BookCard (含心情语录)、StatusBadge、EmptyState、LoadingState、SafeAreaButton、WorkspaceSwitcher
+
+### 已知问题
+- **iOS 真机白屏**: 微信 SummerCPProject 预编译器在合并 JS 到 app-service.js 时生成递归 `$` 函数导致栈溢出，模拟器正常。正在尝试通过 project.config.json 配置绕过。
 
 ### 项目结构
 ```
@@ -293,7 +303,7 @@ booknest/
 
 ### 构建产物
 - `apps/mini-taro/dist/` — 微信开发者工具导入此目录
-- 当前使用 mock 数据，未接入真实 API (Day 13) → 已接入真实 API
+- 已接入真实 API (Day 13 完成)
 - 注意：Taro 环境中 React Query useQuery 不触发查询，所有页面改用 useState + useEffect 直接调 API
 
 ## Tech Stack by Day
@@ -375,4 +385,5 @@ booknest/
 
 ### 待实施
 
-无 — Day 1-18 全部完成。
+- **iOS 真机白屏修复**: 微信 SummerCPProject 预编译器生成递归 `$` 函数，导致 `Maximum call stack size exceeded`。模拟器正常，真机白屏。正在尝试通过 project.config.json 配置绕过 (es6/enhance/useIsolateContext)。
+- Day 1-18 全部完成。

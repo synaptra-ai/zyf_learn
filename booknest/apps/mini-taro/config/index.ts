@@ -20,11 +20,18 @@ export default defineConfig(async (merge) => {
     defineConstants: {
       'process.env.TARO_APP_API_URL': JSON.stringify(process.env.TARO_APP_API_URL || 'http://192.168.31.244:4000'),
     },
-    copy: { patterns: [], options: {} },
+    copy: {
+      patterns: [
+        { from: 'project.config.json', to: 'dist/project.config.json' },
+      ],
+      options: {},
+    },
     framework: 'react',
     compiler: {
       type: 'webpack5',
-      prebundle: { enable: false },
+      prebundle: {
+        enable: false,
+      },
     },
     sass: {
       data: '@use "@/assets/variables.scss" as *;',
@@ -33,14 +40,12 @@ export default defineConfig(async (merge) => {
       '@': resolve(__dirname, '..', 'src'),
     },
     mini: {
-      experimental: {
-        compileMode: true,
+      miniCssExtractPluginOption: {
+        ignoreOrder: true,
       },
-      prerender: {
-        include: ['pages/index/index'],
-        mock: {
-          PRERENDER: true,
-        },
+      webpackChain(chain) {
+        chain.optimization.concatenateModules(false)
+        chain.optimization.minimize(true)
       },
       postcss: {
         pxtransform: { enable: true, config: {} },

@@ -62,7 +62,7 @@ export async function request<T, TBody = unknown>(options: RequestOptions<TBody>
   } catch (error) {
     const message = error instanceof Error ? error.message : '网络请求失败'
     if (options.showErrorToast !== false) {
-      Taro.showToast({ title: message, icon: 'none' })
+      Taro.showToast({ title: message, icon: 'none' }).catch(() => {})
     }
     throw error
   }

@@ -25,14 +25,15 @@ export default defineAppConfig({
   ],
   window: {
     backgroundTextStyle: 'light',
-    navigationBarBackgroundColor: '#FFFFFF',
+    navigationBarBackgroundColor: '#F7F3EE',
     navigationBarTitleText: 'BookNest',
     navigationBarTextStyle: 'black',
   },
   tabBar: {
-    color: '#999999',
-    selectedColor: '#1A1A1A',
-    backgroundColor: '#FFFFFF',
+    custom: true,
+    color: '#B0A79F',
+    selectedColor: '#8B7355',
+    backgroundColor: '#FDFBF8',
     borderStyle: 'white',
     list: [
       { pagePath: 'pages/index/index', text: '书架' },

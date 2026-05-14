@@ -6,16 +6,17 @@ page {
     'Microsoft YaHei', Arial, sans-serif;
   font-size: $font-size-md;
   color: $color-text-primary;
-  background-color: $color-bg-secondary;
+  background-color: $color-bg-primary;
   -webkit-font-smoothing: antialiased;
+  letter-spacing: 0.5rpx;
+  line-height: 1.6;
 }
 
 .container {
   padding: $spacing-lg;
 }
 
-// Global utility: card press feedback
 .card-press:active {
-  transform: scale(0.98);
-  transition: transform $transition-fast;
+  transform: translateY(-2rpx);
+  transition: transform $transition-normal;
 }

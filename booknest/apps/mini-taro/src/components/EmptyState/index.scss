@@ -3,37 +3,48 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 120rpx $spacing-xl;
+  padding: 200rpx $spacing-xl;
 
   &__icon {
-    font-size: 96rpx;
-    margin-bottom: $spacing-lg;
+    font-size: 80rpx;
+    margin-bottom: $spacing-xl;
+    opacity: 0.6;
   }
 
   &__title {
     font-size: $font-size-lg;
-    font-weight: 600;
+    font-weight: 400;
     color: $color-text-primary;
     margin-bottom: $spacing-sm;
+    letter-spacing: 2rpx;
   }
 
   &__desc {
     font-size: $font-size-sm;
     color: $color-text-muted;
     text-align: center;
-    line-height: 1.6;
+    line-height: 2;
+    letter-spacing: 1rpx;
+    font-weight: 300;
   }
 
   &__action {
-    margin-top: $spacing-xl;
-    padding: $spacing-sm $spacing-xl;
-    background: $color-text-primary;
-    border-radius: $border-radius-pill;
+    margin-top: $spacing-xxl;
+    padding: 16rpx 64rpx;
+    background: $color-primary;
+    border-radius: $border-radius-full;
+    transition: transform $transition-normal, opacity $transition-normal;
+
+    &:active {
+      transform: scale(0.95);
+      opacity: 0.9;
+    }
 
     &-text {
       color: $color-text-white;
       font-size: $font-size-md;
-      font-weight: 500;
+      font-weight: 400;
+      letter-spacing: 2rpx;
     }
   }
 }

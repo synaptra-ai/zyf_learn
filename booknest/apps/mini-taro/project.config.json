@@ -1,0 +1,17 @@
+{
+  "miniprogramRoot": "./",
+  "projectname": "booknest-mini",
+  "description": "BookNest Mini Program",
+  "appid": "touristappid",
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "enhance": true,
+    "compileHotReLoad": false,
+    "postcss": false,
+    "minified": false,
+    "nodeModules": false,
+    "useIsolateContext": true
+  },
+  "compileType": "miniprogram"
+}

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>BookNest</title>
+  <script>
+    window.addEventListener('unhandledrejection', function(e) {
+      console.error('UNHANDLED REJECTION:', JSON.stringify(e.reason, null, 2), e.reason);
+      e.preventDefault();
+    });
+    window.addEventListener('error', function(e) {
+      console.error('UNHANDLED ERROR:', e.error || e.message, e);
+    });
+  </script>
+</head>
+<body>
+  <div id="app"></div>
+</body>
+</html>

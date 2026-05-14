@@ -7,6 +7,7 @@ const API_MAP: Record<string, string> = {
 }
 
 export function getEnvVersion() {
+  if (Taro.getEnv() === Taro.ENV_TYPE.WEB) return 'develop'
   try {
     const accountInfo = Taro.getAccountInfoSync()
     return accountInfo?.miniProgram?.envVersion || 'develop'

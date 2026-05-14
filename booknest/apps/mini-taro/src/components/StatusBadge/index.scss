@@ -7,26 +7,27 @@
 
   &--owned {
     background: rgba(139, 115, 85, 0.08);
-    .status-badge__text { color: $color-primary-dark; }
+    .status-badge__text { color: $color-primary; }
   }
 
   &--reading {
-    background: rgba(212, 149, 106, 0.08);
-    .status-badge__text { color: $color-warning; }
+    background: rgba(196, 149, 106, 0.08);
+    .status-badge__text { color: $color-accent; }
   }
 
   &--finished {
-    background: rgba(107, 159, 125, 0.08);
+    background: rgba(123, 166, 141, 0.08);
     .status-badge__text { color: $color-success; }
   }
 
   &--wishlist {
-    background: rgba(153, 153, 153, 0.08);
+    background: rgba(139, 115, 85, 0.05);
     .status-badge__text { color: $color-text-secondary; }
   }
 
   &__text {
     font-size: $font-size-xs;
-    font-weight: 500;
+    font-weight: 400;
+    letter-spacing: 1rpx;
   }
 }

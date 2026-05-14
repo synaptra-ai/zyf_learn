@@ -1,73 +1,86 @@
 .book-card {
   position: relative;
-  border-radius: $border-radius-md;
+  border-radius: $border-radius-lg;
   background: $color-bg-card;
   overflow: hidden;
-  transition: transform $transition-fast;
+  transition: transform $transition-normal, box-shadow $transition-normal;
 
   &:active {
-    transform: scale(0.98);
+    transform: translateY(-2rpx);
+    box-shadow: $shadow-md;
   }
 
   &__cover-wrap {
     width: 100%;
     overflow: hidden;
+    position: relative;
   }
 
   &__cover {
     width: 100%;
     height: 100%;
     border-radius: 0;
-    background: $color-bg-tertiary;
+    background: $color-bg-warm;
 
     &--placeholder {
       display: flex;
       align-items: center;
       justify-content: center;
-      background: $color-bg-tertiary;
+      background: $color-bg-warm;
     }
 
     &-text {
-      font-weight: 700;
+      font-weight: 200;
       color: $color-text-muted;
+      letter-spacing: 6rpx;
     }
   }
 
+  // Featured card mood quote overlay
+  &__quote-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: $spacing-lg $spacing-md $spacing-md;
+    background: linear-gradient(transparent, rgba(44, 40, 37, 0.5));
+  }
+
+  &__mood {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 22rpx;
+    letter-spacing: 2rpx;
+    font-weight: 300;
+    line-height: 1.6;
+  }
+
   &__body {
-    padding: 12rpx 16rpx 16rpx;
+    padding: 18rpx 20rpx 22rpx;
   }
 
   &__title {
     display: -webkit-box;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    font-weight: 600;
+    font-weight: 300;
     color: $color-text-primary;
-    line-height: 1.4;
-  }
-
-  &__author {
-    display: block;
-    margin-top: 4rpx;
-    font-size: $font-size-xs;
-    color: $color-text-muted;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    line-height: 1.7;
+    letter-spacing: 1rpx;
   }
 
   &__badge {
     position: absolute;
-    top: 12rpx;
-    right: 12rpx;
+    top: 16rpx;
+    right: 16rpx;
   }
 
-  // featured: 大卡片
+  // featured: 大卡片 — 生活方式海报
   &--featured {
     box-shadow: $shadow-card;
+    flex: 1;
 
     .book-card__cover-wrap {
-      height: 380rpx;
+      height: 400rpx;
     }
 
     .book-card__cover--placeholder .book-card__cover-text {
@@ -77,20 +90,24 @@
     .book-card__title {
       -webkit-line-clamp: 2;
       font-size: 28rpx;
-      min-height: 78rpx;
+      min-height: 95rpx;
+    }
+
+    .book-card__body {
+      padding: 20rpx 24rpx 24rpx;
     }
   }
 
   // grid: 三列小卡片
   &--grid {
-    border: 1rpx solid $color-bg-tertiary;
+    box-shadow: $shadow-sm;
 
     .book-card__cover-wrap {
-      height: 260rpx;
+      height: 280rpx;
     }
 
     .book-card__cover--placeholder .book-card__cover-text {
-      font-size: 48rpx;
+      font-size: 44rpx;
     }
 
     .book-card__title {
