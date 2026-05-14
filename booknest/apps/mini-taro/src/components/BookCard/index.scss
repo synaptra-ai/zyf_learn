@@ -1,49 +1,55 @@
 .book-card {
-  display: flex;
-  padding: $spacing-md;
+  position: relative;
   border-radius: $border-radius-lg;
-  background: $color-bg-primary;
-  box-shadow: $shadow-md;
-  margin-bottom: $spacing-md;
+  background: $color-bg-card;
+  box-shadow: $shadow-card;
+  overflow: hidden;
+  transition: transform $transition-fast;
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &__cover-wrap {
+    width: 100%;
+    height: 320rpx;
+    overflow: hidden;
+  }
 
   &__cover {
-    width: 128rpx;
-    height: 176rpx;
-    border-radius: $border-radius-md;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
     background: $color-bg-tertiary;
-    flex-shrink: 0;
 
     &--placeholder {
       display: flex;
       align-items: center;
       justify-content: center;
-      background: $color-primary;
+      background: linear-gradient(135deg, $color-primary-light, $color-primary);
     }
 
     &-text {
-      font-size: 56rpx;
+      font-size: 80rpx;
       font-weight: 700;
       color: $color-text-white;
     }
   }
 
   &__body {
-    flex: 1;
-    margin-left: $spacing-md;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    padding: 16rpx 20rpx 24rpx;
   }
 
   &__title {
-    display: block;
-    font-size: $font-size-lg;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    font-size: 28rpx;
     font-weight: 600;
     color: $color-text-primary;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    line-height: 1.4;
+    min-height: 78rpx;
   }
 
   &__author {
@@ -56,15 +62,9 @@
     white-space: nowrap;
   }
 
-  &__meta {
-    display: flex;
-    align-items: center;
-    margin-top: 12rpx;
-    gap: $spacing-sm;
-  }
-
-  &__category {
-    font-size: $font-size-xs;
-    font-weight: 500;
+  &__badge {
+    position: absolute;
+    top: 16rpx;
+    right: 16rpx;
   }
 }

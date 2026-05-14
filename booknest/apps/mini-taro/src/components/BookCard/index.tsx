@@ -17,27 +17,26 @@ export const BookCard = React.memo(function BookCard({ book }: BookCardProps) {
 
   return (
     <View className="book-card" onClick={handleOpen} compileMode>
-      {book.coverUrl ? (
-        <Image className="book-card__cover" src={getCoverThumbUrl(book.coverUrl)} mode="aspectFill" lazyLoad />
-      ) : (
-        <View className="book-card__cover book-card__cover--placeholder">
-          <Text className="book-card__cover-text">{book.title[0]}</Text>
-        </View>
-      )}
+      <View className="book-card__cover-wrap">
+        {book.coverUrl ? (
+          <Image
+            className="book-card__cover"
+            src={getCoverThumbUrl(book.coverUrl)}
+            mode="aspectFill"
+            lazyLoad
+          />
+        ) : (
+          <View className="book-card__cover book-card__cover--placeholder">
+            <Text className="book-card__cover-text">{book.title[0]}</Text>
+          </View>
+        )}
+      </View>
       <View className="book-card__body">
         <Text className="book-card__title">{book.title}</Text>
         <Text className="book-card__author">{book.author}</Text>
-        <View className="book-card__meta">
-          <StatusBadge status={book.status} />
-          {book.category && (
-            <Text
-              className="book-card__category"
-              style={{ color: book.category.color }}
-            >
-              {book.category.name}
-            </Text>
-          )}
-        </View>
+      </View>
+      <View className="book-card__badge">
+        <StatusBadge status={book.status} />
       </View>
     </View>
   )
