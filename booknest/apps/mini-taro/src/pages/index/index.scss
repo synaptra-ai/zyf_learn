@@ -59,23 +59,24 @@
   }
 }
 
-.book-grid {
+.book-scroll {
+  max-height: calc(100vh - 340rpx);
+}
+
+.book-featured {
+  display: flex;
+  gap: $spacing-sm;
   padding: $spacing-sm $spacing-md;
+}
+
+.book-grid {
   display: flex;
   flex-wrap: wrap;
   gap: $spacing-sm;
-  max-height: calc(100vh - 340rpx);
+  padding: $spacing-sm $spacing-md;
 
-  // featured cards: 2 columns
-  .book-card--featured {
-    width: calc(50% - 8rpx);
-    flex-shrink: 0;
-  }
-
-  // grid cards: 3 columns
-  .book-card--grid {
+  .book-card {
     width: calc(33.33% - 12rpx);
-    flex-shrink: 0;
   }
 }
 

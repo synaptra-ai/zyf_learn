@@ -196,10 +196,25 @@ export default function IndexPage() {
       ) : booksLoading && page === 1 ? (
         <LoadingState text="加载中..." />
       ) : items.length > 0 ? (
-        <ScrollView scrollY className="book-grid">
-          {items.map((book, idx) => (
-            <BookCard key={book.id} book={book} variant={idx < 2 ? 'featured' : 'grid'} />
-          ))}
+        <ScrollView scrollY className="book-scroll">
+          {items.length >= 2 && (
+            <View className="book-featured">
+              <BookCard book={items[0]} variant="featured" />
+              <BookCard book={items[1]} variant="featured" />
+            </View>
+          )}
+          {items.length > 2 && (
+            <View className="book-grid">
+              {items.slice(2).map((book) => (
+                <BookCard key={book.id} book={book} variant="grid" />
+              ))}
+            </View>
+          )}
+          {items.length === 1 && (
+            <View className="book-featured">
+              <BookCard book={items[0]} variant="featured" />
+            </View>
+          )}
           {booksLoading && <LoadingState text="加载更多..." />}
           {!hasMore && items.length > PAGE_SIZE && (
             <Text className="page__nomore">没有更多了</Text>
