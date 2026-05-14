@@ -3,27 +3,19 @@
   background: $color-bg-secondary;
   padding-bottom: 140rpx;
 
-  &__header {
-    padding: $spacing-lg $spacing-lg $spacing-md;
+  &__greeting {
+    padding: $spacing-xl $spacing-lg $spacing-sm;
     background: $color-bg-primary;
   }
 
-  &__title {
-    display: block;
+  &__greeting-text {
     font-size: $font-size-xxl;
     font-weight: 700;
     color: $color-text-primary;
   }
 
-  &__subtitle {
-    display: block;
-    margin-top: 8rpx;
-    font-size: $font-size-sm;
-    color: $color-text-muted;
-  }
-
   &__filters {
-    padding: $spacing-sm $spacing-lg;
+    padding: $spacing-sm $spacing-lg $spacing-md;
     background: $color-bg-primary;
   }
 
@@ -31,7 +23,7 @@
     width: 100%;
     height: 72rpx;
     background: $color-bg-tertiary;
-    border-radius: $border-radius-lg;
+    border-radius: $border-radius-pill;
     padding: 0 $spacing-md;
     font-size: $font-size-md;
     margin-bottom: $spacing-sm;
@@ -39,7 +31,7 @@
 
   &__status-bar {
     white-space: nowrap;
-    margin-bottom: $spacing-sm;
+    margin-bottom: $spacing-xs;
   }
 
   &__status-chip {
@@ -50,6 +42,7 @@
     background: $color-bg-tertiary;
     font-size: $font-size-sm;
     color: $color-text-secondary;
+    transition: all $transition-fast;
 
     &--active {
       background: $color-primary;
@@ -66,9 +59,17 @@
   }
 }
 
-.book-list {
-  padding: $spacing-md $spacing-lg;
-  max-height: calc(100vh - 320rpx);
+.book-grid {
+  padding: $spacing-sm $spacing-md;
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+  max-height: calc(100vh - 340rpx);
+
+  .book-card {
+    width: calc(50% - 8rpx);
+    flex-shrink: 0;
+  }
 }
 
 .fab {
@@ -77,12 +78,12 @@
   bottom: 180rpx;
   width: 112rpx;
   height: 112rpx;
-  border-radius: 50%;
+  border-radius: $border-radius-pill;
   background: $color-primary;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: $shadow-lg;
+  box-shadow: $shadow-fab;
   z-index: 99;
 
   &__text {

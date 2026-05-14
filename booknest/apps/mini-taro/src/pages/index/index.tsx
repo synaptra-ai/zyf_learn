@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react'
 import { BookCard } from '@/components/BookCard'
 import { EmptyState } from '@/components/EmptyState'
 import { LoadingState } from '@/components/LoadingState'
-import { WorkspaceSwitcher } from '@/components/WorkspaceSwitcher'
 import { listBooks } from '@/services/books'
 import { listCategories } from '@/services/categories'
 import { useAuthStore } from '@/stores/auth-store'
@@ -15,8 +14,17 @@ import './index.scss'
 
 const PAGE_SIZE = 10
 
+const getGreeting = () => {
+  const hour = new Date().getHours()
+  if (hour < 6) return '夜深了'
+  if (hour < 12) return '早上好'
+  if (hour < 18) return '下午好'
+  return '晚上好'
+}
+
 export default function IndexPage() {
   const token = useAuthStore((s) => s.token)
+  const user = useAuthStore((s) => s.user)
   const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId)
   const setActiveWorkspace = useWorkspaceStore((s) => s.setActiveWorkspace)
 
@@ -124,9 +132,8 @@ export default function IndexPage() {
   if (!token) {
     return (
       <View className="page">
-        <View className="page__header">
-          <Text className="page__title">BookNest Mini</Text>
-          <Text className="page__subtitle">你的团队书架</Text>
+        <View className="page__greeting">
+          <Text className="page__greeting-text">BookNest Mini</Text>
         </View>
         <EmptyState
           title="请先登录"
@@ -140,9 +147,8 @@ export default function IndexPage() {
 
   return (
     <View className="page">
-      <View className="page__header">
-        <Text className="page__title">BookNest Mini</Text>
-        <WorkspaceSwitcher />
+      <View className="page__greeting">
+        <Text className="page__greeting-text">{getGreeting()}，{user?.nickname || '读者'}</Text>
       </View>
 
       <View className="page__filters">
@@ -190,7 +196,7 @@ export default function IndexPage() {
       ) : booksLoading && page === 1 ? (
         <LoadingState text="加载中..." />
       ) : items.length > 0 ? (
-        <ScrollView scrollY className="book-list">
+        <ScrollView scrollY className="book-grid">
           {items.map((book) => (
             <BookCard key={book.id} book={book} />
           ))}
