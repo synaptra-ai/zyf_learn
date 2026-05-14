@@ -12,7 +12,7 @@
     display: block;
     font-size: 56rpx;
     font-weight: 800;
-    color: $color-primary;
+    color: $color-text-primary;
   }
 
   &__subtitle {
@@ -39,7 +39,7 @@
     height: 88rpx;
     padding: 0 $spacing-md;
     background: $color-bg-secondary;
-    border: 2rpx solid #e2e8f0;
+    border: 2rpx solid $color-bg-tertiary;
     border-radius: $border-radius-md;
     font-size: $font-size-md;
     box-sizing: border-box;
@@ -48,7 +48,7 @@
   &__btn {
     margin-top: $spacing-xl;
     height: 88rpx;
-    background: $color-primary;
+    background: $color-text-primary;
     border-radius: $border-radius-lg;
     display: flex;
     align-items: center;
@@ -58,6 +58,23 @@
       color: $color-text-white;
       font-size: $font-size-lg;
       font-weight: 600;
+    }
+  }
+
+  &__wechat-btn {
+    margin-top: $spacing-md;
+    height: 88rpx;
+    background: $color-bg-primary;
+    border: 2rpx solid $color-text-primary;
+    border-radius: $border-radius-lg;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &-text {
+      color: $color-text-primary;
+      font-size: $font-size-lg;
+      font-weight: 500;
     }
   }
 }

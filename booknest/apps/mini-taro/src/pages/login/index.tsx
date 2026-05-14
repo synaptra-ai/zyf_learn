@@ -1,4 +1,4 @@
-import { Button, Input, Text, View } from '@tarojs/components'
+import { Input, Text, View } from '@tarojs/components'
 import Taro, { useRouter } from '@tarojs/taro'
 import { useState } from 'react'
 import { loginByWechat } from '@/services/auth'
@@ -98,14 +98,12 @@ export default function LoginPage() {
           <Text className="login__btn-text">{loading ? '登录中...' : '邮箱登录'}</Text>
         </View>
 
-        <Button
+        <View
           className="login__wechat-btn"
-          type="primary"
           onClick={handleWechatLogin}
-          disabled={loading}
         >
-          微信一键登录
-        </Button>
+          <Text className="login__wechat-btn-text">{loading ? '登录中...' : '微信一键登录'}</Text>
+        </View>
       </View>
     </View>
   )
