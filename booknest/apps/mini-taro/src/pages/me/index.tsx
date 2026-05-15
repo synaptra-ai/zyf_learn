@@ -6,6 +6,7 @@ import { useWorkspaceStore } from '@/stores/workspace-store'
 import { recordCustomerServiceEvent } from '@/services/customer-service'
 import { getAchievements, type Achievement } from '@/services/achievement'
 import { getReadingSummary } from '@/services/reading'
+import { getReadingReport } from '@/services/social'
 import { WorkspaceSwitcher } from '@/components/WorkspaceSwitcher'
 import './index.scss'
 
@@ -17,6 +18,7 @@ export default function MePage() {
   const [achievements, setAchievements] = useState<Achievement[]>([])
   const [achievementStats, setAchievementStats] = useState({ unlocked: 0, total: 0 })
   const [streakDays, setStreakDays] = useState(0)
+  const [report, setReport] = useState<{ booksFinished: number; totalMinutes: number; achievements: number; period: string } | null>(null)
 
   useEffect(() => {
     if (activeWorkspaceId) {
@@ -33,6 +35,7 @@ export default function MePage() {
         setAchievementStats(res.stats)
       }).catch(() => {})
       getReadingSummary().then((res) => setStreakDays(res.streakDays)).catch(() => {})
+      getReadingReport().then((r) => setReport(r)).catch(() => {})
     }
   }, [activeWorkspaceId])
 
@@ -45,6 +48,19 @@ export default function MePage() {
     await recordCustomerServiceEvent({ scene: 'GENERAL_INQUIRY' })
     Taro.showToast({ title: '客服上下文已记录', icon: 'success' })
   }
+
+  Taro.useShareAppMessage(() => {
+    if (report) {
+      return {
+        title: `我的${report.period}阅读报告 — ${report.booksFinished}本书 ${report.totalMinutes}分钟`,
+        path: '/pages/index/index',
+      }
+    }
+    return {
+      title: 'BookNest — 我的阅读空间',
+      path: '/pages/index/index',
+    }
+  })
 
   return (
     <View className="me">
@@ -100,6 +116,14 @@ export default function MePage() {
       </View>
 
       <View className="me__menu">
+        <View className="me__menu-item" onClick={() => {
+          if (report) {
+            Taro.showShareMenu({ withShareTicket: true })
+          }
+        }}>
+          <Text className="me__menu-text">分享阅读报告</Text>
+          <Text className="me__menu-arrow">›</Text>
+        </View>
         <View
           className="me__menu-item"
           onClick={() => Taro.navigateTo({ url: '/sub/activities/pages/list/index' })}

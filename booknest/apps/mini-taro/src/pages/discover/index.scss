@@ -23,4 +23,26 @@
     margin-top: $spacing-xs;
     display: block;
   }
+
+  &__section {
+    margin: $spacing-md $spacing-lg 0;
+  }
+
+  &__section-title {
+    font-size: $font-size-lg;
+    font-weight: 500;
+    color: $color-text-primary;
+    margin-bottom: $spacing-sm;
+    display: block;
+  }
+
+  &__feed-item {
+    padding: $spacing-sm 0;
+    border-bottom: 1rpx solid $color-bg-tertiary;
+  }
+
+  &__feed-text {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+  }
 }

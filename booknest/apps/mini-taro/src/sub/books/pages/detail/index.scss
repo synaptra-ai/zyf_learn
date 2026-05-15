@@ -126,6 +126,19 @@
       color: $color-text-secondary;
       line-height: 1.6;
     }
+
+    &-like {
+      display: flex;
+      align-items: center;
+      margin-top: $spacing-sm;
+      padding: 8rpx 0;
+    }
+
+    &-like-icon {
+      font-size: 40rpx;
+      color: $color-text-muted;
+      cursor: pointer;
+    }
   }
 
   &__empty-reviews {

@@ -3,6 +3,7 @@ import Taro, { usePullDownRefresh } from '@tarojs/taro'
 import { useEffect, useState } from 'react'
 import { RecommendSection } from '@/components/RecommendSection'
 import { getDiscoverPage, type DiscoverData } from '@/services/recommendation'
+import { getFeed, type FeedItem } from '@/services/social'
 import { useAuthStore } from '@/stores/auth-store'
 import { useWorkspaceStore } from '@/stores/workspace-store'
 import { LoadingState } from '@/components/LoadingState'
@@ -14,6 +15,7 @@ export default function DiscoverPage() {
   const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId)
 
   const [data, setData] = useState<DiscoverData | null>(null)
+  const [feedItems, setFeedItems] = useState<FeedItem[]>([])
   const [loading, setLoading] = useState(true)
 
   const fetchData = async () => {
@@ -22,6 +24,7 @@ export default function DiscoverPage() {
     try {
       const res = await getDiscoverPage()
       setData(res)
+      getFeed(1, 10).then((res) => setFeedItems(res.items)).catch(() => {})
     } catch {} finally {
       setLoading(false)
     }
@@ -88,6 +91,24 @@ export default function DiscoverPage() {
           books={pick.books}
         />
       ))}
+
+      {feedItems.length > 0 && (
+        <View className="discover__section">
+          <Text className="discover__section-title">读书圈</Text>
+          {feedItems.map((item) => {
+            let text = ''
+            if (item.type === 'ACHIEVEMENT_UNLOCKED') text = `${item.user.nickname} 解锁了成就「${item.content.name}」`
+            else if (item.type === 'BOOK_FINISHED') text = `${item.user.nickname} 读完了一本书`
+            else if (item.type === 'REVIEW_POSTED') text = `${item.user.nickname} 写了一篇书评`
+            else if (item.type === 'GOAL_MET') text = `${item.user.nickname} 达成了今日阅读目标`
+            return (
+              <View key={item.id} className="discover__feed-item">
+                <Text className="discover__feed-text">{text}</Text>
+              </View>
+            )
+          })}
+        </View>
+      )}
     </View>
   )
 }

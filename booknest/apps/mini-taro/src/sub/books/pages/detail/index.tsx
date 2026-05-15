@@ -5,6 +5,7 @@ import { StatusBadge } from '@/components/StatusBadge'
 import { LoadingState } from '@/components/LoadingState'
 import { getBook, deleteBook } from '@/services/books'
 import { listReviews, createReview, type Review } from '@/services/reviews'
+import { toggleReviewLike } from '@/services/review-like'
 import { listWorkspaces } from '@/services/workspaces'
 import { useAuthStore } from '@/stores/auth-store'
 import { useWorkspaceStore } from '@/stores/workspace-store'
@@ -157,6 +158,11 @@ export default function BookDetailPage() {
                   <Text className="detail__review-stars">{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}</Text>
                 </View>
                 <Text className="detail__review-comment">{r.comment}</Text>
+                <View className="detail__review-like" onClick={() => {
+                  toggleReviewLike(r.id).then(() => loadData()).catch(() => {})
+                }}>
+                  <Text className="detail__review-like-icon">♡</Text>
+                </View>
               </View>
             ))}
           </View>
