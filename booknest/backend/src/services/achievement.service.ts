@@ -1,4 +1,5 @@
 import prisma from '../lib/prisma'
+import { socialService } from './social.service'
 
 interface AchievementDef {
   id: string
@@ -115,6 +116,7 @@ export const achievementService = {
           data: { achievementId: a.id, userId, workspaceId },
         })
         newlyUnlocked.push({ id: a.id, name: a.name, icon: a.icon })
+        socialService.createFeedItem(userId, workspaceId, 'ACHIEVEMENT_UNLOCKED', { achievementId: a.id, name: a.name, icon: a.icon }).catch(() => {})
       }
     }
 

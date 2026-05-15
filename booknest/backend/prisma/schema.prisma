@@ -83,6 +83,8 @@ model User {
   dailySummaries     DailyReadingSummary[]
   readingGoals       ReadingGoal[]
   achievements        UserAchievement[]
+  feedItems           ActivityFeedItem[]
+  reviewLikes         ReviewLike[]
 
   @@map("users")
 }
@@ -107,6 +109,7 @@ model Workspace {
   dailySummaries     DailyReadingSummary[]
   readingGoals       ReadingGoal[]
   achievements        UserAchievement[]
+  feedItems           ActivityFeedItem[]
 
   @@map("workspaces")
 }
@@ -230,6 +233,8 @@ model Review {
   book   Book   @relation(fields: [bookId], references: [id], onDelete: Cascade)
   userId String @map("user_id")
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  likes ReviewLike[]
 
   @@map("reviews")
 }
@@ -465,4 +470,34 @@ model CustomerServiceEvent {
 
   @@index([userId, scene])
   @@map("customer_service_events")
+}
+
+model ActivityFeedItem {
+  id        String   @id @default(cuid())
+  type      String   @map("type")
+  content   String   @map("content")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  userId      String @map("user_id")
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  workspaceId String    @map("workspace_id")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, createdAt])
+  @@map("activity_feed_items")
+}
+
+model ReviewLike {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @map("created_at")
+
+  userId   String @map("user_id")
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  reviewId String @map("review_id")
+  review   Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, reviewId])
+  @@map("review_likes")
 }
