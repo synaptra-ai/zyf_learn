@@ -82,6 +82,7 @@ model User {
   readingSessions    ReadingSession[]
   dailySummaries     DailyReadingSummary[]
   readingGoals       ReadingGoal[]
+  achievements        UserAchievement[]
 
   @@map("users")
 }
@@ -105,6 +106,7 @@ model Workspace {
   readingSessions    ReadingSession[]
   dailySummaries     DailyReadingSummary[]
   readingGoals       ReadingGoal[]
+  achievements        UserAchievement[]
 
   @@map("workspaces")
 }
@@ -286,6 +288,22 @@ model ReadingGoal {
 
   @@unique([userId, workspaceId])
   @@map("reading_goals")
+}
+
+model UserAchievement {
+  id            String   @id @default(cuid())
+  achievementId String   @map("achievement_id")
+  unlockedAt    DateTime @default(now()) @map("unlocked_at")
+
+  userId      String @map("user_id")
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  workspaceId String    @map("workspace_id")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, workspaceId, achievementId])
+  @@index([workspaceId, userId])
+  @@map("user_achievements")
 }
 
 model Activity {

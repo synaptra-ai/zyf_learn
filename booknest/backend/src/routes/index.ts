@@ -10,6 +10,7 @@ import paymentRoutes from './payment.routes'
 import importRoutes from './import.routes'
 import readingRoutes from './reading.routes'
 import recommendationRoutes from './recommendation.routes'
+import achievementRoutes from './achievement.routes'
 import { wechatRouter } from './wechat.routes'
 import { wechatPayRouter } from './wechat-pay.routes'
 import { subscriptionRouter } from './subscription.routes'
@@ -31,6 +32,7 @@ router.use('/payments', paymentRoutes)
 router.use('/imports', importRoutes)
 router.use('/reading', readingRoutes)
 router.use('/recommendations', recommendationRoutes)
+router.use('/achievements', achievementRoutes)
 router.use('/wechat', wechatRouter)
 router.use('/wechat-pay', wechatPayRouter)
 router.use('/subscriptions', subscriptionRouter)
