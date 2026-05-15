@@ -35,6 +35,9 @@ test-results/
 *.swp
 *.swo
 
+# Superpowers plugin cache
+.superpowers/
+
 # Prisma
 prisma/migrations/
 
