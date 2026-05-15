@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import { useAuthStore } from '@/stores/auth-store'
 import { useWorkspaceStore } from '@/stores/workspace-store'
 import { recordCustomerServiceEvent } from '@/services/customer-service'
+import { getAchievements, type Achievement } from '@/services/achievement'
+import { getReadingSummary } from '@/services/reading'
 import { WorkspaceSwitcher } from '@/components/WorkspaceSwitcher'
 import './index.scss'
 
@@ -12,6 +14,9 @@ export default function MePage() {
   const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId)
   const [bookCount, setBookCount] = useState(0)
   const [finishedCount, setFinishedCount] = useState(0)
+  const [achievements, setAchievements] = useState<Achievement[]>([])
+  const [achievementStats, setAchievementStats] = useState({ unlocked: 0, total: 0 })
+  const [streakDays, setStreakDays] = useState(0)
 
   useEffect(() => {
     if (activeWorkspaceId) {
@@ -23,6 +28,11 @@ export default function MePage() {
           .then((res) => setFinishedCount(res.total || 0))
           .catch(() => {})
       })
+      getAchievements().then((res) => {
+        setAchievements(res.achievements)
+        setAchievementStats(res.stats)
+      }).catch(() => {})
+      getReadingSummary().then((res) => setStreakDays(res.streakDays)).catch(() => {})
     }
   }, [activeWorkspaceId])
 
@@ -58,8 +68,34 @@ export default function MePage() {
           <Text className="me__stat-label">已读</Text>
         </View>
         <View className="me__stat">
-          <Text className="me__stat-num">0</Text>
+          <Text className="me__stat-num">{streakDays}</Text>
           <Text className="me__stat-label">连续天数</Text>
+        </View>
+      </View>
+
+      <View className="me__achievements">
+        <View className="me__achievements-header">
+          <Text className="me__achievements-title">成就徽章</Text>
+          <Text className="me__achievements-count">{achievementStats.unlocked}/{achievementStats.total}</Text>
+        </View>
+        <View className="me__achievements-progress">
+          <View
+            className="me__achievements-progress-fill"
+            style={{ width: `${achievementStats.total > 0 ? (achievementStats.unlocked / achievementStats.total) * 100 : 0}%` }}
+          />
+        </View>
+        <View className="me__badges">
+          {achievements.map((a) => (
+            <View
+              key={a.id}
+              className={`me__badge ${a.unlocked ? 'me__badge--unlocked' : 'me__badge--locked'}`}
+            >
+              <View className="me__badge-icon">
+                <Text className={`me__badge-emoji ${a.unlocked ? '' : 'me__badge-emoji--locked'}`}>{a.icon}</Text>
+              </View>
+              <Text className="me__badge-name">{a.name}</Text>
+            </View>
+          ))}
         </View>
       </View>
 
