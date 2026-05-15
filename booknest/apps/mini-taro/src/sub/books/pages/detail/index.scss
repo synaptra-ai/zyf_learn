@@ -75,6 +75,13 @@
     padding: $spacing-lg;
     background: $color-bg-card;
 
+    &-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: $spacing-md;
+    }
+
     &-title {
       display: block;
       font-size: $font-size-lg;
@@ -82,6 +89,12 @@
       color: $color-text-primary;
       margin-bottom: $spacing-md;
     }
+  }
+
+  &__add-btn {
+    font-size: $font-size-sm;
+    color: $color-primary;
+    font-weight: 500;
   }
 
   &__desc {
@@ -251,5 +264,90 @@
       font-size: $font-size-lg;
       font-weight: 600;
     }
+  }
+
+  &__note-form {
+    margin-bottom: $spacing-md;
+  }
+
+  &__note-input {
+    width: 100%;
+    height: 160rpx;
+    padding: $spacing-md;
+    background: $color-bg-secondary;
+    border-radius: $border-radius-md;
+    font-size: $font-size-md;
+    box-sizing: border-box;
+    margin-bottom: $spacing-sm;
+  }
+
+  &__note-form-row {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+  }
+
+  &__note-page-input {
+    flex: 1;
+    height: 72rpx;
+    padding: 0 $spacing-md;
+    background: $color-bg-secondary;
+    border-radius: $border-radius-md;
+    font-size: $font-size-sm;
+  }
+
+  &__note-submit {
+    padding: 0 $spacing-lg;
+    height: 72rpx;
+    background: $color-text-primary;
+    border-radius: $border-radius-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__note-submit-text {
+    color: $color-text-white;
+    font-size: $font-size-sm;
+    font-weight: 600;
+  }
+
+  &__note-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: $spacing-md 0;
+    border-bottom: 1rpx solid $color-bg-tertiary;
+  }
+
+  &__note-content {
+    flex: 1;
+    font-size: $font-size-md;
+    color: $color-text-secondary;
+  }
+
+  &__note-page {
+    display: inline-block;
+    margin-left: $spacing-sm;
+    font-size: $font-size-xs;
+    color: $color-primary;
+    background: rgba($color-primary, 0.1);
+    padding: 2rpx 12rpx;
+    border-radius: $border-radius-sm;
+  }
+
+  &__note-delete {
+    font-size: $font-size-sm;
+    color: $color-danger;
+    margin-left: $spacing-md;
+    flex-shrink: 0;
+  }
+
+  &__empty-text {
+    display: block;
+    text-align: center;
+    padding: $spacing-xl 0;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
   }
 }

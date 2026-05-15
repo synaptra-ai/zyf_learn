@@ -13,11 +13,13 @@ import recommendationRoutes from './recommendation.routes'
 import achievementRoutes from './achievement.routes'
 import socialRoutes from './social.routes'
 import reviewLikeRoutes from './review-like.routes'
+import noteRoutes from './note.routes'
 import { wechatRouter } from './wechat.routes'
 import { wechatPayRouter } from './wechat-pay.routes'
 import { subscriptionRouter } from './subscription.routes'
 import { customerServiceRouter } from './customer-service.routes'
 import { adminRouter } from './admin.routes'
+import statsDashboardRoutes from './stats-dashboard.routes'
 import { exportBooks } from '../controllers/export.controller'
 import { authenticate } from '../middleware/auth'
 import { resolveWorkspace } from '../middleware/workspace'
@@ -37,11 +39,13 @@ router.use('/recommendations', recommendationRoutes)
 router.use('/achievements', achievementRoutes)
 router.use('/social', socialRoutes)
 router.use('/reviews', reviewLikeRoutes)
+router.use('/notes', noteRoutes)
 router.use('/wechat', wechatRouter)
 router.use('/wechat-pay', wechatPayRouter)
 router.use('/subscriptions', subscriptionRouter)
 router.use('/customer-service', customerServiceRouter)
 router.use('/admin', adminRouter)
+router.use('/stats-dashboard', statsDashboardRoutes)
 router.get('/exports/books', authenticate, resolveWorkspace, exportBooks)
 
 export default router

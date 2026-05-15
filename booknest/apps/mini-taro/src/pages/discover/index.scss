@@ -1,9 +1,10 @@
 @import '@/assets/variables';
 
 .discover {
-  min-height: 100vh;
   background: $color-bg-primary;
-  padding-bottom: calc(180rpx + env(safe-area-inset-bottom));
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
 
   &__header {
     padding: $spacing-xl $spacing-lg $spacing-md;

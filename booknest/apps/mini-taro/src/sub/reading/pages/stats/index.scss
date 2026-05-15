@@ -1,0 +1,190 @@
+@import '@/assets/variables';
+
+.stats {
+  min-height: 100vh;
+  background: $color-bg-secondary;
+  padding: $spacing-lg;
+
+  &__overview {
+    display: flex;
+    gap: $spacing-sm;
+    margin-bottom: $spacing-xl;
+  }
+
+  &__overview-card {
+    flex: 1;
+    background: $color-bg-card;
+    border-radius: $border-radius-lg;
+    padding: $spacing-lg $spacing-sm;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: $shadow-sm;
+  }
+
+  &__overview-num {
+    font-size: $font-size-xxl;
+    font-weight: 700;
+    color: $color-primary;
+  }
+
+  &__overview-label {
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+    margin-top: 4rpx;
+  }
+
+  &__section {
+    background: $color-bg-card;
+    border-radius: $border-radius-lg;
+    padding: $spacing-lg;
+    margin-bottom: $spacing-md;
+    box-shadow: $shadow-sm;
+  }
+
+  &__section-title {
+    font-size: $font-size-lg;
+    font-weight: 600;
+    color: $color-text-primary;
+    margin-bottom: $spacing-md;
+    display: block;
+  }
+
+  &__month-row {
+    display: flex;
+    gap: $spacing-lg;
+  }
+
+  &__month-item {
+    flex: 1;
+    text-align: center;
+  }
+
+  &__month-num {
+    font-size: $font-size-xl;
+    font-weight: 700;
+    color: $color-text-primary;
+    display: block;
+  }
+
+  &__month-label {
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+  }
+
+  &__bar-chart {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  &__bar-row {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+
+  &__bar-label {
+    width: 100rpx;
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    flex-shrink: 0;
+  }
+
+  &__bar-track {
+    flex: 1;
+    height: 24rpx;
+    background: $color-bg-tertiary;
+    border-radius: 12rpx;
+    overflow: hidden;
+  }
+
+  &__bar-fill {
+    height: 100%;
+    border-radius: 12rpx;
+    transition: width 0.3s ease;
+    min-width: 8rpx;
+  }
+
+  &__bar-count {
+    width: 48rpx;
+    text-align: right;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+  }
+
+  &__categories {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  &__cat-row {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+
+  &__cat-dot {
+    width: 20rpx;
+    height: 20rpx;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  &__cat-name {
+    width: 120rpx;
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    flex-shrink: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__cat-bar-track {
+    flex: 1;
+    height: 20rpx;
+    background: $color-bg-tertiary;
+    border-radius: 10rpx;
+    overflow: hidden;
+  }
+
+  &__cat-bar-fill {
+    height: 100%;
+    border-radius: 10rpx;
+    min-width: 6rpx;
+  }
+
+  &__cat-count {
+    width: 60rpx;
+    text-align: right;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+  }
+
+  &__heatmap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4rpx;
+  }
+
+  &__heatmap-cell {
+    width: 20rpx;
+    height: 20rpx;
+    border-radius: 4rpx;
+  }
+
+  &__heatmap-legend {
+    display: flex;
+    align-items: center;
+    gap: 6rpx;
+    margin-top: $spacing-sm;
+    justify-content: flex-end;
+  }
+
+  &__heatmap-legend-text {
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+  }
+}

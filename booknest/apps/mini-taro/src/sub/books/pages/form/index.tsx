@@ -87,7 +87,9 @@ export default function BookFormPage() {
         Object.entries(form).filter(([, v]) => v !== '' && v !== undefined)
       ) as BookFormInput
       const book = isEdit ? await updateBook(editId!, cleaned) : await createBook(cleaned)
-      if (tempCoverPath) {
+      // 仅当封面是本地临时文件（新选择的）时才上传
+      const isNewCover = tempCoverPath && !tempCoverPath.startsWith('http')
+      if (isNewCover) {
         await uploadCover(book.id, tempCoverPath)
       }
       Taro.showToast({ title: '保存成功', icon: 'success' })

@@ -1,4 +1,6 @@
-.custom-tab-bar {
+@import '@/assets/variables';
+
+.inline-tab-bar {
   position: fixed;
   bottom: 0;
   left: 0;
@@ -11,7 +13,7 @@
   border-top: 1rpx solid rgba(0, 0, 0, 0.06);
   padding: 0 20rpx;
   padding-bottom: env(safe-area-inset-bottom);
-  z-index: 9999;
+  z-index: 1000;
 
   &__item {
     display: flex;
@@ -22,11 +24,11 @@
     padding: 12rpx 0;
 
     &--active {
-      .custom-tab-bar__icon {
+      .inline-tab-bar__icon {
         opacity: 1;
         transform: scale(1.1);
       }
-      .custom-tab-bar__label {
+      .inline-tab-bar__label {
         color: $color-primary;
         opacity: 1;
       }

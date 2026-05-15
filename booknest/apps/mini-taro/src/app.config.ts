@@ -1,4 +1,5 @@
 export default defineAppConfig({
+  lazyCodeLoading: 'requiredComponents',
   pages: [
     'pages/index/index',
     'pages/categories/index',
@@ -25,7 +26,7 @@ export default defineAppConfig({
     },
     {
       root: 'sub/reading',
-      pages: ['pages/timeline/index'],
+      pages: ['pages/timeline/index', 'pages/stats/index'],
     },
   ],
   window: {

@@ -1,6 +1,8 @@
 .categories {
-  min-height: 100vh;
   background: $color-bg-secondary;
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
 
   &__header {
     display: flex;

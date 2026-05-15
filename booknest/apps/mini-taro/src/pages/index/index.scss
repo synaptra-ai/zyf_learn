@@ -78,9 +78,10 @@
 
 // ===== 页面主体 =====
 .page {
-  min-height: 100vh;
   background: $color-bg-primary;
-  padding-bottom: 200rpx;
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
 
   &__filters {
     padding: $spacing-md $spacing-lg $spacing-xl;
@@ -165,7 +166,7 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 8rpx 32rpx rgba(120, 98, 70, 0.12);
-  z-index: 99;
+  z-index: 101;
   transition: transform $transition-normal, box-shadow $transition-normal;
 
   &:active {

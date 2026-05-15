@@ -44,71 +44,79 @@ export default function DiscoverPage() {
     Taro.stopPullDownRefresh()
   })
 
-  if (loading) return <LoadingState text="发现好书中..." />
+  const renderContent = () => {
+    if (loading) return <LoadingState text="发现好书中..." />
 
-  if (!data) {
+    if (!data) {
+      return (
+        <EmptyState
+          title="暂无推荐"
+          description="添加更多书籍后获取个性化推荐"
+        />
+      )
+    }
+
+    const hasContent =
+      data.continueReading.length > 0 ||
+      data.forYou.length > 0 ||
+      data.categoryPicks.length > 0
+
+    if (!hasContent) {
+      return (
+        <EmptyState
+          title="暂无推荐"
+          description="添加更多书籍后获取个性化推荐"
+        />
+      )
+    }
+
     return (
-      <EmptyState
-        title="暂无推荐"
-        description="添加更多书籍后获取个性化推荐"
-      />
-    )
-  }
+      <>
+        <View className="discover__header">
+          <Text className="discover__title">发现</Text>
+          <Text className="discover__subtitle">根据你的阅读偏好推荐</Text>
+        </View>
 
-  const hasContent =
-    data.continueReading.length > 0 ||
-    data.forYou.length > 0 ||
-    data.categoryPicks.length > 0
+        <RecommendSection
+          title="继续阅读"
+          books={data.continueReading}
+          showProgress
+        />
 
-  if (!hasContent) {
-    return (
-      <EmptyState
-        title="暂无推荐"
-        description="添加更多书籍后获取个性化推荐"
-      />
+        <RecommendSection title="你可能喜欢" books={data.forYou} />
+
+        {data.categoryPicks.map((pick) => (
+          <RecommendSection
+            key={pick.category.id}
+            title={`${pick.category.name}精选`}
+            books={pick.books}
+          />
+        ))}
+
+        {feedItems.length > 0 && (
+          <View className="discover__section">
+            <Text className="discover__section-title">读书圈</Text>
+            {feedItems.map((item) => {
+              let text = ''
+              if (item.type === 'ACHIEVEMENT_UNLOCKED') text = `${item.user.nickname} 解锁了成就「${item.content.name}」`
+              else if (item.type === 'BOOK_FINISHED') text = `${item.user.nickname} 读完了一本书`
+              else if (item.type === 'REVIEW_POSTED') text = `${item.user.nickname} 写了一篇书评`
+              else if (item.type === 'GOAL_MET') text = `${item.user.nickname} 达成了今日阅读目标`
+              return (
+                <View key={item.id} className="discover__feed-item">
+                  <Text className="discover__feed-text">{text}</Text>
+                </View>
+              )
+            })}
+          </View>
+        )}
+      </>
     )
   }
 
   return (
     <View className="discover">
-      <View className="discover__header">
-        <Text className="discover__title">发现</Text>
-        <Text className="discover__subtitle">根据你的阅读偏好推荐</Text>
-      </View>
-
-      <RecommendSection
-        title="继续阅读"
-        books={data.continueReading}
-        showProgress
-      />
-
-      <RecommendSection title="你可能喜欢" books={data.forYou} />
-
-      {data.categoryPicks.map((pick) => (
-        <RecommendSection
-          key={pick.category.id}
-          title={`${pick.category.name}精选`}
-          books={pick.books}
-        />
-      ))}
-
-      {feedItems.length > 0 && (
-        <View className="discover__section">
-          <Text className="discover__section-title">读书圈</Text>
-          {feedItems.map((item) => {
-            let text = ''
-            if (item.type === 'ACHIEVEMENT_UNLOCKED') text = `${item.user.nickname} 解锁了成就「${item.content.name}」`
-            else if (item.type === 'BOOK_FINISHED') text = `${item.user.nickname} 读完了一本书`
-            else if (item.type === 'REVIEW_POSTED') text = `${item.user.nickname} 写了一篇书评`
-            else if (item.type === 'GOAL_MET') text = `${item.user.nickname} 达成了今日阅读目标`
-            return (
-              <View key={item.id} className="discover__feed-item">
-                <Text className="discover__feed-text">{text}</Text>
-              </View>
-            )
-          })}
-        </View>
-      )}
+      {renderContent()}
     </View>
   )
 }

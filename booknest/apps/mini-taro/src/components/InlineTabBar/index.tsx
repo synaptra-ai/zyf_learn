@@ -10,15 +10,26 @@ const tabs = [
   { pagePath: '/pages/me/index', text: '我的', icon: '🪶' },
 ]
 
-export default function CustomTabBar() {
+export function InlineTabBar() {
   const [selected, setSelected] = useState(() => {
     const pages = Taro.getCurrentPages()
     const current = pages[pages.length - 1]
     if (current) {
-      const idx = tabs.findIndex((t) => t.pagePath === `/${current.route}`)
+      const path = '/' + current.route
+      const idx = tabs.findIndex((t) => t.pagePath === path)
       if (idx >= 0) return idx
     }
     return 0
+  })
+
+  Taro.useDidShow(() => {
+    const pages = Taro.getCurrentPages()
+    const current = pages[pages.length - 1]
+    if (current) {
+      const path = '/' + current.route
+      const idx = tabs.findIndex((t) => t.pagePath === path)
+      if (idx >= 0) setSelected(idx)
+    }
   })
 
   const handleSwitch = (index: number) => {
@@ -27,15 +38,15 @@ export default function CustomTabBar() {
   }
 
   return (
-    <View className="custom-tab-bar">
+    <View className="inline-tab-bar">
       {tabs.map((tab, index) => (
         <View
           key={tab.pagePath}
-          className={`custom-tab-bar__item ${selected === index ? 'custom-tab-bar__item--active' : ''}`}
+          className={`inline-tab-bar__item ${selected === index ? 'inline-tab-bar__item--active' : ''}`}
           onClick={() => handleSwitch(index)}
         >
-          <Text className="custom-tab-bar__icon">{tab.icon}</Text>
-          <Text className="custom-tab-bar__label">{tab.text}</Text>
+          <Text className="inline-tab-bar__icon">{tab.icon}</Text>
+          <Text className="inline-tab-bar__label">{tab.text}</Text>
         </View>
       ))}
     </View>

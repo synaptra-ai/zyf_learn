@@ -66,7 +66,11 @@ export default function CategoriesPage() {
     })
   }
 
-  if (loading) return <LoadingState text="加载中..." />
+  if (loading) return (
+    <View className="categories">
+      <LoadingState text="加载中..." />
+    </View>
+  )
 
   return (
     <View className="categories">
@@ -122,6 +126,7 @@ export default function CategoriesPage() {
       ) : (
         <EmptyState title="暂无分类" description="点击上方「+ 添加」创建分类" />
       )}
+
     </View>
   )
 }

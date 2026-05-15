@@ -45,7 +45,7 @@ export default defineConfig(async (merge) => {
       },
       webpackChain(chain) {
         chain.optimization.concatenateModules(false)
-        chain.optimization.minimize(true)
+        chain.optimization.minimize(false)
       },
       postcss: {
         pxtransform: { enable: true, config: {} },

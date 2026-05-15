@@ -7,7 +7,7 @@ export const socialService = {
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { nickname: true, email: true },
+      select: { name: true, email: true },
     })
 
     const booksFinished = await prisma.book.count({
@@ -47,7 +47,7 @@ export const socialService = {
     const period = `${now.getFullYear()}年${now.getMonth() + 1}月`
 
     return {
-      user: { nickname: user?.nickname || user?.email || '读者' },
+      user: { nickname: user?.name || user?.email || '读者' },
       booksFinished,
       totalMinutes,
       streakDays: latestSummary?.streakDays || 0,
@@ -74,7 +74,7 @@ export const socialService = {
       prisma.activityFeedItem.findMany({
         where,
         include: {
-          user: { select: { nickname: true, email: true } },
+          user: { select: { name: true, email: true } },
         },
         orderBy: { createdAt: 'desc' },
         skip: (page - 1) * pageSize,
@@ -88,7 +88,7 @@ export const socialService = {
         id: item.id,
         type: item.type,
         content: JSON.parse(item.content),
-        user: { nickname: item.user.nickname || item.user.email },
+        user: { nickname: item.user.name || item.user.email },
         createdAt: item.createdAt.toISOString(),
       })),
       total,

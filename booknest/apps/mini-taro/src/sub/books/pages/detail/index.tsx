@@ -5,6 +5,7 @@ import { StatusBadge } from '@/components/StatusBadge'
 import { LoadingState } from '@/components/LoadingState'
 import { getBook, deleteBook } from '@/services/books'
 import { listReviews, createReview, type Review } from '@/services/reviews'
+import { listNotes, createNote, deleteNote, type Note } from '@/services/notes'
 import { toggleReviewLike } from '@/services/review-like'
 import { listWorkspaces } from '@/services/workspaces'
 import { useAuthStore } from '@/stores/auth-store'
@@ -32,6 +33,16 @@ export default function BookDetailPage() {
   const [submittingReview, setSubmittingReview] = useState(false)
   const [similarBooks, setSimilarBooks] = useState<RecommendBook[]>([])
 
+  // 笔记
+  const [notes, setNotes] = useState<Note[]>([])
+  const [noteText, setNoteText] = useState('')
+  const [notePage, setNotePage] = useState('')
+  const [showNoteForm, setShowNoteForm] = useState(false)
+
+  const fetchNotes = () => {
+    if (id) listNotes(id).then(setNotes).catch(() => {})
+  }
+
   const loadData = async () => {
     try {
       const [bookData, reviewData] = await Promise.all([
@@ -41,6 +52,7 @@ export default function BookDetailPage() {
       setBook(bookData)
       setReviews(reviewData as Review[])
       getSimilarBooks(id).then((res) => setSimilarBooks(res.items)).catch(() => {})
+      fetchNotes()
     } catch {} finally {
       setLoading(false)
     }
@@ -194,6 +206,76 @@ export default function BookDetailPage() {
               <Text className="detail__review-submit-text">{submittingReview ? '提交中...' : '发表评论'}</Text>
             </View>
           </View>
+        )}
+      </View>
+
+      {/* 读书笔记 */}
+      <View className="detail__section">
+        <View className="detail__section-header">
+          <Text className="detail__section-title">读书笔记 ({notes.length})</Text>
+          <Text className="detail__add-btn" onClick={() => setShowNoteForm(!showNoteForm)}>
+            {showNoteForm ? '取消' : '+ 添加笔记'}
+          </Text>
+        </View>
+
+        {showNoteForm && (
+          <View className="detail__note-form">
+            <Textarea
+              className="detail__note-input"
+              placeholder="写下你的读书笔记..."
+              value={noteText}
+              onInput={(e) => setNoteText(e.detail.value)}
+              maxlength={500}
+            />
+            <View className="detail__note-form-row">
+              <Input
+                className="detail__note-page-input"
+                type="number"
+                placeholder="页码（可选）"
+                value={notePage}
+                onInput={(e) => setNotePage(e.detail.value)}
+              />
+              <View className="detail__note-submit" onClick={async () => {
+                if (!noteText.trim()) return Taro.showToast({ title: '请输入笔记内容', icon: 'none' })
+                try {
+                  await createNote({
+                    bookId: id,
+                    content: noteText.trim(),
+                    pageNumber: notePage ? Number(notePage) : undefined,
+                  })
+                  setNoteText('')
+                  setNotePage('')
+                  setShowNoteForm(false)
+                  fetchNotes()
+                } catch {}
+              }}>
+                <Text className="detail__note-submit-text">保存</Text>
+              </View>
+            </View>
+          </View>
+        )}
+
+        {notes.map((note) => (
+          <View key={note.id} className="detail__note-item">
+            <View className="detail__note-content">
+              <Text>{note.content}</Text>
+              {note.pageNumber && <Text className="detail__note-page">P.{note.pageNumber}</Text>}
+            </View>
+            <Text className="detail__note-delete" onClick={() => {
+              Taro.showModal({
+                title: '确认删除',
+                content: '删除这条笔记？',
+                success: async (res) => {
+                  if (!res.confirm) return
+                  try { await deleteNote(note.id); fetchNotes() } catch {}
+                },
+              })
+            }}>删除</Text>
+          </View>
+        ))}
+
+        {notes.length === 0 && !showNoteForm && (
+          <Text className="detail__empty-text">还没有笔记，点击上方添加</Text>
         )}
       </View>
 

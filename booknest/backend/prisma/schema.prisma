@@ -85,6 +85,7 @@ model User {
   achievements        UserAchievement[]
   feedItems           ActivityFeedItem[]
   reviewLikes         ReviewLike[]
+  notes               Note[]
 
   @@map("users")
 }
@@ -110,6 +111,7 @@ model Workspace {
   readingGoals       ReadingGoal[]
   achievements        UserAchievement[]
   feedItems           ActivityFeedItem[]
+  notes               Note[]
 
   @@map("workspaces")
 }
@@ -193,6 +195,7 @@ model Book {
   category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   reviews    Review[]
   readingSessions ReadingSession[]
+  notes      Note[]
   readingProgress    Int       @default(0) @map("reading_progress")
   lastReadAt         DateTime? @map("last_read_at") @db.Date
   totalReadingMinutes Int      @default(0) @map("total_reading_minutes")
@@ -500,4 +503,24 @@ model ReviewLike {
 
   @@unique([userId, reviewId])
   @@map("review_likes")
+}
+
+model Note {
+  id         String   @id @default(cuid())
+  content    String   @db.Text
+  pageNumber Int?     @map("page_number")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  userId      String @map("user_id")
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  bookId      String @map("book_id")
+  book        Book   @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  workspaceId String    @map("workspace_id")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([bookId, createdAt])
+  @@map("notes")
 }

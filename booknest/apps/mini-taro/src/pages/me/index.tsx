@@ -126,6 +126,13 @@ export default function MePage() {
         </View>
         <View
           className="me__menu-item"
+          onClick={() => Taro.navigateTo({ url: '/sub/reading/pages/stats/index' })}
+        >
+          <Text className="me__menu-text">阅读统计</Text>
+          <Text className="me__menu-arrow">›</Text>
+        </View>
+        <View
+          className="me__menu-item"
           onClick={() => Taro.navigateTo({ url: '/sub/activities/pages/list/index' })}
         >
           <Text className="me__menu-text">读书会活动</Text>
@@ -151,6 +158,7 @@ export default function MePage() {
           <Text className="me__menu-arrow">›</Text>
         </View>
       </View>
+
     </View>
   )
 }
