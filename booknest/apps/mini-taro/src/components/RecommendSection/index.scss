@@ -32,9 +32,9 @@
     position: relative;
     width: 180rpx;
     height: 240rpx;
-    border-radius: $radius-md;
+    border-radius: 16rpx;
     overflow: hidden;
-    background: $color-surface;
+    background: $color-bg-card;
   }
 
   &__cover {
@@ -45,7 +45,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: $color-border;
+      background: $color-bg-tertiary;
     }
 
     &-text {

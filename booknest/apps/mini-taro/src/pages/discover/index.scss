@@ -2,12 +2,12 @@
 
 .discover {
   min-height: 100vh;
-  background: $color-bg;
+  background: $color-bg-primary;
   padding-bottom: calc(180rpx + env(safe-area-inset-bottom));
 
   &__header {
     padding: $spacing-xl $spacing-lg $spacing-md;
-    background: $color-surface;
+    background: $color-bg-card;
   }
 
   &__title {
