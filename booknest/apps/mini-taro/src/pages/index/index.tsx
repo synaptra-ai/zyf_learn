@@ -10,6 +10,8 @@ import { listBooks } from '@/services/books'
 import { listCategories } from '@/services/categories'
 import { getReadingSummary } from '@/services/reading'
 import type { ReadingSummary } from '@/services/reading'
+import { getHomepageRecommendations, type RecommendBook } from '@/services/recommendation'
+import { RecommendSection } from '@/components/RecommendSection'
 import { useAuthStore } from '@/stores/auth-store'
 import { useWorkspaceStore } from '@/stores/workspace-store'
 import { listWorkspaces } from '@/services/workspaces'
@@ -70,6 +72,7 @@ export default function IndexPage() {
 
   const [readingSummary, setReadingSummary] = useState<ReadingSummary | null>(null)
   const [showTimer, setShowTimer] = useState(false)
+  const [recommendations, setRecommendations] = useState<RecommendBook[]>([])
 
   const [workspaces, setWorkspaces] = useState<any[]>([])
 
@@ -134,14 +137,25 @@ export default function IndexPage() {
     getReadingSummary().then(setReadingSummary).catch(() => {})
   }, [activeWorkspaceId])
 
+  useEffect(() => {
+    if (!activeWorkspaceId) return
+    fetchRecommendations()
+  }, [activeWorkspaceId])
+
   const refreshReading = () => {
     if (!activeWorkspaceId) return
     getReadingSummary().then(setReadingSummary).catch(() => {})
   }
 
+  const fetchRecommendations = () => {
+    if (!activeWorkspaceId) return
+    getHomepageRecommendations().then((res) => setRecommendations(res.items)).catch(() => {})
+  }
+
   usePullDownRefresh(async () => {
     setPage(1)
     refreshReading()
+    fetchRecommendations()
     await fetchBooks(true)
     Taro.stopPullDownRefresh()
   })
@@ -219,6 +233,10 @@ export default function IndexPage() {
         onClose={() => setShowTimer(false)}
         onComplete={() => { refreshReading(); fetchBooks(true) }}
       />
+
+      {recommendations.length > 0 && (
+        <RecommendSection title="为你推荐" books={recommendations} />
+      )}
 
       <View className="page__filters">
         <Input

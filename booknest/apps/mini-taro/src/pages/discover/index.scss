@@ -1,0 +1,26 @@
+@import '@/assets/variables';
+
+.discover {
+  min-height: 100vh;
+  background: $color-bg;
+  padding-bottom: calc(180rpx + env(safe-area-inset-bottom));
+
+  &__header {
+    padding: $spacing-xl $spacing-lg $spacing-md;
+    background: $color-surface;
+  }
+
+  &__title {
+    font-size: $font-size-xxl;
+    font-weight: 600;
+    color: $color-text-primary;
+    display: block;
+  }
+
+  &__subtitle {
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    margin-top: $spacing-xs;
+    display: block;
+  }
+}

@@ -2,6 +2,7 @@ export default defineAppConfig({
   pages: [
     'pages/index/index',
     'pages/categories/index',
+    'pages/discover/index',
     'pages/me/index',
     'pages/login/index',
   ],
@@ -42,6 +43,7 @@ export default defineAppConfig({
     list: [
       { pagePath: 'pages/index/index', text: '书架' },
       { pagePath: 'pages/categories/index', text: '分类' },
+      { pagePath: 'pages/discover/index', text: '发现' },
       { pagePath: 'pages/me/index', text: '我的' },
     ],
   },

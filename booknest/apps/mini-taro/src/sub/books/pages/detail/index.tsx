@@ -9,6 +9,8 @@ import { listWorkspaces } from '@/services/workspaces'
 import { useAuthStore } from '@/stores/auth-store'
 import { useWorkspaceStore } from '@/stores/workspace-store'
 import { canEditBook, canDeleteBook } from '@/utils/permissions'
+import { getSimilarBooks, type RecommendBook } from '@/services/recommendation'
+import { RecommendSection } from '@/components/RecommendSection'
 import type { Book } from '@booknest/domain'
 import './index.scss'
 
@@ -27,6 +29,7 @@ export default function BookDetailPage() {
   const [rating, setRating] = useState(5)
   const [comment, setComment] = useState('')
   const [submittingReview, setSubmittingReview] = useState(false)
+  const [similarBooks, setSimilarBooks] = useState<RecommendBook[]>([])
 
   const loadData = async () => {
     try {
@@ -36,6 +39,7 @@ export default function BookDetailPage() {
       ])
       setBook(bookData)
       setReviews(reviewData as Review[])
+      getSimilarBooks(id).then((res) => setSimilarBooks(res.items)).catch(() => {})
     } catch {} finally {
       setLoading(false)
     }
@@ -202,6 +206,13 @@ export default function BookDetailPage() {
               <Text className="detail__btn-text">删除</Text>
             </View>
           )}
+        </View>
+      )}
+
+      {similarBooks.length > 0 && (
+        <View className="detail__section">
+          <Text className="detail__section-title">相关推荐</Text>
+          <RecommendSection title="" books={similarBooks} />
         </View>
       )}
     </View>

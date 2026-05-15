@@ -6,6 +6,7 @@ import './index.scss'
 const tabs = [
   { pagePath: '/pages/index/index', text: '书架', icon: '📖' },
   { pagePath: '/pages/categories/index', text: '分类', icon: '🗂' },
+  { pagePath: '/pages/discover/index', text: '发现', icon: '🧭' },
   { pagePath: '/pages/me/index', text: '我的', icon: '🪶' },
 ]
 
