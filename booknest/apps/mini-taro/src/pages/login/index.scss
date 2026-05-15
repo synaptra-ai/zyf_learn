@@ -45,6 +45,27 @@
     box-sizing: border-box;
   }
 
+  &__remember {
+    display: flex;
+    align-items: center;
+    gap: 8rpx;
+    margin-bottom: $spacing-sm;
+  }
+
+  &__checkbox {
+    font-size: 36rpx;
+    color: $color-text-muted;
+
+    &--checked {
+      color: $color-primary;
+    }
+  }
+
+  &__remember-text {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+  }
+
   &__btn {
     margin-top: $spacing-xl;
     height: 88rpx;

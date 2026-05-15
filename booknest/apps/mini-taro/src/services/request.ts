@@ -49,6 +49,9 @@ export async function request<T, TBody = unknown>(options: RequestOptions<TBody>
     })
 
     if (res.statusCode === 401) {
+      if (options.auth === false) {
+        throw new Error(res.data?.message || '邮箱或密码错误')
+      }
       useAuthStore.getState().logout()
       Taro.navigateTo({ url: `/pages/login/index?redirect=${encodeURIComponent(getCurrentPath())}` })
       throw new Error('登录已失效，请重新登录')
